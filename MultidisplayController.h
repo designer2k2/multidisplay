@@ -32,10 +32,10 @@ public:
 	MultidisplayController();
 	virtual ~MultidisplayController();
 
-    int SerOut;
-    int DoCal;
-    int DoTypK;
-    int DoCheck;
+	uint8_t SerOut;
+    uint8_t DoCal;
+    uint8_t DoTypK;
+    uint8_t DoCheck;
 
 
 	void mainLoop();
@@ -73,7 +73,7 @@ private:
 
 
 
-	int read_adc(int channel);
+	int read_adc(uint8_t channel);
 	void expanderWrite(byte _data);
 	byte expanderRead();
 	void expanderWrite2(byte _data);

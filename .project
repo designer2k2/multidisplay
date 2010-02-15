@@ -3,6 +3,7 @@
 	<name>multidisplay</name>
 	<comment></comment>
 	<projects>
+		<project>arduinoDuemilanoveCoreLib</project>
 		<project>arduinoDuemilanoveCore</project>
 	</projects>
 	<buildSpec>

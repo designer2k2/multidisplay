@@ -175,10 +175,10 @@ MultidisplayController::~MultidisplayController() {
 
 
 //http://www.arduino.cc/playground/Code/MCP3208
-int MultidisplayController::read_adc(int channel){
+int MultidisplayController::read_adc(uint8_t channel){
 	int adcvalue = 0;
 	byte commandbits = B11000000; //command bits - start, mode, chn (3), dont care (3)
-	int Chan = channel;  //Save the channel, to make it possible to deselect the MCP later.
+	uint8_t savedChannel = channel;  //Save the channel, to make it possible to deselect the MCP later.
 
 	//choose the right MCP3208, depending on number to read.
 	if(channel>8) 	{
@@ -197,7 +197,7 @@ int MultidisplayController::read_adc(int channel){
 	expanderWrite2(IOport2); //Select ADC
 
 	// setup bits to be written
-	for (int i=7; i>=3; i--){
+	for (int i=7 ; i>=3 ; i--){
 		digitalWrite(DATAOUT,commandbits&1<<i);
 		//cycle clock
 		digitalWrite(SPICLOCK,HIGH);
@@ -210,7 +210,7 @@ int MultidisplayController::read_adc(int channel){
 	digitalWrite(SPICLOCK,LOW);
 
 	//read bits from adc
-	for (int i=11; i>=0; i--){
+	for (int i=11 ; i>=0 ; i--){
 		adcvalue+=digitalRead(DATAIN)<<i;
 		//cycle clock
 		digitalWrite(SPICLOCK,HIGH);
@@ -218,7 +218,7 @@ int MultidisplayController::read_adc(int channel){
 	}
 
 	//Deselct the MCP
-	if(Chan>8) 	{
+	if(savedChannel > 8) 	{
 		//Channels 9-16 on second MCP3208
 		IOport2 = IOport2 | B10000010;     //Sets the Selection Pin for MCP 2
 	} 	else 	{
@@ -312,10 +312,6 @@ void MultidisplayController::AnaConversion()
 		SaveMax(2);
 	}
 
-
-#if RPMShiftLight
-	Shiftlight();
-#endif //RPMShiftLight
 
 	//Battery Voltage: (Directly from the Arduino!, so only 1024, not 4096.)
 	//measured Voltage * 4,09 + 0,7V should give the supply voltage
@@ -660,13 +656,17 @@ void MultidisplayController::mainLoop() {
 	time = millis();
 
 	//Read in all Analog values:
-	for(int i = 1; i <=16;i++) {
+	for(uint8_t i = 1; i <=16;i++) {
 		sdata.anaIn[i] = read_adc(i);
 	}
 
 	//Calibrate them:
 	if(DoCal == 1) {
 		AnaConversion();
+
+#if RPMShiftLight
+		Shiftlight();
+#endif //RPMShiftLight
 	}
 
 	//Check for Limits:

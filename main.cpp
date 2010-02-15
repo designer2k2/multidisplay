@@ -27,7 +27,7 @@
 #include <Wire.h>              //to get the I2C working.
 #include "HardwareSerial.h"
 
-#include "MultiDisplayController.h"
+#include "MultidisplayController.h"
 
 
 int debug = 0;
