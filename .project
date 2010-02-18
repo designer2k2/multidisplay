@@ -3,7 +3,6 @@
 	<name>multidisplay</name>
 	<comment></comment>
 	<projects>
-		<project>arduinoDuemilanoveCoreLib</project>
 		<project>arduinoDuemilanoveCore</project>
 	</projects>
 	<buildSpec>
@@ -33,7 +32,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${workspace_loc:/multidisplay/Debug}</value>
+					<value>${workspace_loc:/multidisplay/Release}</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>

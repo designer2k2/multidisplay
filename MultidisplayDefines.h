@@ -120,4 +120,10 @@ typedef unsigned char byte;
 #define SCREENA 1
 #define SCREENB 2
 
+#define SCOPE_BOOST 1
+#define SCOPE_LMM 2
+#define SCOPE_RPM 3
+#define SCOPE_THROTTLE 4
+#define SCOPE_LAMBDA 5
+
 #endif /* MULTIDISPLAY_DEFINES_H_ */

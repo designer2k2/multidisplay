@@ -57,6 +57,11 @@ public:
         this->ScreenSave = ScreenSave;
     }
 
+    //FIXME temp hack
+    UserInterface* getUiP ();
+    //FIXME
+    SensorData sdata;
+
 private:
     static const unsigned int PROGMEM tempTypK[];
     static const unsigned int PROGMEM tempVDOPressure[];
@@ -64,7 +69,6 @@ private:
     uint8_t IOport2;
     TwoWire wire;
     UserInterface ui;
-    SensorData sdata;
     unsigned long FlashETimeU;
     unsigned long FlashTimeU;
     unsigned long ScreenSave;
@@ -90,5 +94,7 @@ private:
 	void CheckLimits();
 	void SaveMax(int Num);
 };
+
+extern MultidisplayController mController;
 
 #endif /* MULTIDISPLAYCONTROLLER_H_ */

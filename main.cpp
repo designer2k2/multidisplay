@@ -46,10 +46,10 @@ ToDo:
 */
 
 
+MultidisplayController mController = MultidisplayController();
+LCDController lcdController = LCDController();
 
 int main(void) {
-	MultidisplayController mController = MultidisplayController();
-
 
 	for (;;) {
 		mController.mainLoop();
@@ -57,3 +57,5 @@ int main(void) {
 	// we arent allowed to return from this main function!
 }
 
+
+//-T /usr/lib/binutils/avr/2.19.1/ldscripts/avr5.x

@@ -152,16 +152,16 @@ MultidisplayController::MultidisplayController() {
 	Serial.println("MultiDisplay PRE!");
 
 	//Read the Values from the EEPROM back
-	ui.setActiveScreen(EEPROM.read(100));        //what screen was last shown?
+	lcdController.activeScreen = EEPROM.read(100);        //what screen was last shown?
 
-	ui.setBrightness (EEPROM.read(105));    //The Brightness from the LCD
+	lcdController.setBrightness (EEPROM.read(105));    //The Brightness from the LCD
 	sdata.ldCalPoint = EEPROM.read(205);
 	sdata.calLd = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
 
-	ui.lcdShowIntro(INITTIME);                      //Shows the Into
+	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
 
 
-	ui.screenInit();
+	lcdController.init();
 
 
 	//Init the Buttons:
@@ -578,7 +578,7 @@ void MultidisplayController::FetchTypK()  {
 //This checks certain values if they exceed limits or not, if so an alarm is triggered
 void MultidisplayController::CheckLimits()
 {
-	int Brightness = ui.getBrightness();
+	int Brightness = lcdController.brightness;
 	int FlashTrigger=0;
 
 	/*
@@ -619,15 +619,15 @@ void MultidisplayController::CheckLimits()
 			}
 
 			FlashTimeU = millis() + FLASH_TIME;      //And save the Next Changetime
-			ui.setBrightness(Brightness);              //And set the Brightness
+			lcdController.setBrightness(Brightness);              //And set the Brightness
 		}
 	}
 	else {
 		//?!?
 		Brightness = EEPROM.read(105);           //Set back the Brightness
-		ui.setBrightness(Brightness);              //And set the Brightness
+		lcdController.setBrightness(Brightness);              //And set the Brightness
 	}
-	ui.setBrightness(Brightness);
+	lcdController.setBrightness(Brightness);
 
 }
 
@@ -679,7 +679,7 @@ void MultidisplayController::mainLoop() {
 	SerialPrint();
 
 	// ui knows what screen is active and draws it!
-	ui.screenDraw();
+	lcdController.draw();
 
 	//My own Button Check Function
 
@@ -689,7 +689,7 @@ void MultidisplayController::mainLoop() {
 
 	if(millis()>= ScreenSave) {
 		//and now save it:
-		EEPROM.write(100,ui.getActiveScreen());
+		EEPROM.write(100, lcdController.activeScreen);
 		//And also prevent a double save!
 		ScreenSave = 429400000;        // (thats close to 50days of runtime...)
 	}
@@ -714,4 +714,6 @@ void MultidisplayController::mainLoop() {
 }
 
 
-
+UserInterface* MultidisplayController::getUiP () {
+	return &ui;
+}
