@@ -52,42 +52,42 @@ void LCDScreen3::customDraw()  {
 
 	//First, show the Bars on the last 10 Chars:
 
-	int boostMapped  = map(mController.sdata.anaIn[BOOSTPIN], 0, 4096, 0, 100);
+	int boostMapped  = map(data.anaIn[BOOSTPIN], 0, 4096, 0, 100);
 	boostMapped = constrain(boostMapped, 0, 100);
-	int rpmMapped = map(mController.sdata.anaIn[RPMPIN], 0, RPMMAX, 0, 100);
+	int rpmMapped = map(data.anaIn[RPMPIN], 0, RPMMAX, 0, 100);
 	rpmMapped = constrain(rpmMapped, 0, 100);
 
 	//Print the Values:
 
 
 	lcdp->commandWrite(0x80+5);
-	lcdp->printIn(itoa(mController.sdata.calLambda, buf, 10));
+	lcdp->printIn(itoa(data.calLambda, buf, 10));
 	lcdp->print(32);
 	lcdp->commandWrite(0xC0+4);
 
-	if(mController.sdata.calBoost<0.0) {
+	if(data.calBoost<0.0) {
 		lcdp->printIn("-");
 	} else {
 		lcdp->printIn(" ");
 	}
-	lcdController.printfloat(abs(mController.sdata.calBoost),2);              //Shows current Boost
+	lcdController.printfloat(abs(data.calBoost),2);              //Shows current Boost
 
 	lcdp->print(32);
 	lcdp->commandWrite(0x94+5);
-	lcdp->printIn(itoa(mController.sdata.calThrottle, buf, 10));
+	lcdp->printIn(itoa(data.calThrottle, buf, 10));
 	lcdp->print(32);
 	lcdp->commandWrite(0xD4+5);
-	lcdp->printIn(itoa((mController.sdata.calRPM/10)*10, buf, 10));    //gets rid of the last 10, thats not needed.
+	lcdp->printIn(itoa((data.calRPM/10)*10, buf, 10));    //gets rid of the last 10, thats not needed.
 	lcdp->print(32);
 
 
 	//Now lets make the Bars:
 	lcdp->commandWrite(0x80+10);
-	lcdController.drawBar(10,mController.sdata.calLambda/2);
+	lcdController.drawBar(10,data.calLambda/2);
 	lcdp->commandWrite(0xC0+10);
 	lcdController.drawBar(10,boostMapped);
 	lcdp->commandWrite(0x94+10);
-	lcdController.drawBar(10,mController.sdata.calThrottle);
+	lcdController.drawBar(10,data.calThrottle);
 	lcdp->commandWrite(0xD4+10);
 	lcdController.drawBar(10,rpmMapped);
 }

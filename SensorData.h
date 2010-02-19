@@ -66,4 +66,6 @@ public:
 
 };
 
+extern SensorData data;
+
 #endif

@@ -17,6 +17,8 @@
     along with Multidisplay.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+
 #include "wiring.h"
 
 #include "MultidisplayDefines.h"
@@ -100,7 +102,7 @@ void LCDController::toggleScreen () {
 char LCDController::bn12[]={255,1,255,0, 1,255,254,0, 1,3,255,0, 1,3,255,0, 255,2,2,0, 255,3,1,0, 255,3,1,0, 1,1,255,0, 255,3,255,0, 255,3,255,0};
 char LCDController::bn22[]={255,2,255,0, 2,255,2,0,   255,2,2,0, 2,2,255,0, 254,255,254,0, 2,2,255,0,   255,2,255,0, 254,255,254,0, 255,2,255,0, 254,254,255,0};
 // Array index into parts of big numbers. Numbers consist of 12 custom characters in 4 lines
-//              0               1            2              3                4             5             6              7              8              9
+//              			0               1            2              3                4             5             6              7              8              9
 char LCDController::bn14[]={1,2,3,0,       2,3,254,0,     1,2,3,0,       1,2,3,0,       2,254,254,0,   2,2,2,0,       1,2,3,0,       2,2,2,0,       1,2,3,0,       1,2,3,0};
 char LCDController::bn24[]={255,254,255,0, 254,255,254,0, 1,2,255,0,     254,2,255,0,   255,2,2,0,     255,2,2,0,     255,2,3,0,     254,2,255,0,   255,2,255,0,   255,254,255,0};
 char LCDController::bn34[]={255,254,255,0, 254,255,254,0, 255,254,254,0, 254,254,255,0, 254,255,254,0, 254,254,255,0, 255,254,255,0, 254,255,254,0, 255,254,255,0, 4,6,255,0};
@@ -156,30 +158,27 @@ void LCDController::cgramBigFont4() {
 
 //-------------------------------------------------------------------------------------------------------
 
-void LCDController::printOneNumber2(uint8_t digit, uint8_t leftAdjust, int LineOffset)
-{
+void LCDController::printOneNumber2(uint8_t digit, uint8_t leftAdjust, int LineOffset) {
 	// LineOffset = 0, means 1 Line, LineOffset = 20 means 2 Line.
 	// leftAdjust = 0, means 1 Pos, leftAdjust = 1 is second Pos.
 
 	// Line 1 of the one digit number
 	lcdp->commandWrite(0x80+LineOffset+leftAdjust*3+1*leftAdjust);                  //Line1
 
-	lcdp->print(bn12[digit*3+digit*1]);
-	lcdp->print(bn12[digit*3+1+digit*1]);
-	lcdp->print(bn12[digit*3+2+digit*1]);
+	lcdp->print (bn12[digit*3+digit*1]);
+	lcdp->print (bn12[digit*3+1+digit*1]);
+	lcdp->print (bn12[digit*3+2+digit*1]);
 
 	// Line 2 of the one-digit number
 	lcdp->commandWrite(0xC0+LineOffset+leftAdjust*3+1*leftAdjust);              // Line 2
 	lcdp->print(bn22[digit*3+digit*1]);
 	lcdp->print(bn22[digit*3+1+digit*1]);
 	lcdp->print(bn22[digit*3+2+digit*1]);
-
 }
 
 //-------------------------------------------------------------------------------------------------------
 
-void LCDController::printOneNumber4(uint8_t digit, uint8_t leftAdjust)
-{
+void LCDController::printOneNumber4(uint8_t digit, uint8_t leftAdjust) {
 	// leftAdjust = 0, means 1 Pos, leftAdjust = 1 is second Pos.
 
 	// Line 1 of the one digit number
@@ -240,11 +239,11 @@ void LCDController::bigNum (unsigned long t, int LineOffset, uint8_t leftAdjust,
 	}
 
 	lcdp->commandWrite(0x80+LineOffset+leftAdjust);
-	lcdp->printIn (bn12+(r[2]-'0')*4);
+	lcdp->printIn ( bn12 + (r[2]-'0')*4 );
 	lcdp->printIn_P ( PSTR(" ") );
-	lcdp->printIn (bn12+(r[4]-'0')*4);
+	lcdp->printIn (bn12 + (r[4]-'0')*4);
 	lcdp->printIn_P ( PSTR(" ") );
-	lcdp->printIn (bn12+(r[5]-'0')*4);
+	lcdp->printIn (bn12 + (r[5]-'0')*4);
 
 	lcdp->commandWrite(0xC0+LineOffset+leftAdjust);
 	lcdp->printIn(bn22+(r[2]-'0')*4);
@@ -320,128 +319,88 @@ void LCDController::bigNum4 (unsigned long t, uint8_t leftAdjust, int d){
 
 
 
-//-------------------------------------------------------------------------------------------------------
-//Displays a 4 Digit Number (RPM, Thermocouple Temp) over 2 Lines
-//only Full Digits are shown!
-//no leading 0 or commas.
-//it clears all in front
-
-void LCDController::bigNum24(int Value,int LineOffset)
-{
-
+/**
+* Displays a 4 Digit Number (RPM, Thermocouple Temp) over 2 Lines
+* only Full Digits are shown!
+* no leading 0 or commas.
+* right aligned, it clears all in front
+*/
+void LCDController::bigNum24(int Value,int LineOffset) {
 	//how many digits?
+	uint8_t Dig = 1;
 
-	int Dig;
-
-	if(Value>=999)
-	{
+	if (Value>=999) 	{
 		Dig = 4;
-	}
-	else
-	{
-		if(Value>=99)
-		{
+	} else 	{
+		if(Value>=99) {
 			Dig = 3;
-		}
-		else
-		{
+		} else {
 			if(Value>=9)
-			{
 				Dig = 2;
-			}
-			else
-			{
-				Dig = 1;
-			}
+// optimized for size :-)
+//			else {
+//				Dig = 1;
+//			}
 		}
 	}
+	//convert int to char string
+	char value_c[5];
+	snprintf(value_c, sizeof(value_c), "%d", Value);
 
-	//depending from the Digits, i need to print it different.
+	//compute array of uint8_t out of the char array
+	uint8_t value_i[4];
+    char c[2];
+    c[1] = '\0';
+    for ( uint8_t i = 0 ; i < sizeof(&value_c) ; i++ ) {
+    	c[0] = value_c[i];
+	    value_i[i] = atoi(&c[0]);
+	 }
 
-	int D1;
-	int D2;
-	int D3;
-	int D4;
+    //clear digits
+	lcdp->commandWrite(0x80+LineOffset+0);                  //Line1
+	blanks( 3 * ( 4-Dig) );
+	lcdp->commandWrite(0xC0+LineOffset+0);                  //Line1
+	blanks( 3 * ( 4-Dig) );
 
-	switch (Dig) {
-	case 1:
-		//Thats easy...
-		printOneNumber2(Value,0,LineOffset+9);
-
-		//And clear digit 1+2+3:
-		lcdp->commandWrite(0x80+LineOffset+0);                  //Line1
-		blanks3();
-		blanks3();
-		blanks3();
-
-		lcdp->commandWrite(0xC0+LineOffset+0);                  //Line1
-		blanks3();
-		blanks3();
-		blanks3();
-
-		break;
-	case 2:
-		//Not so easy anymore.
-		D2 = abs(Value/10);  //First Value
-		D1 = Value - D2*10;     //Last Value
-
-		printOneNumber2(D2,0,LineOffset+6);
-		printOneNumber2(D1,0,LineOffset+9);
-
-		//And clear digit 1+2:
-		lcdp->commandWrite(0x80+LineOffset+0);                  //Line1
-		blanks3();
-		blanks3();
-
-
-		lcdp->commandWrite(0xC0+LineOffset+0);                  //Line1
-		blanks3();
-		blanks3();
-
-		break;
-	case 3:
-		//Not so easy anymore.
-		D3 = abs(Value/100);  //First Value
-		D2 = abs((Value - D3*100)/10);
-		D1 = abs((Value - D3*100 - D2*10));     //Last Value
-
-		printOneNumber2(D3,0,LineOffset+3);
-		printOneNumber2(D2,0,LineOffset+6);
-		printOneNumber2(D1,0,LineOffset+9);
-
-		//And clear digit 1:
-		lcdp->commandWrite(0x80+LineOffset+0);                  //Line1
-		blanks3();
-
-		lcdp->commandWrite(0xC0+LineOffset+0);                  //Line1
-		blanks3();
-
-
-		break;
-	case 4:
-		//Not so easy anymore.
-		D4 = abs(Value/1000); //First Value
-		D3 = abs((Value - D4*1000)/100);
-		D2 = abs((Value - D4*1000 - D3*100)/10);
-		D1 = abs((Value - D4*1000 - D3*100 - D2*10));     //Last Value
-
-		printOneNumber2(D4,0,LineOffset+0);
-		printOneNumber2(D3,0,LineOffset+3);
-		printOneNumber2(D2,0,LineOffset+6);
-		printOneNumber2(D1,0,LineOffset+9);
-
-
-		break;
+	uint8_t rf = 4-Dig;
+	for ( uint8_t i = 0 ; i < Dig ; i++ ) {
+		printOneNumber2(value_i[i], 0,LineOffset + 3*rf );
+		rf++;
 	}
-
-
+//	switch (Dig) {
+//	case 1:
+//		//Thats easy...
+//
+//		printOneNumber2(Value,0,LineOffset+9);
+//
+//		break;
+//	case 2:
+//		//First Value
+//		printOneNumber2(value_i[0], 0, LineOffset+6);
+//		//Last Value
+//		printOneNumber2(value_i[1],0,LineOffset+9);
+//
+//		break;
+//	case 3:
+//		//First Value
+//		printOneNumber2(value_i[0], 0, LineOffset+3);
+//		printOneNumber2(value_i[1], 0, LineOffset+6);
+//		//Last Value
+//		printOneNumber2(value_i[2], 0, LineOffset+9);
+//
+//		break;
+//	case 4:
+//		printOneNumber2(value_i[0], 0,LineOffset+0);
+//		printOneNumber2(value_i[1], 0,LineOffset+3);
+//		printOneNumber2(value_i[2], 0,LineOffset+6);
+//		printOneNumber2(value_i[3], 0,LineOffset+9);
+//		break;
+//	}
 }
 
-void LCDController::blanks3()
-{
-	lcdp->print(254);
-	lcdp->print(254);
-	lcdp->print(254);
+void LCDController::blanks(uint8_t c) {
+	for ( uint8_t i = 0 ; i < c ; i++ )
+		lcdp->print(254);
 }
 
 

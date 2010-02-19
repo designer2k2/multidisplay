@@ -27,12 +27,6 @@
 #include <EEPROM.h>
 
 UserInterface::UserInterface()  {
-        sdataP = NULL;
-}
-
-UserInterface::UserInterface(SensorData* p, MultidisplayController* c) {
-        sdataP = p;
-
         buttonInt = 0;     //Button state
         buttonTime = 0;   //Button time
 }
@@ -51,7 +45,7 @@ UserInterface::~UserInterface() {
 void UserInterface::buttonAHold() {
 	lcdController.toggleScreen();
 	//Set the Timestamp for the Save:
-	mController.setScreenSave ( millis() + SCREENSAVEDELAY );
+	mController.ScreenSave = millis() + SCREENSAVEDELAY;
 }
 
 //-------------------------------------------------------------------------------------------------------

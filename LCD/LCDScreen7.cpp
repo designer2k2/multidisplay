@@ -60,19 +60,19 @@ void LCDScreen7::customDraw() {
 
 	switch(flags.f.mode){
 	case SCOPE_BOOST:
-		ScopeVal = mController.sdata.anaIn[BOOSTPIN];
+		ScopeVal = data.anaIn[BOOSTPIN];
 		break;
 	case SCOPE_THROTTLE:
-		ScopeVal = mController.sdata.calThrottle;
+		ScopeVal = data.calThrottle;
 		break;
 	case SCOPE_LMM:
-		ScopeVal = mController.sdata.calLMM;
+		ScopeVal = data.calLMM;
 		break;
 	case SCOPE_RPM:
-		ScopeVal = mController.sdata.calRPM;
+		ScopeVal = data.calRPM;
 		break;
 	case SCOPE_LAMBDA:
-			ScopeVal = mController.sdata.calLambda;
+			ScopeVal = data.calLambda;
 			break;
 	default:
 		break;
@@ -107,7 +107,7 @@ void LCDScreen7::customDraw() {
 	lcdp->printIn(":");
 	lcdp->printIn(itoa(refreshCounter, buf, 10));
 
-	Serial.println(mController.getTime());
+	Serial.println(mController.time);
 }
 
 

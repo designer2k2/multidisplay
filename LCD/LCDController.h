@@ -70,7 +70,7 @@ public:
 	void bigNum (unsigned long t, int LineOffset, uint8_t leftAdjust, int d);
 	void bigNum4 (unsigned long t, uint8_t leftAdjust, int d);
 	void bigNum24(int Value,int LineOffset);
-	void blanks3();
+	void blanks(uint8_t c);
 	char* format(unsigned long num);
 
 	// Array index into parts of big numbers. Numbers consist of 6 custom characters in 2 lines

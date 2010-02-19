@@ -59,20 +59,20 @@ void LCDScreen8::customDraw()  {
 
 	lcdp->commandWrite(0xC0+3);                  //Max1LD
 
-	if(mController.sdata.maxLdE[screen8Val]<0.0)  {
+	if(data.maxLdE[screen8Val]<0.0)  {
 		lcdp->printIn("-");
 	} else {
 		lcdp->printIn(" ");
 	}
-	lcdController.printfloat(abs(mController.sdata.maxLdE[screen8Val]),2);              //Shows current Boost
+	lcdController.printfloat(abs(data.maxLdE[screen8Val]),2);              //Shows current Boost
 
 	lcdp->commandWrite(0xC0+14);                 //Max1RPM
-	lcdp->printIn(itoa(mController.sdata.maxRpmE[screen8Val], buf, 10));
+	lcdp->printIn(itoa(data.maxRpmE[screen8Val], buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0x94+4);                  //LMM
-	lcdp->printIn(itoa((mController.sdata.maxLmmE[screen8Val]), buf, 10));
+	lcdp->printIn(itoa((data.maxLmmE[screen8Val]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0x94+14);                 //Max1AGTVal
-	lcdp->printIn(itoa(mController.sdata.maxAgtValE[screen8Val], buf, 10));
+	lcdp->printIn(itoa(data.maxAgtValE[screen8Val], buf, 10));
 	lcdController.print2Blanks();
 }

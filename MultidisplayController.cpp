@@ -117,17 +117,15 @@ MultidisplayController::MultidisplayController() {
 	// TODO Auto-generated constructor stub
 	IOport2 = 0b11111111;
 	wire = TwoWire();
-	sdata = SensorData();
-	ui = UserInterface(&sdata, this);
 
 	FlashETimeU = 0;
 	FlashTimeU = 0;
 	ScreenSave = 0;
 	time = 0;
 	val3=0;
-	sdata.calLd = 0.0;          //calibration from the Boost
-	sdata.maxLd = 0;
-	sdata.maxLdt=0;               //max LD for the screen
+	data.calLd = 0.0;          //calibration from the Boost
+	data.maxLd = 0;
+	data.maxLdt=0;               //max LD for the screen
 
 	DoCheck = 1;
 
@@ -155,8 +153,8 @@ MultidisplayController::MultidisplayController() {
 	lcdController.activeScreen = EEPROM.read(100);        //what screen was last shown?
 
 	lcdController.setBrightness (EEPROM.read(105));    //The Brightness from the LCD
-	sdata.ldCalPoint = EEPROM.read(205);
-	sdata.calLd = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
+	data.ldCalPoint = EEPROM.read(205);
+	data.calLd = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
 
 	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
 
@@ -268,54 +266,54 @@ void MultidisplayController::AnaConversion()
 	//This converts all 16 Analog Values into the real deal :)
 
 	//Boost:
-	sdata.calRAWBoost = 5.0*sdata.anaIn[BOOSTPIN]/4096.0;             //only gets 0-5V
-	sdata.calRAWBoost = (sdata.calRAWBoost * 50 - 10)/100;     	//makes 0-250kPa out of it
-	sdata.calBoost = sdata.calRAWBoost - sdata.calLd;			//apply the offset (ambient pressure)
+	data.calRAWBoost = 5.0*data.anaIn[BOOSTPIN]/4096.0;             //only gets 0-5V
+	data.calRAWBoost = (data.calRAWBoost * 50 - 10)/100;     	//makes 0-250kPa out of it
+	data.calBoost = data.calRAWBoost - data.calLd;			//apply the offset (ambient pressure)
 
 	//Check if the Boost is a new Max Boost Event
-	if( sdata.calBoost >= sdata.maxLdE[1] ) 	{
+	if( data.calBoost >= data.maxLdE[1] ) 	{
 		SaveMax(1);
 	}
 
 	//Lambda:
-	sdata.calLambda = map(sdata.anaIn[LAMBDAPIN], LAMBDAMIN, LAMBDAMAX, 0, 200);    //gets about the 0-1V into 0-200 values
-	sdata.calLambda = constrain(sdata.calLambda, 0, 200);
+	data.calLambda = map(data.anaIn[LAMBDAPIN], LAMBDAMIN, LAMBDAMAX, 0, 200);    //gets about the 0-1V into 0-200 values
+	data.calLambda = constrain(data.calLambda, 0, 200);
 
 	//CaseTemp: (damped)
-	sdata.calCaseTemp = sdata.calCaseTemp*0.9 + (500.0*sdata.anaIn[CASETEMPPIN]/4096.0)*0.1;  //thats how to get °C out from a LM35 with 12Bit ADW
+	data.calCaseTemp = data.calCaseTemp*0.9 + (500.0*data.anaIn[CASETEMPPIN]/4096.0)*0.1;  //thats how to get °C out from a LM35 with 12Bit ADW
 
 	//Throttle:
-	sdata.calThrottle = map(sdata.anaIn[THROTTLEPIN], THROTTLEMIN, THROTTLEMAX, 0, 100);
-	sdata.calThrottle = constrain(sdata.calThrottle, 0, 100);
-	sdata.calThrottle = 100 - sdata.calThrottle;                 //VR6 has 5V for closed and 0V for open throttle...
+	data.calThrottle = map(data.anaIn[THROTTLEPIN], THROTTLEMIN, THROTTLEMAX, 0, 100);
+	data.calThrottle = constrain(data.calThrottle, 0, 100);
+	data.calThrottle = 100 - data.calThrottle;                 //VR6 has 5V for closed and 0V for open throttle...
 
 	//LMM:
-	sdata.calLMM = 5.0*sdata.anaIn[LMMPIN]/4096.0;		   //makes 0.0 to 5.0 Volt out of it, with VagCom this could be maped to gr Air i think
+	data.calLMM = 5.0*data.anaIn[LMMPIN]/4096.0;		   //makes 0.0 to 5.0 Volt out of it, with VagCom this could be maped to gr Air i think
 
 	//RPM
 	//(from the smoothing example)
-	sdata.rpmTotal -= sdata.rpmReadings[sdata.rpmIndex];               // subtract the last reading
-	sdata.rpmReadings[sdata.rpmIndex] = sdata.anaIn[RPMPIN];           // read from the sensor
-	sdata.rpmTotal += sdata.rpmReadings[sdata.rpmIndex];               // add the reading to the total
-	sdata.rpmIndex = (sdata.rpmIndex + 1);                       // advance to the next index
+	data.rpmTotal -= data.rpmReadings[data.rpmIndex];               // subtract the last reading
+	data.rpmReadings[data.rpmIndex] = data.anaIn[RPMPIN];           // read from the sensor
+	data.rpmTotal += data.rpmReadings[data.rpmIndex];               // add the reading to the total
+	data.rpmIndex = (data.rpmIndex + 1);                       // advance to the next index
 
-	if (sdata.rpmIndex >= RPMSMOOTH)                       // if we're at the end of the array...
+	if (data.rpmIndex >= RPMSMOOTH)                       // if we're at the end of the array...
 	{
-		sdata.rpmIndex = 0;                                  // ...wrap around to the beginning
+		data.rpmIndex = 0;                                  // ...wrap around to the beginning
 	}
 
-	sdata.rpmAverage = sdata.rpmTotal / RPMSMOOTH;               // calculate the average
-	sdata.calRPM = sdata.rpmAverage*RPMFACTOR;                   // apply the factor for calibration
+	data.rpmAverage = data.rpmTotal / RPMSMOOTH;               // calculate the average
+	data.calRPM = data.rpmAverage*RPMFACTOR;                   // apply the factor for calibration
 
 	//Check if the RPM is a new Max RPM Event
-	if ( sdata.calRPM >= sdata.maxRpmE[2] ) {
+	if ( data.calRPM >= data.maxRpmE[2] ) {
 		SaveMax(2);
 	}
 
 
 	//Battery Voltage: (Directly from the Arduino!, so only 1024, not 4096.)
 	//measured Voltage * 4,09 + 0,7V should give the supply voltage
-	sdata.batVolt = ((5.0*analogRead(BATTERYPIN)/1023.0)*4.09)+0.7;
+	data.batVolt = ((5.0*analogRead(BATTERYPIN)/1023.0)*4.09)+0.7;
 
 	//Lets do the Typ K Conversion:
 	if(DoTypK==1) 	{
@@ -324,12 +322,12 @@ void MultidisplayController::AnaConversion()
 
 	//VDO Stuff:
 
-	sdata.VDOTemp1 = GetVDOTemp(sdata.anaIn[VDOT1PIN]);
-	sdata.VDOTemp2 = GetVDOTemp(sdata.anaIn[VDOT2PIN]);
-	sdata.VDOTemp3 = GetVDOTemp(sdata.anaIn[VDOT3PIN]);
-	sdata.VDOPres1 = GetVDOPressure(sdata.anaIn[VDOP1PIN]);
-	sdata.VDOPres2 = GetVDOPressure(sdata.anaIn[VDOP2PIN]);
-	sdata.VDOPres3 = GetVDOPressure(sdata.anaIn[VDOP3PIN]);
+	data.VDOTemp1 = GetVDOTemp(data.anaIn[VDOT1PIN]);
+	data.VDOTemp2 = GetVDOTemp(data.anaIn[VDOT2PIN]);
+	data.VDOTemp3 = GetVDOTemp(data.anaIn[VDOT3PIN]);
+	data.VDOPres1 = GetVDOPressure(data.anaIn[VDOP1PIN]);
+	data.VDOPres2 = GetVDOPressure(data.anaIn[VDOP2PIN]);
+	data.VDOPres3 = GetVDOPressure(data.anaIn[VDOP3PIN]);
 
 }
 
@@ -337,11 +335,11 @@ void MultidisplayController::AnaConversion()
 void MultidisplayController::Shiftlight()
 {
 	//This sets the brightness according to the RPM
-	if(sdata.calRPM >= RPM_SHIFT_LOW && sdata.calRPM <= RPM_SHIFT_HIGH) 	{
+	if(data.calRPM >= RPM_SHIFT_LOW && data.calRPM <= RPM_SHIFT_HIGH) 	{
 		analogWrite(RPMSHIFTLIGHTPIN,RPM_LOW_BRIGHT);
-	} else if(sdata.calRPM>= RPM_SHIFT_HIGH) 	{
+	} else if(data.calRPM>= RPM_SHIFT_HIGH) 	{
 		analogWrite(RPMSHIFTLIGHTPIN,RPM_HIGH_BRIGHT);
-	} else if(sdata.calRPM< RPM_SHIFT_LOW) {
+	} else if(data.calRPM< RPM_SHIFT_LOW) {
 		analogWrite(RPMSHIFTLIGHTPIN,RPM_NO_BRIGHT);
 	}
 }
@@ -357,32 +355,32 @@ void MultidisplayController::SerialPrint() {
 		Serial.print(time);
 		Serial.print(";");
 		for(int I = 1; I <=15;I++){
-			Serial.print(sdata.anaIn[I]);
+			Serial.print(data.anaIn[I]);
 			Serial.print(";");
 		}
-		Serial.println(sdata.anaIn[16]);
+		Serial.println(data.anaIn[16]);
 		break;
 	case SERIALOUT_ENABLED:
 		//Convertet Output:
 		Serial.print(time);
 		Serial.print(";");
-		Serial.print(sdata.calRPM);
+		Serial.print(data.calRPM);
 		Serial.print(";");
-		Serial.print(sdata.calBoost);
+		Serial.print(data.calBoost);
 		Serial.print(";");
-		Serial.print(sdata.calThrottle);
+		Serial.print(data.calThrottle);
 		Serial.print(";");
-		Serial.print(sdata.calLambda);
+		Serial.print(data.calLambda);
 		Serial.print(";");
-		Serial.print(sdata.calLMM);
+		Serial.print(data.calLMM);
 		Serial.print(";");
-		Serial.print(sdata.calCaseTemp);
+		Serial.print(data.calCaseTemp);
 		Serial.print(";");
-		Serial.print(sdata.calAgt[0]);
+		Serial.print(data.calAgt[0]);
 		Serial.print(";");
-		Serial.print(sdata.calAgt[1]);
+		Serial.print(data.calAgt[1]);
 		Serial.print(";");
-		Serial.println(sdata.batVolt);
+		Serial.println(data.batVolt);
 		break;
 	default:
 		SerOut = SERIALOUT_DISABLED;
@@ -391,8 +389,8 @@ void MultidisplayController::SerialPrint() {
 
 }
 
-void MultidisplayController::HeaderPrint()
-{
+void MultidisplayController::HeaderPrint() {
+
 
 	switch(SerOut){
 	case SERIALOUT_DISABLED:
@@ -405,7 +403,7 @@ void MultidisplayController::HeaderPrint()
 		break;
 	case SERIALOUT_RAW:
 		Serial.println(" ");
-		Serial.println("Time;sdata.anaIn0;sdata.anaIn1;sdata.anaIn2;sdata.anaIn3;sdata.anaIn4;sdata.anaIn5;sdata.anaIn6;sdata.anaIn7");
+		Serial.println("Time;data.anaIn0;data.anaIn1;data.anaIn2;data.anaIn3;data.anaIn4;data.anaIn5;data.anaIn6;data.anaIn7");
 		break;
 	case SERIALOUT_ENABLED:
 		Serial.println(" ");
@@ -440,20 +438,20 @@ void MultidisplayController::ChangeSerOut()
 
 void MultidisplayController::CalibrateLD()
 {
-	sdata.calLd = sdata.calRAWBoost;
+	data.calLd = data.calRAWBoost;
 	// changed from global val3 to caluclation of mapped boost
-	sdata.ldCalPoint = map(sdata.anaIn[BOOSTPIN], 0, 4096, 0, 200) / 10;
+	data.ldCalPoint = map(data.anaIn[BOOSTPIN], 0, 4096, 0, 200) / 10;
 	//and saved:
-	EEPROM.write(205,sdata.ldCalPoint);
-	EEPROMWriteDouble(200,sdata.calLd*1000);    //writes the float as long, will do it.
+	EEPROM.write(205,data.ldCalPoint);
+	EEPROMWriteDouble(200,data.calLd*1000);    //writes the float as long, will do it.
 
 	//The MaxLD will be reset!
-	sdata.maxLd = 0.0;
-	sdata.maxLdt = sdata.ldCalPoint;
+	data.maxLd = 0.0;
+	data.maxLdt = data.ldCalPoint;
 
 	Serial.println(" ");
 	Serial.print("CalBoost: ");
-	Serial.println(sdata.calLd);
+	Serial.println(data.calLd);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -555,13 +553,13 @@ void MultidisplayController::FetchTypK()  {
 		if(Temp>=MAXTYPK) {
 			Temp = 0;
 		} else {
-			Temp += int(sdata.calCaseTemp);                       //apply the Correction
+			Temp += int(data.calCaseTemp);                       //apply the Correction
 		}
 
-		sdata.calAgt[i] = Temp;              //Save it into the array
+		data.calAgt[i] = Temp;              //Save it into the array
 
 		//Check if the Temp is a new Max Temp Event
-		if(Temp>=sdata.maxAgtValE[3]) {
+		if(Temp>=data.maxAgtValE[3]) {
 			SaveMax(3);
 		}
 
@@ -588,12 +586,12 @@ void MultidisplayController::CheckLimits()
   }
 	 */
 
-	if(sdata.calAgt[0]>MaxAGT) {
+	if(data.calAgt[0]>MaxAGT) {
 		FlashTrigger = 1;    //Enable the LCDFlash
 	}
 
 
-	if(sdata.calAgt[1]>MaxAGT) 	{
+	if(data.calAgt[1]>MaxAGT) 	{
 		FlashTrigger = 1;    //Enable the LCDFlash
 	}
 
@@ -637,11 +635,11 @@ void MultidisplayController::CheckLimits()
 //Saves all Data to the arrays
 void MultidisplayController::SaveMax(int Num)
 {
-	sdata.maxAgtValE[Num] = sdata.calAgt[0];
-	sdata.maxLdE[Num] = sdata.calBoost;
-	sdata.maxRpmE[Num] = sdata.calRPM;
-	sdata.maxLmmE[Num] = sdata.calLMM;
-	sdata.maxOilE[Num] = sdata.VDOPres1;
+	data.maxAgtValE[Num] = data.calAgt[0];
+	data.maxLdE[Num] = data.calBoost;
+	data.maxRpmE[Num] = data.calRPM;
+	data.maxLmmE[Num] = data.calLMM;
+	data.maxOilE[Num] = data.VDOPres1;
 }
 
 
@@ -657,7 +655,7 @@ void MultidisplayController::mainLoop() {
 
 	//Read in all Analog values:
 	for(uint8_t i = 1; i <=16;i++) {
-		sdata.anaIn[i] = read_adc(i);
+		data.anaIn[i] = read_adc(i);
 	}
 
 	//Calibrate them:
@@ -714,6 +712,3 @@ void MultidisplayController::mainLoop() {
 }
 
 
-UserInterface* MultidisplayController::getUiP () {
-	return &ui;
-}

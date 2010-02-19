@@ -36,31 +36,15 @@ public:
     uint8_t DoCal;
     uint8_t DoTypK;
     uint8_t DoCheck;
-
+    unsigned long ScreenSave;
+    unsigned long time;
 
 	void mainLoop();
 	void ChangeSerOut();
 	void CalibrateLD();
 	void HeaderPrint();
-    unsigned long getTime() const
-    {
-        return time;
-    }
 
-    unsigned long getScreenSave() const
-    {
-        return ScreenSave;
-    }
 
-    void setScreenSave(unsigned long  ScreenSave)
-    {
-        this->ScreenSave = ScreenSave;
-    }
-
-    //FIXME temp hack
-    UserInterface* getUiP ();
-    //FIXME
-    SensorData sdata;
 
 private:
     static const unsigned int PROGMEM tempTypK[];
@@ -68,11 +52,9 @@ private:
     static const unsigned int PROGMEM tempVDOTemp[];
     uint8_t IOport2;
     TwoWire wire;
-    UserInterface ui;
     unsigned long FlashETimeU;
     unsigned long FlashTimeU;
-    unsigned long ScreenSave;
-    unsigned long time;
+
     int val3;
 
 

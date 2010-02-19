@@ -49,42 +49,42 @@ void LCDScreen1::customDraw() {
 	int boostMapped = 0;
 
 	//Calibrate it:
-	val = mController.sdata.calLambda/10;
-	boostMapped = map(mController.sdata.anaIn[BOOSTPIN], 0, 4096, 0, 200);
+	val = data.calLambda/10;
+	boostMapped = map(data.anaIn[BOOSTPIN], 0, 4096, 0, 200);
 	boostMapped = constrain(boostMapped, 0, 200);
 
 	lcdp->commandWrite(0x80+5);               //Line 1, position 5!
 
 	char buf[12];
 	//AGT1+AGT2/2 thats because off my 2 Probes
-	lcdp->printIn( itoa((mController.sdata.calAgt[0]+mController.sdata.calAgt[1])/2, buf, 10));
+	lcdp->printIn( itoa((data.calAgt[0]+data.calAgt[1])/2, buf, 10));
 
 	lcdp->print(32);                           //Print a " " at the end, to clear in case its needed
 
 	lcdp->commandWrite(0x80+14);              //Line 3,
 
-	lcdController.printfloat(mController.sdata.calCaseTemp,1);
+	lcdController.printfloat(data.calCaseTemp,1);
 
 	lcdp->print(223);                         //Print a " " at the end, to clear in case its needed
 	lcdp->printIn( "C");                       //Print a " " at the end, to clear in case its needed
 
 	lcdp->commandWrite(0x94+3);
 
-	if(mController.sdata.calBoost < 0.0) {
+	if(data.calBoost < 0.0) {
 		lcdp->printIn("-");
 	} else {
 		lcdp->printIn(" ");
 	}
-	lcdController.printfloat(abs(mController.sdata.calBoost),2);              //Shows current Boost
+	lcdController.printfloat(abs(data.calBoost),2);              //Shows current Boost
 
 	//Check for new MaxLD, and then save the point where to make the square
-	if(mController.sdata.calBoost > mController.sdata.maxLd) {
-		mController.sdata.maxLd  = mController.sdata.calBoost;
-		mController.sdata.maxLdt = boostMapped/10;
+	if(data.calBoost > data.maxLd) {
+		data.maxLd  = data.calBoost;
+		data.maxLdt = boostMapped/10;
 	}
 
 	lcdp->commandWrite(0x94+16);
-	lcdController.printfloat(mController.sdata.maxLd,2);                    //Max Boost
+	lcdController.printfloat(data.maxLd,2);                    //Max Boost
 
 	//Lets draw the dot:
 	lcdp->commandWrite(0xC0);              // Line 2
@@ -112,10 +112,10 @@ void LCDScreen1::customDraw() {
 
 	//And draw a Dot at the max pos & 0 Pos
 
-	lcdp->commandWrite(0xD4 + mController.sdata.maxLdt);                // Line 4
+	lcdp->commandWrite(0xD4 + data.maxLdt);                // Line 4
 	lcdp->print(255);
 
-	lcdp->commandWrite(0xD4 + mController.sdata.ldCalPoint);                // Line 4
+	lcdp->commandWrite(0xD4 + data.ldCalPoint);                // Line 4
 	lcdp->print(255);
 
 }

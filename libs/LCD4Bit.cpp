@@ -129,6 +129,20 @@ void LCD4Bit::print(int value) {
   pushByte(value);
 }
 
+void LCD4Bit::print_P(uint8_t value[], uint8_t len) {
+	for ( uint8_t i = 0 ; i < len ; i++ )
+		print_P (value[i]);
+}
+
+void LCD4Bit::print_P(uint8_t value) {
+  //set the RS and RW pins to show we're writing data
+  digitalWrite(RS, HIGH);
+  if (USING_RW) { digitalWrite(RW, LOW); }
+
+  //let pushByte worry about the intricacies of Enable, nibble order.
+  pushByte( pgm_read_byte(value) );
+}
+
 
 //print the given string to the LCD at the current cursor position.  overwrites, doesn't insert.
 //While I don't understand why this was named printIn (PRINT IN?) in the original LiquidCrystal library, I've preserved it here to maintain the interchangeability of the two libraries.

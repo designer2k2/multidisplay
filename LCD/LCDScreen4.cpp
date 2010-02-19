@@ -56,27 +56,27 @@ void LCDScreen4::customDraw()  {
 
 
 	lcdp->commandWrite(0x80+4);                  //T1
-	lcdp->printIn(itoa((mController.sdata.calAgt[0]), buf, 10));
+	lcdp->printIn(itoa((data.calAgt[0]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0x80+14);                 //T2
-	lcdp->printIn(itoa((mController.sdata.calAgt[1]), buf, 10));
+	lcdp->printIn(itoa((data.calAgt[1]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0xC0+4);                  //T3
-	lcdp->printIn(itoa((mController.sdata.calAgt[2]), buf, 10));
+	lcdp->printIn(itoa((data.calAgt[2]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0xC0+14);                 //T4
-	lcdp->printIn(itoa((mController.sdata.calAgt[3]), buf, 10));
+	lcdp->printIn(itoa((data.calAgt[3]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0x94+4);                  //T5
-	lcdp->printIn(itoa((mController.sdata.calAgt[4]), buf, 10));
+	lcdp->printIn(itoa((data.calAgt[4]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0x94+14);                 //T6
-	lcdp->printIn(itoa((mController.sdata.calAgt[5]), buf, 10));
+	lcdp->printIn(itoa((data.calAgt[5]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0xD4+4);                  //T7
-	lcdp->printIn(itoa((mController.sdata.calAgt[6]), buf, 10));
+	lcdp->printIn(itoa((data.calAgt[6]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0xD4+14);                 //T8
-	lcdp->printIn(itoa((mController.sdata.calAgt[7]), buf, 10));
+	lcdp->printIn(itoa((data.calAgt[7]), buf, 10));
 	lcdController.print2Blanks();
 }

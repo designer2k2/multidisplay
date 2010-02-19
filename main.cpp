@@ -26,7 +26,8 @@
 #include <avr/pgmspace.h>      //for PROGMEN
 #include <Wire.h>              //to get the I2C working.
 #include "HardwareSerial.h"
-
+#include "UserInterface.h"
+#include "SensorData.h"
 #include "MultidisplayController.h"
 
 
@@ -48,6 +49,8 @@ ToDo:
 
 MultidisplayController mController = MultidisplayController();
 LCDController lcdController = LCDController();
+UserInterface ui = UserInterface();
+SensorData data = SensorData();
 
 int main(void) {
 

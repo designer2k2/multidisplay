@@ -37,7 +37,6 @@ class UserInterface {
 
 public:
 	UserInterface();
-	UserInterface(SensorData* p, MultidisplayController *c);
 	virtual ~UserInterface();
 
 	void buttonCheck(int buttonState);
@@ -56,8 +55,8 @@ private:
 	void buttonAPressed();
 	void buttonBHold();
 	void buttonBPressed();
-
-
 };
+
+extern UserInterface ui;
 
 #endif /* USERINTERFACE_H_ */

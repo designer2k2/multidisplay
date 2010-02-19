@@ -63,24 +63,24 @@ void LCDScreen6::customDraw()  {
 		//The Boost:
 
 		lcdp->commandWrite(0x80+7);
-		if(mController.sdata.calBoost<0.0) {
+		if(data.calBoost<0.0) {
 			lcdp->print(2);
 			lcdp->print(2);
 		} else {
 			lcdp->printIn("  ");
 		}
 
-		lcdController.bigNum(abs(mController.sdata.calBoost)*1000,0,9,1);
+		lcdController.bigNum(abs(data.calBoost)*1000,0,9,1);
 
 		//The Temp:
-		lcdController.bigNum(abs(mController.sdata.calCaseTemp)*1000,20,9,1);
+		lcdController.bigNum(abs(data.calCaseTemp)*1000,20,9,1);
 
 	} else {
 		//T1:
-		lcdController.bigNum24(mController.sdata.calAgt[0],0+8);
+		lcdController.bigNum24(data.calAgt[0],0+8);
 
 		//T2:
 		//bigNum24(CalAGT[1],20);
-		lcdController.bigNum24(mController.sdata.calAgt[1],20+8);
+		lcdController.bigNum24(data.calAgt[1],20+8);
 	}
 }

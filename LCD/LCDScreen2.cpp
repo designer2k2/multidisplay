@@ -59,28 +59,28 @@ void LCDScreen2::customDraw()  {
 	uint8_t mcp = flags.f.mode == SCREENA ? 0 : 8;
 
 	lcdp->commandWrite(0x80+4);                  //A1
-	lcdp->printIn(itoa((mController.sdata.anaIn[1+mcp]), buf, 10));
+	lcdp->printIn(itoa((data.anaIn[1+mcp]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0x80+14);                 //A2
-	lcdp->printIn(itoa((mController.sdata.anaIn[2+mcp]), buf, 10));
+	lcdp->printIn(itoa((data.anaIn[2+mcp]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0xC0+4);                  //A3
-	lcdp->printIn(itoa((mController.sdata.anaIn[3+mcp]), buf, 10));
+	lcdp->printIn(itoa((data.anaIn[3+mcp]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0xC0+14);                 //A4
-	lcdp->printIn(itoa((mController.sdata.anaIn[4+mcp]), buf, 10));
+	lcdp->printIn(itoa((data.anaIn[4+mcp]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0x94+4);                  //A5
-	lcdp->printIn(itoa((mController.sdata.anaIn[5+mcp]), buf, 10));
+	lcdp->printIn(itoa((data.anaIn[5+mcp]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0x94+14);                 //A6
-	lcdp->printIn(itoa((mController.sdata.anaIn[6+mcp]), buf, 10));
+	lcdp->printIn(itoa((data.anaIn[6+mcp]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0xD4+4);                  //A7
-	lcdp->printIn(itoa((mController.sdata.anaIn[7+mcp]), buf, 10));
+	lcdp->printIn(itoa((data.anaIn[7+mcp]), buf, 10));
 	lcdController.print2Blanks();
 	lcdp->commandWrite(0xD4+14);                 //A8
-	lcdp->printIn(itoa((mController.sdata.anaIn[8+mcp]), buf, 10));
+	lcdp->printIn(itoa((data.anaIn[8+mcp]), buf, 10));
 	lcdController.print2Blanks();
  }
 

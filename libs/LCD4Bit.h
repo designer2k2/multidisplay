@@ -11,6 +11,8 @@ public:
 
   void print(int value);
   void print_P(int value);
+  void print_P(uint8_t value);
+  void print_P(uint8_t value[], uint8_t len);
 
   void printIn(char value[]);
   void printIn_P(char value[]);
