@@ -37,9 +37,6 @@ LCDScreen6::LCDScreen6() {
 	flags.f.mode = SCREENA;
 }
 
-LCDScreen6::~LCDScreen6() {
-	// TODO Auto-generated destructor stub
-}
 
 void LCDScreen6::customInit() {
 	if ( flags.f.mode == SCREENA ) {

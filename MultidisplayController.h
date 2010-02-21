@@ -24,13 +24,12 @@
 #include "util.h"
 
 #include<Wire.h>
-#include"UserInterface.h"
+#include <avr/pgmspace.h>
 #include"SensorData.h"
 
 class MultidisplayController {
 public:
 	MultidisplayController();
-	virtual ~MultidisplayController();
 
 	uint8_t SerOut;
     uint8_t DoCal;
@@ -55,9 +54,7 @@ private:
     unsigned long FlashETimeU;
     unsigned long FlashTimeU;
 
-    int val3;
-
-
+//    int val3;
 
 	int read_adc(uint8_t channel);
 	void expanderWrite(byte _data);
@@ -75,6 +72,16 @@ private:
 	void FetchTypK();
 	void CheckLimits();
 	void SaveMax(int Num);
+
+	//button related functions
+	unsigned long buttonTime;   //Button time
+
+	//TODO documentation!
+	void buttonCheck(int buttonState);
+	void buttonAHold();
+	void buttonAPressed();
+	void buttonBHold();
+	void buttonBPressed();
 };
 
 extern MultidisplayController mController;

@@ -33,10 +33,6 @@ LCDScreen1::LCDScreen1() {
 
 }
 
-LCDScreen1::~LCDScreen1() {
-	// TODO Auto-generated destructor stub
-}
-
 void LCDScreen1::customInit() {
 	//Line1
 	lcdp->lcdCommandWriteAndPrintIn_P (0x80, PSTR("EGT:"));

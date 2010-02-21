@@ -37,9 +37,6 @@ LCDScreen7::LCDScreen7() {
 	//FIXME local variables!
 }
 
-LCDScreen7::~LCDScreen7() {
-	// TODO Auto-generated destructor stub
-}
 
 #include "MultidisplayDefines.h"
 void LCDScreen7::customInit() {

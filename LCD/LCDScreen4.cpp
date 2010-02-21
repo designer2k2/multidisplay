@@ -34,9 +34,6 @@ LCDScreen4::LCDScreen4() {
 	flags.f.loadVBar = 0;
 }
 
-LCDScreen4::~LCDScreen4() {
-	// TODO Auto-generated destructor stub
-}
 
 void LCDScreen4::customInit() {
 	//Typ K Screen

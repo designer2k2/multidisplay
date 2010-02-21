@@ -35,9 +35,6 @@ LCDScreen8::LCDScreen8() {
 	flags.f.loadBigFont4 = 0;
 }
 
-LCDScreen8::~LCDScreen8() {
-	// TODO Auto-generated destructor stub
-}
 
 void LCDScreen8::customInit() {
 	lcdp->lcdCommandWriteAndPrintIn_P (0x80, PSTR("Max "));

@@ -35,10 +35,6 @@ LCDScreen9::LCDScreen9() {
 	flags.f.loadBigFont4 = 0;
 }
 
-LCDScreen9::~LCDScreen9() {
-	// TODO Auto-generated destructor stub
-}
-
 //VDO Screen
 void LCDScreen9::customInit() {
 	lcdp->lcdCommandWriteAndPrintIn_P (0x80, PSTR("VDO Screen:"));

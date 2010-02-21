@@ -18,6 +18,8 @@
 */
 
 #include "MultidisplayController.h"
+#include "LCDController.h"
+#include "LCDScreen.h"
 
 #include <stdlib.h>
 #include <inttypes.h>
@@ -122,12 +124,14 @@ MultidisplayController::MultidisplayController() {
 	FlashTimeU = 0;
 	ScreenSave = 0;
 	time = 0;
-	val3=0;
+//	val3=0;
 	data.calLd = 0.0;          //calibration from the Boost
 	data.maxLd = 0;
 	data.maxLdt=0;               //max LD for the screen
 
 	DoCheck = 1;
+
+	buttonTime = 0;
 
 	// the following was method void setup() {
 	pinMode(LCDBRIGHTPIN, OUTPUT);
@@ -157,17 +161,11 @@ MultidisplayController::MultidisplayController() {
 	data.calLd = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
 
 	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
-
-
 	lcdController.init();
 
 
 	//Init the Buttons:
 	expanderWrite(0b10000011);        //This may needs to be modified when a third button is attached.
-}
-
-MultidisplayController::~MultidisplayController() {
-	// TODO Auto-generated destructor stub
 }
 
 
@@ -681,7 +679,7 @@ void MultidisplayController::mainLoop() {
 
 	//My own Button Check Function
 
-	ui.buttonCheck(expanderRead());
+	buttonCheck(expanderRead());
 
 	//Saves the Screen when needed:
 
@@ -711,4 +709,162 @@ void MultidisplayController::mainLoop() {
 #endif
 }
 
+
+
+/*==============================================================================
+ * BUTTON FUNCTIONS
+ *============================================================================*/
+
+void MultidisplayController::buttonAHold() {
+	lcdController.toggleScreen();
+	//Set the Timestamp for the Save:
+	mController.ScreenSave = millis() + SCREENSAVEDELAY;
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+void MultidisplayController::buttonAPressed() {
+
+  //Serial.print(time*1);
+  //Serial.print(";");
+  //Serial.println("Button A Pressed");
+
+  switch(lcdController.activeScreen){
+   case 1:
+      mController.ChangeSerOut();      //Switch from RAW to Cal to Nothing and vise versa.
+      break;
+   case 2:
+       //Toggle A and B MCP
+      lcdController.myScreens[1]->toggleScreenAB();
+      break;
+   case 3:
+	   mController.ChangeSerOut();      //Switch from RAW to Cal to Nothing and vise versa.
+      break;
+   case 6:                 //Switches the 2 Row Screen
+	   lcdController.myScreens[5]->toggleScreenAB();
+      break;
+   case 7:
+	   lcdController.myScreens[6]->toggleRefreshCounter();
+      break;
+   default:
+      break;
+  }
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+void MultidisplayController::buttonBHold()
+{
+
+  //Serial.print(time*1);
+  //Serial.print(";");
+  //Serial.println("Button B Hold");
+
+  switch(lcdController.activeScreen){
+   case 0:
+      break;
+   case 1:
+      //The Calibration from the LD will be done
+      mController.CalibrateLD();
+      break;
+   default:
+   break;
+  }
+
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+void MultidisplayController::buttonBPressed() {
+
+	//Serial.print(time*1);
+	//Serial.print(";");
+	//Serial.println("Button B Pressed");
+
+	switch(lcdController.activeScreen){
+	case 0:
+		break;
+	case 1:
+		//The MaxLD will be reset!
+		data.maxLd = 0.0;
+		data.maxLdt = data.ldCalPoint;
+		break;
+	case 2:
+		//Change LCD brightness
+		lcdController.toggleBrightness();
+
+		//and save the new value:
+		EEPROM.write(105,lcdController.brightness);
+		break;
+	case 7:
+		//FIXME integrate into LCDSCreen6 its broken atm!
+//		screen6DataSel++;      //Change the Scope Screen
+//		if(screen6DataSel >= 5)
+//			screen6DataSel = 1;
+//
+//		//Reset the Constrains:
+//		//FIXME global ?!?
+//		screen6Val1 = 0;
+//		screen6Val2 = 5000;
+		break;
+	case 8:
+		//FIXME integrate into LCDSCreen8 its broken atm!
+//		screen8Val++;	//changes the MAX screen through all values
+//		if(screen8Val >= 4)
+//			screen8Val = 1;
+		break;
+
+	default:
+		break;
+	}
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+ void MultidisplayController::buttonCheck(int buttonState)  {
+	 /**
+	  * A hold : switch screens
+	  */
+
+	 /*
+	3 = open
+	1 = s1
+	2 = s2
+	  */
+
+	 //compensate for the LED:
+	 buttonState -= 128;
+
+	 //now a little inteligent stuff:
+	 switch(buttonState) {
+	 case 1:
+		 if(buttonTime == 0) {
+			 buttonAPressed();
+			 buttonTime = millis();
+		 } else {
+			 if(millis()>=buttonTime+BUTTONHOLD) {
+				 buttonAHold();
+				 buttonTime = millis();
+			 }
+		 }
+		 break;
+
+	 case 2:
+		 if(buttonTime == 0) {
+			 buttonBPressed();
+			 buttonTime = millis();
+		 } else {
+			 if(millis()>=buttonTime+BUTTONHOLD) {
+				 buttonBHold();
+				 buttonTime = millis();
+			 }
+		 }
+		 break;
+
+	 case 3:
+		 buttonTime = 0;
+		 break;
+	 }
+	 //Thats it... easy.
+ }
 

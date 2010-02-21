@@ -29,9 +29,6 @@ LCDScreen2::LCDScreen2() {
 	flags.f.refreshRate = 2;
 }
 
-LCDScreen2::~LCDScreen2() {
-	// TODO Auto-generated destructor stub
-}
 
 void LCDScreen2::customInit() {
 	if (flags.f.mode > 1) {

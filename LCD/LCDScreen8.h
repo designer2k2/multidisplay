@@ -28,7 +28,6 @@
 class LCDScreen8: public LCDScreen {
 public:
 	LCDScreen8();
-	virtual ~LCDScreen8();
 
 	void customInit ();
 	void customDraw ();

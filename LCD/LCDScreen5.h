@@ -26,7 +26,6 @@
 class LCDScreen5: public LCDScreen {
 public:
 	LCDScreen5();
-	virtual ~LCDScreen5();
 
 	void customInit ();
 	void customDraw ();

@@ -17,7 +17,7 @@
     along with Multidisplay.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include "LCDController.h"
 #include "LCDScreen.h"
 #include "LCD4Bit.h"
 #include "wiring.h"
@@ -26,10 +26,6 @@
 LCDScreen::LCDScreen() {
 	// TODO Auto-generated constructor stub
 
-}
-
-LCDScreen::~LCDScreen() {
-	// TODO Auto-generated destructor stub
 }
 
 LCDScreen::LCDScreen(LCD4Bit *lcdp, uint16_t flags) : lcdp(lcdp) {

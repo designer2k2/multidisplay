@@ -23,8 +23,51 @@
 
 #include "MultidisplayDefines.h"
 
-class SensorData {
-public:
+//class SensorData {
+//public:
+//	int anaIn[17];
+//	float calLd;          //calibration from the Boost
+//	float maxLd;
+//	int maxLdt;               //max LD for the screen
+//	int ldCalPoint;             //where to draw the dot from the calibration
+//
+//	int calAgt[NUMTYPK+1];  //All Typ K Values will be stored inside this array
+//
+//	//RPM Smoothing:
+//	int rpmReadings[RPMSMOOTH];                // the readings from the analog input
+//	int rpmIndex;                            // the index of the current reading
+//	int rpmTotal;                            // the running total
+//	int rpmAverage;                          // the average
+//
+//	//convertet values:
+//	float calBoost;
+//	float calRAWBoost;
+//	int calLambda;
+//	long calRPM;
+//	int calThrottle;
+//	float calCaseTemp;
+//	float calLMM;
+//	int VDOTemp1;
+//	int VDOTemp2;
+//	int VDOTemp3;
+//	int VDOPres1;
+//	int VDOPres2;
+//	int VDOPres3;
+//	float batVolt;
+//
+//	//Saving of the MAx Values: (0=AGT, 1=Boost, 2=RPM)
+//	unsigned int maxAgtValE[4];          //maximum AGT
+//	float maxLdE[4];
+//	long maxRpmE[4];            //maximum RPM
+//	float maxLmmE[4];         //maximum LMM
+//	int maxOilE[4];             //maximum Oilpressure
+//
+//	SensorData();
+//
+//};
+
+
+struct SensorData {
 	int anaIn[17];
 	float calLd;          //calibration from the Boost
 	float maxLd;
@@ -61,10 +104,9 @@ public:
 	long maxRpmE[4];            //maximum RPM
 	float maxLmmE[4];         //maximum LMM
 	int maxOilE[4];             //maximum Oilpressure
-
-	SensorData();
-
 };
+
+void initSensorData ( SensorData *s );
 
 extern SensorData data;
 

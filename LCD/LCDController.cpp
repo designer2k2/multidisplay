@@ -51,10 +51,6 @@ LCDController::LCDController() : activeScreen(0), brightness(2) {
     myScreens[8] = new LCDScreen9();
 }
 
-LCDController::~LCDController() {
-	// TODO Auto-generated destructor stub
-}
-
 void LCDController::init() {
 	myScreens[activeScreen]->init();
 }
@@ -320,10 +316,12 @@ void LCDController::bigNum4 (unsigned long t, uint8_t leftAdjust, int d){
 
 
 /**
-* Displays a 4 Digit Number (RPM, Thermocouple Temp) over 2 Lines
+* Displays a 4 Digit Number (RPM, Thermocouple Temp) over 2 Lines into the first 2 lines
 * only Full Digits are shown!
 * no leading 0 or commas.
 * right aligned, it clears all in front
+* @param Value value to print
+* @param LineOffset
 */
 void LCDController::bigNum24(int Value,int LineOffset) {
 	//how many digits?

@@ -22,8 +22,9 @@
 
 #include <stdint.h>
 #include <avr/pgmspace.h>
+#include <LCD4Bit.h>
 
-class LCD4Bit;
+#include <LCDController.h>
 
 struct s_screen_flags_t {
 	uint8_t doCal : 1;
@@ -52,7 +53,6 @@ public:
 	LCDScreen();
 	LCDScreen (LCD4Bit* lcdp, uint16_t flags);
 
-	virtual ~LCDScreen();
 
 	void init ();
 	virtual void customInit () = 0;

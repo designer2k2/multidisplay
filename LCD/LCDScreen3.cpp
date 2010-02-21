@@ -32,10 +32,6 @@ LCDScreen3::LCDScreen3() {
 	flags.f.loadBar = 1;
 }
 
-LCDScreen3::~LCDScreen3() {
-	// TODO Auto-generated destructor stub
-}
-
 void LCDScreen3::customInit() {
 	//Line1
 	lcdp->lcdCommandWriteAndPrintIn_P  (0x80, PSTR("LAM:"));

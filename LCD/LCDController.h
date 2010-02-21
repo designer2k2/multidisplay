@@ -24,12 +24,11 @@
 #include <avr/pgmspace.h>
 #include <LCD4Bit.h>
 
-#include "LCDScreen.h"
+class LCDScreen;
 
 class LCDController {
 public:
 	LCDController();
-	virtual ~LCDController();
 
 	LCD4Bit* lcdp;
 

@@ -36,9 +36,6 @@ LCDScreen5::LCDScreen5() {
 	flags.f.loadBigFont4 = 1;
 }
 
-LCDScreen5::~LCDScreen5() {
-	// TODO Auto-generated destructor stub
-}
 
 void LCDScreen5::customInit() {
 	lcdp->lcdCommandWriteAndPrintIn_P (0x80, PSTR("Boost:"));
