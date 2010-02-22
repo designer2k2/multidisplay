@@ -174,6 +174,7 @@ void LCDController::printOneNumber2(uint8_t digit, uint8_t leftAdjust, int LineO
 
 //-------------------------------------------------------------------------------------------------------
 
+// TODO not used at the moment!!!
 void LCDController::printOneNumber4(uint8_t digit, uint8_t leftAdjust) {
 	// leftAdjust = 0, means 1 Pos, leftAdjust = 1 is second Pos.
 
@@ -205,6 +206,7 @@ void LCDController::printOneNumber4(uint8_t digit, uint8_t leftAdjust) {
 
 //-------------------------------------------------------------------------------------------------------
 
+// prints boost over 2 lines!
 void LCDController::bigNum (unsigned long t, int LineOffset, uint8_t leftAdjust, int d){
 
 	// LineOffset = 0, means 1 Line, LineOffset = 20 means 2 Line.
@@ -252,6 +254,14 @@ void LCDController::bigNum (unsigned long t, int LineOffset, uint8_t leftAdjust,
 
 //-------------------------------------------------------------------------------------------------------
 
+/**
+* ??? displays a 4 digit Number over 4 Lines.
+* @param t ??? value to print
+* @param leftAdjust
+* @param d decimalpoint
+*
+* used to print boost
+*/
 void LCDController::bigNum4 (unsigned long t, uint8_t leftAdjust, int d){
 
 	// LineOffset = 0, means 1 Line, LineOffset = 20 means 2 Line.
@@ -316,7 +326,7 @@ void LCDController::bigNum4 (unsigned long t, uint8_t leftAdjust, int d){
 
 
 /**
-* Displays a 4 Digit Number (RPM, Thermocouple Temp) over 2 Lines into the first 2 lines
+* Displays a 4 digit Number (RPM, Thermocouple Temp) over 2 Lines into the first 2 lines.
 * only Full Digits are shown!
 * no leading 0 or commas.
 * right aligned, it clears all in front
@@ -405,6 +415,7 @@ void LCDController::blanks(uint8_t c) {
 //-------------------------------------------------------------------------------------------------------
 
 
+// formats a long ( convertet from a float ) to a string with decimal point
 char* LCDController::format(unsigned long num){
 
 	byte dp = 3;

@@ -26,6 +26,10 @@
 
 class LCDScreen;
 
+/**
+ * controlls the LCD screen
+ * provides helper methods for drawing
+ */
 class LCDController {
 public:
 	LCDController();
@@ -64,11 +68,11 @@ public:
 	void print2Blanks();
 	void cgramBigFont2();
 	void cgramBigFont4();
-	void printOneNumber2(uint8_t digit, uint8_t leftAdjust, int LineOffset);
-	void printOneNumber4(uint8_t digit, uint8_t leftAdjust);
+
 	void bigNum (unsigned long t, int LineOffset, uint8_t leftAdjust, int d);
 	void bigNum4 (unsigned long t, uint8_t leftAdjust, int d);
 	void bigNum24(int Value,int LineOffset);
+
 	void blanks(uint8_t c);
 	char* format(unsigned long num);
 
@@ -107,6 +111,8 @@ private:
 	//TODO check
 	char fBuff[7];
 
+	void printOneNumber2(uint8_t digit, uint8_t leftAdjust, int LineOffset);
+	void printOneNumber4(uint8_t digit, uint8_t leftAdjust);
 
 };
 

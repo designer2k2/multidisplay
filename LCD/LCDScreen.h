@@ -48,6 +48,9 @@ union screen_flags_t {
 	uint32_t all;
 };
 
+/**
+ * abstract base class for an lcd screen
+ */
 class LCDScreen {
 public:
 	LCDScreen();
