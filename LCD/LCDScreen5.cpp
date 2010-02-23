@@ -55,7 +55,7 @@ void LCDScreen5::customDraw() {
 
 	//bigNum(abs(CalBoost)*1000,0,9,1);
 
-	lcdController.bigNum4(abs(data.calBoost)*1000,9,1);
+	lcdController.printBigNum ( (double) data.calBoost, LCD_WIDTH-9, 9, 0, LCD_BIGFONT_4);
 
 
 	//Check for new MaxLD

@@ -23,6 +23,9 @@
 
 #include "LCDScreen.h"
 
+/**
+ * screen2: raw value from 8 inputs
+ */
 class LCDScreen2: public LCDScreen {
 public:
 	LCDScreen2();

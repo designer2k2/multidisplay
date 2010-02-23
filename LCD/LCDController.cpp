@@ -17,6 +17,7 @@
     along with Multidisplay.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #include <stdio.h>
 
 #include "wiring.h"
@@ -33,8 +34,13 @@
 #include "LCDScreen8.h"
 #include "LCDScreen9.h"
 
+const uint8_t	LCDController::ystart[] = { 0x80, 0xC0, 0x94, 0xD4 };
+
+
 LCDController::LCDController() : activeScreen(0), brightness(2) {
 	lcdp = new LCD4Bit(4);
+	cbuf = (char*) malloc (sizeof(char) * LCD_BUFSIZE);
+
 	lcdp->init();
 
     for ( int i = 0 ; i < 20 ; i++ )
@@ -94,6 +100,7 @@ void LCDController::toggleScreen () {
 }
 
 
+//TODO convert into one 2D array!
 //const prog_uchar LCDController::bn12[]={255,1,255,0, 1,255,254,0, 1,3,255,0, 1,3,255,0, 255,2,2,0, 255,3,1,0, 255,3,1,0, 1,1,255,0, 255,3,255,0, 255,3,255,0};
 char LCDController::bn12[]={255,1,255,0, 1,255,254,0, 1,3,255,0, 1,3,255,0, 255,2,2,0, 255,3,1,0, 255,3,1,0, 1,1,255,0, 255,3,255,0, 255,3,255,0};
 char LCDController::bn22[]={255,2,255,0, 2,255,2,0,   255,2,2,0, 2,2,255,0, 254,255,254,0, 2,2,255,0,   255,2,255,0, 254,255,254,0, 255,2,255,0, 254,254,255,0};
@@ -148,25 +155,24 @@ void LCDController::cgramBigFont4() {
 	lcdUploadUdef5x8_P (7,data7);
 
 }
-//-------------------------------------------------------------------------------------------------------
 
-
-
-//-------------------------------------------------------------------------------------------------------
-
-void LCDController::printOneNumber2(uint8_t digit, uint8_t leftAdjust, int LineOffset) {
-	// LineOffset = 0, means 1 Line, LineOffset = 20 means 2 Line.
-	// leftAdjust = 0, means 1 Pos, leftAdjust = 1 is second Pos.
-
+/**
+ * prints a 2 line number
+ * @param digit
+ * @param x_offset 1 unit is one lcd char, not one big char!
+ * @param y_offset lcd lines!
+ * TODO do we need boundary check?
+ */
+void LCDController::printOneNumber2(uint8_t digit, uint8_t x_offset, uint8_t y_offset) {
 	// Line 1 of the one digit number
-	lcdp->commandWrite(0x80+LineOffset+leftAdjust*3+1*leftAdjust);                  //Line1
+	lcdp->commandWrite( ystart[y_offset] + x_offset); //Line1
 
 	lcdp->print (bn12[digit*3+digit*1]);
 	lcdp->print (bn12[digit*3+1+digit*1]);
 	lcdp->print (bn12[digit*3+2+digit*1]);
 
 	// Line 2 of the one-digit number
-	lcdp->commandWrite(0xC0+LineOffset+leftAdjust*3+1*leftAdjust);              // Line 2
+	lcdp->commandWrite(ystart[y_offset+1] + x_offset); // Line 2
 	lcdp->print(bn22[digit*3+digit*1]);
 	lcdp->print(bn22[digit*3+1+digit*1]);
 	lcdp->print(bn22[digit*3+2+digit*1]);
@@ -174,237 +180,43 @@ void LCDController::printOneNumber2(uint8_t digit, uint8_t leftAdjust, int LineO
 
 //-------------------------------------------------------------------------------------------------------
 
-// TODO not used at the moment!!!
-void LCDController::printOneNumber4(uint8_t digit, uint8_t leftAdjust) {
-	// leftAdjust = 0, means 1 Pos, leftAdjust = 1 is second Pos.
+/**
+ * prints a 4 line number
+ * @param digit
+ * @param x_offset 1 unit is one lcd char, not one big char!
+ * @param y_offset lcd lines!
+ * TODO do we need boundary check?
+ * TODO untested!
+ */
+void LCDController::printOneNumber4(uint8_t digit, uint8_t x_offset, uint8_t y_offset) {
 
 	// Line 1 of the one digit number
-	lcdp->commandWrite(0x80+leftAdjust*3+1*leftAdjust);                  //Line 1
+	lcdp->commandWrite( ystart[y_offset] + x_offset);                  //Line 1
 	lcdp->print(bn14[digit*3]);
 	lcdp->print(bn14[digit*3+1]);
 	lcdp->print(bn14[digit*3+2]);
 
 	// Line 2 of the one-digit number
-	lcdp->commandWrite(0xC0+leftAdjust*3+1*leftAdjust);              // Line 2
+	lcdp->commandWrite( ystart[y_offset+1] + x_offset);
 	lcdp->print(bn24[digit*3]);
 	lcdp->print(bn24[digit*3+1]);
 	lcdp->print(bn24[digit*3+2]);
 
 	// Line 3 of the one digit number
-	lcdp->commandWrite(0x94+leftAdjust*3+1*leftAdjust);                  //Line 3
+	lcdp->commandWrite( ystart[y_offset+2] + x_offset);
 	lcdp->print(bn34[digit*3]);
 	lcdp->print(bn34[digit*3+1]);
 	lcdp->print(bn34[digit*3+2]);
 
 	// Line 4 of the one-digit number
-	lcdp->commandWrite(0xD4+leftAdjust*3+1*leftAdjust);              // Line 4
+	lcdp->commandWrite( ystart[y_offset+3] + x_offset);
 	lcdp->print(bn44[digit*3]);
 	lcdp->print(bn44[digit*3+1]);
 	lcdp->print(bn44[digit*3+2]);
-
 }
 
 //-------------------------------------------------------------------------------------------------------
 
-// prints boost over 2 lines!
-void LCDController::bigNum (unsigned long t, int LineOffset, uint8_t leftAdjust, int d){
-
-	// LineOffset = 0, means 1 Line, LineOffset = 20 means 2 Line.
-	// d = 0, means no dp!
-
-	//  unsigned long t = 98550ul;//number in thousandths
-	//  unsigned long t = 9855ul;//number in thousandths
-	char  dp = 254;
-	char  dp2 = 254;
-
-
-	char* r = "009.99"; //default to 999
-	if(t<=99500){
-		r=format(t/10); //0098.6
-		dp=6;
-	}else if(t<=999500){
-		r=format(t/100);
-	}
-	if(t<=9950) {
-		dp = 254;
-		dp2 = 6;
-		r=format(t); //009.86
-	}
-
-	if(d==0) {
-		dp = 254;
-		dp2 = 254;
-	}
-
-	lcdp->commandWrite(0x80+LineOffset+leftAdjust);
-	lcdp->printIn ( bn12 + (r[2]-'0')*4 );
-	lcdp->printIn_P ( PSTR(" ") );
-	lcdp->printIn (bn12 + (r[4]-'0')*4);
-	lcdp->printIn_P ( PSTR(" ") );
-	lcdp->printIn (bn12 + (r[5]-'0')*4);
-
-	lcdp->commandWrite(0xC0+LineOffset+leftAdjust);
-	lcdp->printIn(bn22+(r[2]-'0')*4);
-	lcdp->print(dp2);
-	lcdp->printIn(bn22+(r[4]-'0')*4);
-	lcdp->print(dp);
-	lcdp->printIn(bn22+(r[5]-'0')*4);
-
-}
-
-//-------------------------------------------------------------------------------------------------------
-
-/**
-* ??? displays a 4 digit Number over 4 Lines.
-* @param t ??? value to print
-* @param leftAdjust
-* @param d decimalpoint
-*
-* used to print boost
-*/
-void LCDController::bigNum4 (unsigned long t, uint8_t leftAdjust, int d){
-
-	// LineOffset = 0, means 1 Line, LineOffset = 20 means 2 Line.
-	// d = 0, means no dp!
-
-	//  unsigned long t = 98550ul;//number in thousandths
-	//  unsigned long t = 9855ul;//number in thousandths
-	char  dp = 254;
-	char  dp2 = 254;
-
-
-	char * r = "009.99"; //default to 999
-	if(t<=99500){
-		r=format(t/10); //0098.6
-		dp=7;
-	}else if(t<=999500){
-		r=format(t/100);
-	}
-	if(t<=9950)
-	{
-		dp = 254;
-		dp2 = 7;
-		r=format(t); //009.86
-	}
-
-	if(d==0)
-	{
-		dp = 254;
-		dp2 = 254;
-	}
-
-	lcdp->commandWrite(0x80+leftAdjust);
-	lcdp->printIn(bn14+(r[2]-'0')*4);
-	lcdp->printInBlank();
-	lcdp->printIn(bn14+(r[4]-'0')*4);
-	lcdp->printInBlank();
-	lcdp->printIn(bn14+(r[5]-'0')*4);
-
-	lcdp->commandWrite(0xC0+leftAdjust);
-	lcdp->printIn(bn24+(r[2]-'0')*4);
-	lcdp->printInBlank();
-	lcdp->printIn(bn24+(r[4]-'0')*4);
-	lcdp->printInBlank();
-	lcdp->printIn(bn24+(r[5]-'0')*4);
-
-	lcdp->commandWrite(0x94+leftAdjust);
-	lcdp->printIn(bn34+(r[2]-'0')*4);
-	lcdp->printInBlank();
-	lcdp->printIn(bn34+(r[4]-'0')*4);
-	lcdp->printInBlank();
-	lcdp->printIn(bn34+(r[5]-'0')*4);
-
-	lcdp->commandWrite(0xD4+leftAdjust);
-	lcdp->printIn(bn44+(r[2]-'0')*4);
-	lcdp->print(dp2);
-	lcdp->printIn(bn44+(r[4]-'0')*4);
-	lcdp->print(dp);
-	lcdp->printIn(bn44+(r[5]-'0')*4);
-
-}
-
-
-
-/**
-* Displays a 4 digit Number (RPM, Thermocouple Temp) over 2 Lines into the first 2 lines.
-* only Full Digits are shown!
-* no leading 0 or commas.
-* right aligned, it clears all in front
-* @param Value value to print
-* @param LineOffset
-*/
-void LCDController::bigNum24(int Value,int LineOffset) {
-	//how many digits?
-	uint8_t Dig = 1;
-
-	if (Value>=999) 	{
-		Dig = 4;
-	} else 	{
-		if(Value>=99) {
-			Dig = 3;
-		} else {
-			if(Value>=9)
-				Dig = 2;
-// optimized for size :-)
-//			else {
-//				Dig = 1;
-//			}
-		}
-	}
-	//convert int to char string
-	char value_c[5];
-	snprintf(value_c, sizeof(value_c), "%d", Value);
-
-	//compute array of uint8_t out of the char array
-	uint8_t value_i[4];
-    char c[2];
-    c[1] = '\0';
-    for ( uint8_t i = 0 ; i < sizeof(&value_c) ; i++ ) {
-    	c[0] = value_c[i];
-	    value_i[i] = atoi(&c[0]);
-	 }
-
-    //clear digits
-	lcdp->commandWrite(0x80+LineOffset+0);                  //Line1
-	blanks( 3 * ( 4-Dig) );
-	lcdp->commandWrite(0xC0+LineOffset+0);                  //Line1
-	blanks( 3 * ( 4-Dig) );
-
-	uint8_t rf = 4-Dig;
-	for ( uint8_t i = 0 ; i < Dig ; i++ ) {
-		printOneNumber2(value_i[i], 0,LineOffset + 3*rf );
-		rf++;
-	}
-//	switch (Dig) {
-//	case 1:
-//		//Thats easy...
-//
-//		printOneNumber2(Value,0,LineOffset+9);
-//
-//		break;
-//	case 2:
-//		//First Value
-//		printOneNumber2(value_i[0], 0, LineOffset+6);
-//		//Last Value
-//		printOneNumber2(value_i[1],0,LineOffset+9);
-//
-//		break;
-//	case 3:
-//		//First Value
-//		printOneNumber2(value_i[0], 0, LineOffset+3);
-//		printOneNumber2(value_i[1], 0, LineOffset+6);
-//		//Last Value
-//		printOneNumber2(value_i[2], 0, LineOffset+9);
-//
-//		break;
-//	case 4:
-//		printOneNumber2(value_i[0], 0,LineOffset+0);
-//		printOneNumber2(value_i[1], 0,LineOffset+3);
-//		printOneNumber2(value_i[2], 0,LineOffset+6);
-//		printOneNumber2(value_i[3], 0,LineOffset+9);
-//		break;
-//	}
-}
 
 void LCDController::blanks(uint8_t c) {
 	for ( uint8_t i = 0 ; i < c ; i++ )
@@ -412,40 +224,6 @@ void LCDController::blanks(uint8_t c) {
 }
 
 
-//-------------------------------------------------------------------------------------------------------
-
-
-// formats a long ( convertet from a float ) to a string with decimal point
-char* LCDController::format(unsigned long num){
-
-	byte dp = 3;
-
-	while(num > 999999){
-		num /= 10;
-		dp++;
-		if( dp == 5 )
-			break; // We'll lose the top numbers like an odometer
-	}
-	if(dp == 5)
-		dp = 99; // We don't need a decimal point here.
-
-	// Round off the non-printed value.
-	if((num % 10) > 4)
-		num += 10;
-	num /= 10;
-	byte x = 6;
-	while(x > 0){
-		x--;
-		if(x==dp){ //time to poke in the decimal point?{
-			fBuff[x]='.';
-		}else{
-			fBuff[x]= '0' + (num % 10);//poke the ascii character for the digit.
-			num /= 10;
-		}
-	}
-	fBuff[6] = 0;
-	return fBuff;
-}
 
 //http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1239715016/3#3
 void LCDController::printfloat(float all , int decimals){
@@ -756,9 +534,87 @@ void LCDController::scopeMode() {
 
 		//shift Data to the left
 		scopeInt[i] = scopeInt[i+1];
-
 	}
-
 }
 
+void LCDController::printBigNum (uint16_t value, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type) {
+	snprintf(cbuf, LCD_BUFSIZE, "%d", value);
+	printBigNum ( cbuf, length, x_offset, y_offset, type );
+}
+
+void LCDController::printBigNum (double value, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type) {
+	snprintf(cbuf, LCD_BUFSIZE, "%.2f", value);
+	printBigNum ( cbuf, length, x_offset, y_offset, type );
+}
+
+/**
+* displays a digit Number over 2 or 4 lines
+* right aligned, it clears all in front starting at x_offset
+* @param str string to be printed
+* @param length
+* @param x_offset
+* @param y_offset
+* @param type LCD_BIGFONT_2 or LCD_BIGFONT_4 (2 or 4 rows)
+*/
+void LCDController::printBigNum (char* str, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type) {
+	//blank 254
+	//point 7
+	//comma 5
+
+	//set to pos where decimal point should be, 0 if no
+	uint8_t dp_pos = 99;
+
+
+	uint8_t strlen = 0;
+
+	//TODO do we need one blank between 4 row numbers ?!?
+
+	//compute array of uint8_t out of the char array
+	uint8_t value_i[21];
+    char c[2];
+    c[1] = '\0';
+    for ( uint8_t i = 0 ; i < sizeof(&str) ; i++ ) {
+    	c[0] = str[i];
+    	if (c[0]=='.' || c[0]==';') {
+    		value_i[i]=c[0];
+    		dp_pos = i;
+    		if (type==LCD_BIGFONT_2)
+    			strlen++;
+    	} else {
+    		if ( c[0] != ' ') {
+    			value_i[i] = atoi(&c[0]);
+    			if (type==LCD_BIGFONT_4)
+    				strlen += 4;
+    			else
+    				strlen += 3;
+    		}
+    	}
+	 }
+
+    //clear digits in front
+    for ( uint8_t l = 0 ; l < type ; l++ ) {
+    	lcdp->commandWrite( ystart[l + y_offset] + x_offset);
+    	//TODO boundary check!
+    	blanks( length - strlen );
+    }
+
+    //now set x_offset to x_offset + blanks!
+    x_offset += length - strlen;
+	for ( uint8_t i = 0 ; i < strlen ; i++ ) {
+		if ( i == dp_pos ) {
+			//TODO print bigger decimal point!
+			lcdp->print(5);
+			if ( type == LCD_BIGFONT_2 )
+				x_offset++;
+		} else {
+			if ( type == LCD_BIGFONT_2 ) {
+				printOneNumber2(value_i[i], x_offset, y_offset );
+				x_offset += 3;
+			} else {
+				printOneNumber4(value_i[i], 0, x_offset);
+				x_offset += 4;
+			}
+		}
+	}
+}
 

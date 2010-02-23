@@ -67,17 +67,26 @@ void LCDScreen6::customDraw()  {
 			lcdp->printIn("  ");
 		}
 
-		lcdController.bigNum(abs(data.calBoost)*1000,0,9,1);
+//		lcdController.bigNum(abs(data.calBoost)*1000,0,9,1);
+		lcdController.printBigNum ( (double) data.calBoost, LCD_WIDTH-9, 9, 0, LCD_BIGFONT_2 );
 
 		//The Temp:
-		lcdController.bigNum(abs(data.calCaseTemp)*1000,20,9,1);
+//		lcdController.bigNum(abs(data.calCaseTemp)*1000,20,9,1);
+		lcdController.printBigNum( (double) data.calCaseTemp, LCD_WIDTH-9, 9, 2, LCD_BIGFONT_2);
 
 	} else {
 		//T1:
-		lcdController.bigNum24(data.calAgt[0],0+8);
+		// 4 digits
+//		snprintf(lcdController.cbuf, LCD_BUFSIZE 21, "%4d", data.calAgt[0]);
+//		lcdController.printBigNum (lcdController.cbuf, LCD_WIDTH-8, 8, 0, LCD_BIGFONT_2);
+
+		lcdController.printBigNum ( (uint16_t) data.calAgt[0], 6, 8, 0, LCD_BIGFONT_2);
+//		lcdController.bigNum24(data.calAgt[0],0+8);
 
 		//T2:
 		//bigNum24(CalAGT[1],20);
-		lcdController.bigNum24(data.calAgt[1],20+8);
+//		lcdController.bigNum24(data.calAgt[1],20+8);
+		//sollte ganz rechts ausgegeben werden!
+		lcdController.printBigNum ( (uint16_t) data.calAgt[1], LCD_WIDTH-8, 8, 2, LCD_BIGFONT_2);
 	}
 }

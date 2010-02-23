@@ -126,4 +126,12 @@ typedef unsigned char byte;
 #define SCOPE_THROTTLE 4
 #define SCOPE_LAMBDA 5
 
+//buffer in LCDController
+#define LCD_BUFSIZE 21
+
+#define LCD_WIDTH 20
+#define LCD_HEIGHT 4
+#define LCD_BIGFONT_2 2
+#define LCD_BIGFONT_4 4
+
 #endif /* MULTIDISPLAY_DEFINES_H_ */

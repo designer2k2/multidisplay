@@ -69,12 +69,14 @@ public:
 	void cgramBigFont2();
 	void cgramBigFont4();
 
-	void bigNum (unsigned long t, int LineOffset, uint8_t leftAdjust, int d);
-	void bigNum4 (unsigned long t, uint8_t leftAdjust, int d);
-	void bigNum24(int Value,int LineOffset);
+	void printBigNum (uint16_t value, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type);
+	void printBigNum (double value, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type);
+	void printBigNum (char* str, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type);
+	//first char of each line
+	static const uint8_t ystart[];
+
 
 	void blanks(uint8_t c);
-	char* format(unsigned long num);
 
 	// Array index into parts of big numbers. Numbers consist of 6 custom characters in 2 lines
 	//              0             1          2        3          4             5         6       7               8       9
@@ -107,12 +109,10 @@ public:
 	int scopeInt[20];      //needed for the Scrolling Scope
 
 private:
+	char *cbuf;
 
-	//TODO check
-	char fBuff[7];
-
-	void printOneNumber2(uint8_t digit, uint8_t leftAdjust, int LineOffset);
-	void printOneNumber4(uint8_t digit, uint8_t leftAdjust);
+	void printOneNumber2(uint8_t digit, uint8_t x_offset, uint8_t y_offset=0);
+	void printOneNumber4(uint8_t digit, uint8_t x_offset, uint8_t y_offset=0);
 
 };
 

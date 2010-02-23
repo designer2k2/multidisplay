@@ -23,8 +23,10 @@
 
 #include "LCDScreen.h"
 
+
 /**
  * scope mode screen
+ * screen7: scope screen (boost, throttle, lmm or rpm)
  */
 class LCDScreen7: public LCDScreen {
 public:

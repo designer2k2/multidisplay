@@ -24,6 +24,7 @@
 
 /**
  * Max Value Screen (This shows the Max LD, RPM or AGT or Oil values)
+ * screen8: max boost, rpm, lmm, agt
  */
 class LCDScreen8: public LCDScreen {
 public:

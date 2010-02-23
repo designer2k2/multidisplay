@@ -22,6 +22,9 @@
 
 #include "LCDScreen.h"
 
+/**
+ * screen3: lambda, boost, throttle, rpm
+ */
 class LCDScreen3: public LCDScreen {
 public:
 	LCDScreen3();

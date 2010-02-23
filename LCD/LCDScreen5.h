@@ -23,6 +23,9 @@
 
 #include "LCDScreen.h"
 
+/**
+ * screen5: boost, maxboost (bigfont)
+ */
 class LCDScreen5: public LCDScreen {
 public:
 	LCDScreen5();

@@ -22,6 +22,9 @@
 
 #include "LCDScreen.h"
 
+/**
+ * screen1: egt, boost, maxboost, lambda bar, boost bar, castetemp, ldcalpoint
+ */
 class LCDScreen1: public LCDScreen {
 public:
 	LCDScreen1();

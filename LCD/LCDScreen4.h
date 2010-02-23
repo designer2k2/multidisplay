@@ -23,6 +23,9 @@
 
 #include "LCDScreen.h"
 
+/**
+ * screen4: 8 TypeK
+ */
 class LCDScreen4: public LCDScreen {
 public:
 	LCDScreen4();
