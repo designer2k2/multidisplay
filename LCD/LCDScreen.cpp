@@ -25,7 +25,6 @@
 
 LCDScreen::LCDScreen() {
 	// TODO Auto-generated constructor stub
-
 }
 
 LCDScreen::LCDScreen(LCD4Bit *lcdp, uint16_t flags) : lcdp(lcdp) {

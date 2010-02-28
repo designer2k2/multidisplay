@@ -161,6 +161,7 @@ MultidisplayController::MultidisplayController() {
 	data.calLd = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
 
 	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
+
 	lcdController.init();
 
 

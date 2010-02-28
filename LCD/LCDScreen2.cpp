@@ -55,30 +55,18 @@ void LCDScreen2::customInit() {
 void LCDScreen2::customDraw()  {
 	uint8_t mcp = flags.f.mode == SCREENA ? 0 : 8;
 
-	lcdp->commandWrite(0x80+4);                  //A1
-	lcdp->printIn(itoa((data.anaIn[1+mcp]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0x80+14);                 //A2
-	lcdp->printIn(itoa((data.anaIn[2+mcp]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0xC0+4);                  //A3
-	lcdp->printIn(itoa((data.anaIn[3+mcp]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0xC0+14);                 //A4
-	lcdp->printIn(itoa((data.anaIn[4+mcp]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0x94+4);                  //A5
-	lcdp->printIn(itoa((data.anaIn[5+mcp]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0x94+14);                 //A6
-	lcdp->printIn(itoa((data.anaIn[6+mcp]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0xD4+4);                  //A7
-	lcdp->printIn(itoa((data.anaIn[7+mcp]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0xD4+14);                 //A8
-	lcdp->printIn(itoa((data.anaIn[8+mcp]), buf, 10));
-	lcdController.print2Blanks();
- }
+	//FIXME why do we need to print 2 blanks? if we need them, we should do it with a custom format string
+	//A1
+	lcdController.printInt(0x80+4, data.anaIn[1+mcp]);
+	//A2
+	lcdController.printInt(0x80+14, data.anaIn[2+mcp]);
+	//A3
+	lcdController.printInt(0xC0+4, data.anaIn[3+mcp]);
+	lcdController.printInt(0xC0+14, data.anaIn[4+mcp]);
+	lcdController.printInt(0x94+4, data.anaIn[5+mcp]);
+	lcdController.printInt(0x94+14, data.anaIn[6+mcp]);
+	lcdController.printInt(0xD4+4, data.anaIn[7+mcp]);
+	lcdController.printInt(0xD4+14, data.anaIn[8+mcp]);
+}
 
 

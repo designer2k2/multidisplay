@@ -33,6 +33,7 @@ LCDScreen9::LCDScreen9() {
 	flags.f.loadDot = 0;
 	flags.f.loadVBar = 0;
 	flags.f.loadBigFont4 = 0;
+
 }
 
 //VDO Screen
@@ -45,23 +46,19 @@ void LCDScreen9::customInit() {
 
 void LCDScreen9::customDraw() {
 
-	lcdp->commandWrite(0xC0+4);                  //T1
-	lcdp->printIn(itoa(data.VDOTemp1, buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0xC0+14);                 //P1
-	lcdController.printfloat(float(data.VDOPres1/10.0),1);
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0x94+4);                  //T2
-	lcdp->printIn(itoa(data.VDOTemp2, buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0x94+14);                 //P2
-	lcdController.printfloat(float(data.VDOPres2/10.0),1);
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0xD4+4);                  //T3
-	lcdp->printIn(itoa(data.VDOTemp3, buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0xD4+14);                 //P3
-	lcdController.printfloat(float(data.VDOPres3/10.0),1);
-	lcdController.print2Blanks();
+	//FIXME removed lcdController.print2Blanks(); after each print. if we need it -> custom formatstring!
+
+	lcdController.printInt(0xC0+4, data.VDOTemp1);
+
+	 //P1
+	lcdController.printFloat2DP(0xC0+14, float(data.VDOPres1/10.0));
+	//T2
+	lcdController.printInt(0x94+4, data.VDOTemp2);
+	//P2
+	lcdController.printFloat2DP(0x94+14, float(data.VDOPres2/10.0));
+	//T3
+	lcdController.printInt(0xD4+4, data.VDOTemp3);
+	//P3
+	lcdController.printFloat2DP(0xD4+14, float(data.VDOPres3/10.0));
 }
 

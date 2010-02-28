@@ -27,7 +27,15 @@
 class LCDScreen;
 
 /**
- * controlls the LCD screen
+ * cvoid LCDController::printFloat2DP(uint8_t pos, float f) {
+	printFloat (pos, f, "%.2f");
+}
+
+void LCDController::printFloat(uint8_t pos, float f, char* formatstring) {
+	lcdp->commandWrite(pos);
+	printFloat (f, formatstring);
+}
+ * ontrolls the LCD screen
  * provides helper methods for drawing
  */
 class LCDController {
@@ -65,9 +73,11 @@ public:
 
     void lcdShowIntro(int delayValue);
 
-	void print2Blanks();
 	void cgramBigFont2();
 	void cgramBigFont4();
+
+	void printInt (uint8_t pos, int value);
+	void printString (uint8_t pos, char* str);
 
 	void printBigNum (uint16_t value, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type);
 	void printBigNum (double value, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type);
@@ -90,8 +100,11 @@ public:
 	static char bn34[];
 	static char bn44[];
 
-	//from functions.pde
-	void printfloat(float all , int decimals);
+
+	void printFloat2DP(uint8_t pos, float f);
+	void printFloat2DP(float f);
+	void printFloat(uint8_t pos, float f, char* formatstring="%.2f");
+	void printFloat(float f, char* formatstring="%.2f");
 
 	// data has to point to PMEM!
 	void lcdUploadUdef5x8_P (uint8_t charIndex, const uint8_t *data);
@@ -102,8 +115,8 @@ public:
 
 	void cgramIntro();
 	void cgramIntro2();
-	void drawBar(int Digits, int Value);
-	void drawVertBar(int Val, int Pos);
+	void drawBar(uint8_t digits, uint8_t value);
+	void drawVertBar(uint8_t Val, uint8_t Pos);
 	void scopeMode();
 
 	int scopeInt[20];      //needed for the Scrolling Scope

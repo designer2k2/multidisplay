@@ -45,13 +45,12 @@ void LCDScreen8::customInit() {
 }
 
 
-//FIXME broken! screen8Val gets no set yet!
+//FIXME broken! screen8Val gets not set yet!
 void LCDScreen8::customDraw()  {
 	uint8_t screen8Val = 0;
 
 	//Header:
-	lcdp->commandWrite(0x80+4);                  //Line
-	lcdp->printIn(itoa(screen8Val, buf, 10));
+	lcdController.printInt(0x80+4, screen8Val);
 
 
 	lcdp->commandWrite(0xC0+3);                  //Max1LD
@@ -61,15 +60,14 @@ void LCDScreen8::customDraw()  {
 	} else {
 		lcdp->printIn(" ");
 	}
-	lcdController.printfloat(abs(data.maxLdE[screen8Val]),2);              //Shows current Boost
+	lcdController.printFloat2DP(abs(data.maxLdE[screen8Val]));
 
-	lcdp->commandWrite(0xC0+14);                 //Max1RPM
-	lcdp->printIn(itoa(data.maxRpmE[screen8Val], buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0x94+4);                  //LMM
-	lcdp->printIn(itoa((data.maxLmmE[screen8Val]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0x94+14);                 //Max1AGTVal
-	lcdp->printIn(itoa(data.maxAgtValE[screen8Val], buf, 10));
-	lcdController.print2Blanks();
+	//Max1RPM
+	lcdController.printInt(0xC0+14, data.maxRpmE[screen8Val]);
+	//FIXME removed lcdController.print2Blanks(); after each print. if we need it -> custom formatstring!
+
+	//LMM
+	lcdController.printInt(0x94+4, data.maxLmmE[screen8Val]);
+
+	lcdController.printInt(0x94+14, data.maxAgtValE[screen8Val]);
 }

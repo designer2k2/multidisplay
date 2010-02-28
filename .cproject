@@ -62,7 +62,8 @@
 <option id="de.innot.avreclipse.cpplinker.option.libs.29111790" name="Libraries (-l)" superClass="de.innot.avreclipse.cpplinker.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="arduinocore"/>
 </option>
-<option id="de.innot.avreclipse.cpplinker.option.otherlinkargs.219272997" name="Other Arguments" superClass="de.innot.avreclipse.cpplinker.option.otherlinkargs" value="-T /usr/lib/binutils/avr/2.19.1/ldscripts/avr5.x" valueType="string"/>
+<option id="de.innot.avreclipse.cpplinker.option.otherlinkargs.219272997" name="Other Arguments" superClass="de.innot.avreclipse.cpplinker.option.otherlinkargs" value="" valueType="string"/>
+<option id="de.innot.avreclipse.cpplinker.option.nostart.1622884364" name="No startup or default libs (-nostdlib)" superClass="de.innot.avreclipse.cpplinker.option.nostart" value="false" valueType="boolean"/>
 </tool>
 <tool id="de.innot.avreclipse.tool.archiver.winavr.base.2003307006" name="AVR Archiver" superClass="de.innot.avreclipse.tool.archiver.winavr.base"/>
 <tool command="-avr-objdump" commandLinePattern="${COMMAND} ${FLAGS} ${INPUTS} &gt;${OUTPUT}" errorParsers="" id="de.innot.avreclipse.tool.objdump.winavr.app.debug.601658590" name="AVR Create Extended Listing" superClass="de.innot.avreclipse.tool.objdump.winavr.app.debug"/>
@@ -864,6 +865,7 @@
 <listOptionValue builtIn="false" value="arduinocore"/>
 </option>
 <option id="de.innot.avreclipse.cpplinker.option.otherlinkargs.1318766721" name="Other Arguments" superClass="de.innot.avreclipse.cpplinker.option.otherlinkargs" value="" valueType="string"/>
+<option id="de.innot.avreclipse.cpplinker.option.nostart.446730052" name="No startup or default libs (-nostdlib)" superClass="de.innot.avreclipse.cpplinker.option.nostart" value="false" valueType="boolean"/>
 </tool>
 <tool id="de.innot.avreclipse.tool.archiver.winavr.base.1464507051" name="AVR Archiver" superClass="de.innot.avreclipse.tool.archiver.winavr.base"/>
 <tool command="-avr-objdump" commandLinePattern="${COMMAND} ${FLAGS} ${INPUTS} &gt;${OUTPUT}" errorParsers="" id="de.innot.avreclipse.tool.objdump.winavr.app.release.404116872" name="AVR Create Extended Listing" superClass="de.innot.avreclipse.tool.objdump.winavr.app.release"/>
@@ -873,6 +875,9 @@
 <tool id="de.innot.avreclipse.tool.avrdude.app.release.1080052121" name="AVRDude" superClass="de.innot.avreclipse.tool.avrdude.app.release"/>
 </toolChain>
 </folderInfo>
+<sourceEntries>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+</sourceEntries>
 </configuration>
 </storageModule>
 <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>

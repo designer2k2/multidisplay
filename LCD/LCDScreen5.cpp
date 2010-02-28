@@ -63,6 +63,7 @@ void LCDScreen5::customDraw() {
 		data.maxLd  = data.calBoost;
 	}
 
-	lcdp->commandWrite(0xD4);
-	lcdController.printfloat(data.maxLd,2);                    //Max Boost
+//	lcdp->commandWrite(0xD4);
+//	lcdController.printFloat2DP(data.maxLd);                    //Max Boost
+	lcdController.printFloat2DP(0xD4, data.maxLd);                    //Max Boost
  }

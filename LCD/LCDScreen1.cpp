@@ -25,12 +25,12 @@
 #include "LCDController.h"
 #include "LCDScreen1.h"
 
+
 LCDScreen1::LCDScreen1() {
 	flags.f.doCal=1;
 	flags.f.doTypK = 1;
 	flags.f.serial = SERIALOUT_ENABLED;
 	flags.f.refreshRate = 0;
-
 }
 
 void LCDScreen1::customInit() {
@@ -51,27 +51,28 @@ void LCDScreen1::customDraw() {
 
 	lcdp->commandWrite(0x80+5);               //Line 1, position 5!
 
-	char buf[12];
 	//AGT1+AGT2/2 thats because off my 2 Probes
-	lcdp->printIn( itoa((data.calAgt[0]+data.calAgt[1])/2, buf, 10));
+//	char buf[12];
+//	lcdp->printIn( itoa((data.calAgt[0]+data.calAgt[1])/2, buf, 10));
+	lcdController.printInt( 0x80+5, (data.calAgt[0]+data.calAgt[1])/2);
 
 	lcdp->print(32);                           //Print a " " at the end, to clear in case its needed
 
 	lcdp->commandWrite(0x80+14);              //Line 3,
 
-	lcdController.printfloat(data.calCaseTemp,1);
+	lcdController.printFloat2DP (data.calCaseTemp);
 
 	lcdp->print(223);                         //Print a " " at the end, to clear in case its needed
-	lcdp->printIn( "C");                       //Print a " " at the end, to clear in case its needed
+	lcdp->printIn_P( PSTR("C") );                       //Print a " " at the end, to clear in case its needed
 
 	lcdp->commandWrite(0x94+3);
 
 	if(data.calBoost < 0.0) {
-		lcdp->printIn("-");
+		lcdp->printIn_P (PSTR("-"));
 	} else {
-		lcdp->printIn(" ");
+		lcdp->printIn_P (PSTR(" "));
 	}
-	lcdController.printfloat(abs(data.calBoost),2);              //Shows current Boost
+	lcdController.printFloat2DP(abs(data.calBoost));              //Shows current Boost
 
 	//Check for new MaxLD, and then save the point where to make the square
 	if(data.calBoost > data.maxLd) {
@@ -79,8 +80,8 @@ void LCDScreen1::customDraw() {
 		data.maxLdt = boostMapped/10;
 	}
 
-	lcdp->commandWrite(0x94+16);
-	lcdController.printfloat(data.maxLd,2);                    //Max Boost
+//	lcdp->commandWrite(0x94+16);
+	lcdController.printFloat2DP(0x94+16, data.maxLd);                    //Max Boost
 
 	//Lets draw the dot:
 	lcdp->commandWrite(0xC0);              // Line 2

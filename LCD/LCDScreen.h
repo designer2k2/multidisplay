@@ -48,6 +48,12 @@ union screen_flags_t {
 	uint32_t all;
 };
 
+struct lcd_init_t {
+	uint8_t count;
+	uint8_t *pos;
+	char *str;
+};
+
 /**
  * abstract base class for an lcd screen
  */
@@ -74,8 +80,6 @@ protected:
 
 	//TODO FIXME change name
 	//used by the draw methods
-	char buf[12];           // "-2147483648\0"
-
 };
 
 #endif /* LCDSCREEN_H_ */

@@ -85,11 +85,6 @@ void LCDController::setBrightness(uint8_t bright)  {
     analogWrite(LCDBRIGHTPIN,pgm_read_word(&LCDBrightnessD[brightness]));
 }
 
-void LCDController::print2Blanks() {
-   lcdp->print(32);
-   lcdp->print(32);
-}
-
 void LCDController::toggleScreen () {
 	// 9 screens atm -> 0..8!
 	if ( activeScreen == 8 )
@@ -224,69 +219,77 @@ void LCDController::blanks(uint8_t c) {
 }
 
 
+void LCDController::printFloat2DP(float f) {
+	printFloat (f, "%.2f");
+}
 
-//http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1239715016/3#3
-void LCDController::printfloat(float all , int decimals){
-	// will only work with lcd4bit library, basically it breaks the float into 2 integers then prints them seperatley with decimal point in the middle.
-	int decimal = 1 ;// intial multiplier so you dont get the situation decimal = 0 * 10 arrising
-	int dec2 = decimals;
+void LCDController::printFloat(float f, char* formatstring) {
+	snprintf (cbuf, LCD_BUFSIZE, formatstring, f);
+	lcdp->printIn(cbuf);
+}
 
-	while(decimals > 0) // calculate the multipler for moving the decimal along i.e. *10 *100 *1000 etc
-	{
-		decimal = decimal * 10 ;
-		decimals = decimals - 1;
-	}
+void LCDController::printFloat2DP(uint8_t pos, float f) {
+	printFloat (pos, f, "%.2f");
+}
 
-	int parta; // the first part of the float (numbers after the decimal point)
-	int partb; // the last part of the part  (numbers before the decimal point)
-
-	parta = int(all); // converting the float into an integer droping the info after the decimal
-	partb = (all * decimal) - (parta * decimal); // messing around to derive the integer form of the numbers before the decimal
-	char buf[12];
-	itoa (parta, buf, 10);
-	lcdp->printIn(buf);
-
-	lcdp->printIn(".");
-
-	//if the partb has less then the decimals -1, make a additional 0
-	if(dec2 ==2)
-	{
-		if(partb<10)
-		{
-			lcdp->printIn("0");
-		}
-	}
-
-	itoa (partb, buf, 10);
-	lcdp->printIn(buf);
+void LCDController::printFloat(uint8_t pos, float f, char* formatstring) {
+	lcdp->commandWrite(pos);
+	printFloat (f, formatstring);
 }
 
 
+//-------------------------------------------------------------------------------------------------------
+//
+//void LCDController::cgramIntro() {
+//	const prog_uint8_t data1[] = {28,28,28,30,30,31,31,31};  // 1--- k
+//	const prog_uint8_t data2[] = {7,7,7,15,15,31,31,31};     // -1-- k
+//	const prog_uint8_t data3[] = {31,31,31,28,28,28,28,28};  // --1- k
+//	const prog_uint8_t data4[] = {24,28,30,15,7,7,7,7};      // ---1 k
+//
+//	lcdUploadUdef5x8_P (1,data1);
+//	lcdUploadUdef5x8_P (2,data2);
+//	lcdUploadUdef5x8_P (3,data3);
+//	lcdUploadUdef5x8_P (4,data4);
+//}
+//
+//void LCDController::cgramIntro2() {
+//	const prog_uint8_t data1[] = {31,29,29,28,28,28,28,28};  // 2--- k
+//	const prog_uint8_t data2[] = {31,23,23,7,7,7,7,7};       // -2-- k
+//	const prog_uint8_t data3[] = {28,28,28,28,28,31,31,31};  // --2- k
+//	const prog_uint8_t data4[] = {7,7,7,7,15,30,28,24};      // ---2 k
+//
+//	lcdUploadUdef5x8_P (5,data1);
+//	lcdUploadUdef5x8_P (6,data2);
+//	lcdUploadUdef5x8_P (7,data3);
+//	lcdUploadUdef5x8_P (8,data4);
+//}
+
+
 void LCDController::lcdShowIntro(int delayValue) {
-
-	//Must load this in 2 steps, somehow its not possible to load 8 chars at once...
-	cgramIntro();
-	cgramIntro2();
-
-	//Show the Intro:
-	lcdp->commandWrite(0x80+2);                  //Line1
-	lcdp->print(1);
-	lcdp->print(2);
-	lcdp->commandWrite(0x80+10);                  //Line1
-	lcdp->print(3);
-	lcdp->print(4);
-
-	lcdp->commandWrite(0xC0+2); 			//Line2
-	lcdp->print(5);
-	lcdp->print(6);
-	lcdp->printIn_P ( PSTR("ulti") );
-	lcdp->commandWrite(0xC0+10); 			//Line2
-	lcdp->print(7);
-	lcdp->print(8);
-	lcdp->printIn_P ( PSTR("isplay") );
-
-	lcdp->commandWrite(0xD4+1);                  //Line=4
-	lcdp->printIn_P ( PSTR("www.designer2k2.at") );
+//
+//	//Must load this in 2 steps, somehow its not possible to load 8 chars at once...
+//	cgramIntro();
+//	cgramIntro2();
+//
+//	//Show the Intro:
+//	lcdp->commandWrite(0x80+2);                  //Line1
+//	lcdp->print(1);
+//	lcdp->print(2);
+//	lcdp->commandWrite(0x80+10);                  //Line1
+//	lcdp->print(3);
+//	lcdp->print(4);
+//
+//	lcdp->commandWrite(0xC0+2); 			//Line2
+//	lcdp->print(5);
+//	lcdp->print(6);
+//	lcdp->printIn_P ( PSTR("ulti") );
+//	lcdp->commandWrite(0xC0+10); 			//Line2
+//	lcdp->print(7);
+//	lcdp->print(8);
+//	lcdp->printIn_P ( PSTR("isplay") );
+//
+//	lcdp->commandWrite(0xD4+1);                  //Line=4
+//	lcdp->printIn_P ( PSTR("www.designer2k2.at") );
 
 	//Set the LCD brightness: (This turns on the Light, looks nice)
 	lcdController.setBrightness(2);
@@ -358,32 +361,6 @@ void LCDController::cgramBar() {
 	lcdUploadUdef5x8_P (3,data3);
 	lcdUploadUdef5x8_P (4,data4);
 }
-//-------------------------------------------------------------------------------------------------------
-
-void LCDController::cgramIntro() {
-	const prog_uint8_t data1[] = {28,28,28,30,30,31,31,31};  // 1--- k
-	const prog_uint8_t data2[] = {7,7,7,15,15,31,31,31};     // -1-- k
-	const prog_uint8_t data3[] = {31,31,31,28,28,28,28,28};  // --1- k
-	const prog_uint8_t data4[] = {24,28,30,15,7,7,7,7};      // ---1 k
-
-	lcdUploadUdef5x8_P (1,data1);
-	lcdUploadUdef5x8_P (2,data2);
-	lcdUploadUdef5x8_P (3,data3);
-	lcdUploadUdef5x8_P (4,data4);
-}
-//-------------------------------------------------------------------------------------------------------
-
-void LCDController::cgramIntro2() {
-	const prog_uint8_t data1[] = {31,29,29,28,28,28,28,28};  // 2--- k
-	const prog_uint8_t data2[] = {31,23,23,7,7,7,7,7};       // -2-- k
-	const prog_uint8_t data3[] = {28,28,28,28,28,31,31,31};  // --2- k
-	const prog_uint8_t data4[] = {7,7,7,7,15,30,28,24};      // ---2 k
-
-	lcdUploadUdef5x8_P (5,data1);
-	lcdUploadUdef5x8_P (6,data2);
-	lcdUploadUdef5x8_P (7,data3);
-	lcdUploadUdef5x8_P (8,data4);
-}
 
 
 /**
@@ -391,18 +368,18 @@ void LCDController::cgramIntro2() {
  * @param Digits number of chars the bar has on the lcd screen
  * @param Value the actual value. 0 <= value <= 10 x Digits ?!?
  */
-void LCDController::drawBar(int Digits, int Value) {
+void LCDController::drawBar(uint8_t digits, uint8_t value) {
 
-	int Curs = Value/10;
-	for (int i=0; i <= Digits-1; i++) {
-		if(i<Curs) {
+	uint8_t Curs = value/10;
+	for (uint8_t i=0; i < digits; i++) {
+		if ( i<Curs ) {
 			lcdp->print(255);
 		} else {
 
 			if(i==Curs) {
 				//in val ist 84 und in val5 die 8
 				//ich brauch die 4 /2 als int
-				int ChrW = (Value - Curs*10)/2;
+				int ChrW = (value - Curs*10)/2;
 
 				if(ChrW==0) {
 					lcdp->printIn(" ");
@@ -440,83 +417,95 @@ void LCDController::cgramVertBar() {
 }
 //-------------------------------------------------------------------------------------------------------
 
-void LCDController::drawVertBar(int Val, int Pos) {
-	//Val must be between 0 and 32 (4x8)
-	//Pos must be between 0 and 20 (on a 20 char disp)
+/**
+ * draws a vertical bar
+ * @param val must be between 0 and 32 (4x8)
+ * @param pos must be between 0 and 20 (on a 20 char disp)
+ */
+void LCDController::drawVertBar(uint8_t val, uint8_t pos) {
 
 	//whats the modulo with 8 ?
-	int Mod;
-	Mod = Val % 8;
+	uint8_t mod = val % 8;
 	//This is directly the code for the top character!
 	//But at what pos it must be printed?
 
-	int PrintPos;
-	PrintPos = (Val - Mod) / 8;
+	uint8_t printPos = (val - mod) / 8;
 
 	//But if Mod = 0, the LCD nothing is 254.
 
-	if(Mod == 0)
-		Mod=254;
+	if(mod == 0)
+		mod=254;
 
-	//now lets make a switch case depending on the PrintPos.
-
-	switch(PrintPos){
-	case 0:
-		//so there is only one character /3 blanks and the character in the lowest position
-		lcdp->commandWrite(0x80+Pos);              //Line 1
-		lcdp->print(254); //Blank
-		lcdp->commandWrite(0xC0+Pos);              //Line 2
-		lcdp->print(254); //Blank
-		lcdp->commandWrite(0x94+Pos);              //Line 3
-		lcdp->print(254); //Blank
-		lcdp->commandWrite(0xD4+Pos);              //Line 4
-		lcdp->print(Mod); //The Custom Character presenting the value
-		break;
-	case 1:
-		//so there is only one character /1 fulls and the character in the 2nd position
-		lcdp->commandWrite(0x80+Pos);              //Line 1
-		lcdp->print(254); //Blank
-		lcdp->commandWrite(0xC0+Pos);              //Line 2
-		lcdp->print(254); //Blank
-		lcdp->commandWrite(0x94+Pos);              //Line 3
-		lcdp->print(Mod); //The Custom Character presenting the value
-		lcdp->commandWrite(0xD4+Pos);              //Line 4
-		lcdp->print(255); //Full
-		break;
-	case 2:
-		//so there is only one character /2 fulls and the character in the 3rd position
-		lcdp->commandWrite(0x80+Pos);              //Line 1
-		lcdp->print(254); //Blank
-		lcdp->commandWrite(0xC0+Pos);              //Line 2
-		lcdp->print(Mod); //The Custom Character presenting the value
-		lcdp->commandWrite(0x94+Pos);              //Line 3
-		lcdp->print(255); //Full
-		lcdp->commandWrite(0xD4+Pos);              //Line 4
-		lcdp->print(255); //Full
-		break;
-	case 3:
-		//so there is only one character /3 fulls and the character in the highest position
-		lcdp->commandWrite(0x80+Pos);              //Line 1
-		lcdp->print(Mod); //The Custom Character presenting the value
-		lcdp->commandWrite(0xC0+Pos);              //Line 2
-		lcdp->print(255); //Full
-		lcdp->commandWrite(0x94+Pos);              //Line 3
-		lcdp->print(255); //Full
-		lcdp->commandWrite(0xD4+Pos);              //Line 4
-		lcdp->print(255); //Full
-		break;
-	case 4:
-		//easy, eveything is full!
-		lcdp->commandWrite(0x80+Pos);              //Line 1
-		lcdp->print(255); //Full
-		lcdp->commandWrite(0xC0+Pos);              //Line 2
-		lcdp->print(255); //Full
-		lcdp->commandWrite(0x94+Pos);              //Line 3
-		lcdp->print(255); //Full
-		lcdp->commandWrite(0xD4+Pos);              //Line 4
-		lcdp->print(255); //Full
-		break;
+	for ( uint8_t i = 0 ; i < 4 ; i++ ) {
+		//blank
+		uint8_t  draw = 254;
+		if (printPos == i)
+			draw = mod;
+		else if ( i < printPos )
+			draw = 255;
+		//now draw it!
+		lcdp->commandWrite( ystart[i] + pos);
+		lcdp->print( draw );
 	}
+
+//	//now lets make a switch case depending on the PrintPos.
+//	switch(printPos){
+//	case 0:
+//		//so there is only one character /3 blanks and the character in the lowest position
+//		lcdp->commandWrite(0x80+pos);              //Line 1
+//		lcdp->print(254); //Blank
+//		lcdp->commandWrite(0xC0+pos);              //Line 2
+//		lcdp->print(254); //Blank
+//		lcdp->commandWrite(0x94+pos);              //Line 3
+//		lcdp->print(254); //Blank
+//		lcdp->commandWrite(0xD4+pos);              //Line 4
+//		lcdp->print(mod); //The Custom Character presenting the value
+//		break;
+//	case 1:
+//		//so there is only one character /1 fulls and the character in the 2nd position
+//		lcdp->commandWrite(0x80+pos);              //Line 1
+//		lcdp->print(254); //Blank
+//		lcdp->commandWrite(0xC0+pos);              //Line 2
+//		lcdp->print(254); //Blank
+//		lcdp->commandWrite(0x94+pos);              //Line 3
+//		lcdp->print(mod); //The Custom Character presenting the value
+//		lcdp->commandWrite(0xD4+pos);              //Line 4
+//		lcdp->print(255); //Full
+//		break;
+//	case 2:
+//		//so there is only one character /2 fulls and the character in the 3rd position
+//		lcdp->commandWrite(0x80+pos);              //Line 1
+//		lcdp->print(254); //Blank
+//		lcdp->commandWrite(0xC0+pos);              //Line 2
+//		lcdp->print(mod); //The Custom Character presenting the value
+//		lcdp->commandWrite(0x94+pos);              //Line 3
+//		lcdp->print(255); //Full
+//		lcdp->commandWrite(0xD4+pos);              //Line 4
+//		lcdp->print(255); //Full
+//		break;
+//	case 3:
+//		//so there is only one character /3 fulls and the character in the highest position
+//		lcdp->commandWrite(0x80+pos);              //Line 1
+//		lcdp->print(mod); //The Custom Character presenting the value
+//		lcdp->commandWrite(0xC0+pos);              //Line 2
+//		lcdp->print(255); //Full
+//		lcdp->commandWrite(0x94+pos);              //Line 3
+//		lcdp->print(255); //Full
+//		lcdp->commandWrite(0xD4+pos);              //Line 4
+//		lcdp->print(255); //Full
+//		break;
+//	case 4:
+//		//easy, eveything is full!
+//		lcdp->commandWrite(0x80+pos);              //Line 1
+//		lcdp->print(255); //Full
+//		lcdp->commandWrite(0xC0+pos);              //Line 2
+//		lcdp->print(255); //Full
+//		lcdp->commandWrite(0x94+pos);              //Line 3
+//		lcdp->print(255); //Full
+//		lcdp->commandWrite(0xD4+pos);              //Line 4
+//		lcdp->print(255); //Full
+//		break;
+//	}
 
 	//thats it, easy :)
 
@@ -618,3 +607,18 @@ void LCDController::printBigNum (char* str, uint8_t length, uint8_t x_offset, ui
 	}
 }
 
+/**
+ * prints a integer value to postion pos
+ */
+void LCDController::printInt (uint8_t pos, int value) {
+	snprintf (cbuf, LCD_BUFSIZE, "%d", value);
+	printString (pos, cbuf);
+}
+/**
+ * print a string to position pos
+ */
+void LCDController::printString (uint8_t pos, char* str) {
+	if (pos >= 0x80)
+		lcdp->commandWrite (pos);
+	lcdp->printIn (str);
+}

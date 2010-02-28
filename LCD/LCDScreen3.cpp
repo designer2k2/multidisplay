@@ -56,24 +56,24 @@ void LCDScreen3::customDraw()  {
 	//Print the Values:
 
 
-	lcdp->commandWrite(0x80+5);
-	lcdp->printIn(itoa(data.calLambda, buf, 10));
+//	lcdp->commandWrite(0x80+5);
+//	lcdp->printIn(itoa(data.calLambda, buf, 10));
+	lcdController.printInt(0x80+5, data.calLambda);
 	lcdp->print(32);
 	lcdp->commandWrite(0xC0+4);
 
 	if(data.calBoost<0.0) {
-		lcdp->printIn("-");
+		lcdp->printIn_P(PSTR("-"));
 	} else {
-		lcdp->printIn(" ");
+		lcdp->printIn_P(PSTR(" "));
 	}
-	lcdController.printfloat(abs(data.calBoost),2);              //Shows current Boost
+	lcdController.printFloat2DP(abs(data.calBoost));              //Shows current Boost
 
 	lcdp->print(32);
-	lcdp->commandWrite(0x94+5);
-	lcdp->printIn(itoa(data.calThrottle, buf, 10));
+	lcdController.printInt(0x94+5, data.calThrottle);
 	lcdp->print(32);
-	lcdp->commandWrite(0xD4+5);
-	lcdp->printIn(itoa((data.calRPM/10)*10, buf, 10));    //gets rid of the last 10, thats not needed.
+	//gets rid of the last 10, thats not needed.
+	lcdController.printInt(0xD4+5, (data.calRPM/10)*10);
 	lcdp->print(32);
 
 

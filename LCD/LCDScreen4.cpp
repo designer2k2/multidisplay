@@ -51,29 +51,21 @@ void LCDScreen4::customDraw()  {
 	//This just printÂ´s all the Thermocouple values:
 	//like screen2 it only updates every X repeatÂ´s
 
-
-	lcdp->commandWrite(0x80+4);                  //T1
-	lcdp->printIn(itoa((data.calAgt[0]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0x80+14);                 //T2
-	lcdp->printIn(itoa((data.calAgt[1]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0xC0+4);                  //T3
-	lcdp->printIn(itoa((data.calAgt[2]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0xC0+14);                 //T4
-	lcdp->printIn(itoa((data.calAgt[3]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0x94+4);                  //T5
-	lcdp->printIn(itoa((data.calAgt[4]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0x94+14);                 //T6
-	lcdp->printIn(itoa((data.calAgt[5]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0xD4+4);                  //T7
-	lcdp->printIn(itoa((data.calAgt[6]), buf, 10));
-	lcdController.print2Blanks();
-	lcdp->commandWrite(0xD4+14);                 //T8
-	lcdp->printIn(itoa((data.calAgt[7]), buf, 10));
-	lcdController.print2Blanks();
+	//FIXME removed lcdController.print2Blanks(); after each print. if we need it -> custom formatstring!
+	//T1
+	lcdController.printInt(0x80+4, data.calAgt[0]);
+	//T2
+	lcdController.printInt(0x80+14, data.calAgt[1]);
+	//T3
+	lcdController.printInt(0xC0+4, data.calAgt[2]);
+	//T4
+	lcdController.printInt(0xC0+14, data.calAgt[3]);
+	//T5
+	lcdController.printInt(0x94+4, data.calAgt[4]);
+	//T6
+	lcdController.printInt(0x94+14, data.calAgt[5]);
+	//T7
+	lcdController.printInt(0xD4+4, data.calAgt[6]);
+	//T8
+	lcdController.printInt(0xD4+14, data.calAgt[7]);
 }

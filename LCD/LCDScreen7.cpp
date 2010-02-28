@@ -99,10 +99,13 @@ void LCDScreen7::customDraw() {
 
 
 	//Draw the Caption:
-	lcdp->commandWrite(0x80);                  //Line1
-	lcdp->printIn(itoa(flags.f.mode, buf, 10));
+	//Line1
+//	lcdp->commandWrite(0x80);
+//	lcdp->printIn(itoa(flags.f.mode, buf, 10));
+	lcdController.printInt(0x80, flags.f.mode);
 	lcdp->printIn(":");
-	lcdp->printIn(itoa(refreshCounter, buf, 10));
+//	lcdp->printIn(itoa(refreshCounter, buf, 10));
+	lcdController.printInt (0, refreshCounter);
 
 	Serial.println(mController.time);
 }
