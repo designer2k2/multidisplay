@@ -28,10 +28,14 @@
  */
 class LCDScreen8: public LCDScreen {
 public:
+	uint8_t maxr;
+
 	LCDScreen8();
 
 	void customInit ();
 	void customDraw ();
+
+	void toggleMax ();
 };
 
 #endif /* LCDSCREEN8_H_ */

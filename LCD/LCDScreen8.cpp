@@ -33,6 +33,8 @@ LCDScreen8::LCDScreen8() {
 	flags.f.loadDot = 0;
 	flags.f.loadVBar = 0;
 	flags.f.loadBigFont4 = 0;
+
+	maxr = 0;
 }
 
 
@@ -45,29 +47,34 @@ void LCDScreen8::customInit() {
 }
 
 
-//FIXME broken! screen8Val gets not set yet!
+void LCDScreen8::toggleMax () {
+	//changes the MAX screen through all values
+	maxr++;
+	if ( maxr >= 4 )
+		maxr = 0;
+}
+
 void LCDScreen8::customDraw()  {
-	uint8_t screen8Val = 0;
 
 	//Header:
-	lcdController.printInt(0x80+4, screen8Val);
+	lcdController.printInt(0x80+4, maxr);
 
 
 	lcdp->commandWrite(0xC0+3);                  //Max1LD
 
-	if(data.maxLdE[screen8Val]<0.0)  {
+	if(data.maxLdE[maxr]<0.0)  {
 		lcdp->printIn("-");
 	} else {
 		lcdp->printIn(" ");
 	}
-	lcdController.printFloat2DP(abs(data.maxLdE[screen8Val]));
+	lcdController.printFloat2DP(abs(data.maxLdE[maxr]));
 
 	//Max1RPM
-	lcdController.printInt(0xC0+14, data.maxRpmE[screen8Val]);
+	lcdController.printInt(0xC0+14, data.maxRpmE[maxr]);
 	//FIXME removed lcdController.print2Blanks(); after each print. if we need it -> custom formatstring!
 
 	//LMM
-	lcdController.printInt(0x94+4, data.maxLmmE[screen8Val]);
+	lcdController.printInt(0x94+4, data.maxLmmE[maxr]);
 
-	lcdController.printInt(0x94+14, data.maxAgtValE[screen8Val]);
+	lcdController.printInt(0x94+14, data.maxAgtValE[maxr]);
 }
