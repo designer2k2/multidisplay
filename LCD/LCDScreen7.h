@@ -36,10 +36,9 @@ public:
 	void customDraw ();
 
 private:
-	//FIXME change name!
-	int val1;
-	//FIXME change name!
-	int val2;
+	//FIXME needed ?!?
+//	int val1;
+//	int val2;
 };
 
 #endif /* LCDSCREEN7_H_ */

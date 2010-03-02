@@ -56,8 +56,8 @@ void EEPROMWriteDouble(int p_address, long p_value)
 	EEPROM.write(p_address + 2, Byte3);
 	EEPROM.write(p_address + 3, Byte4);
 }
-long EEPROMReadDouble(int p_address)
-{
+
+long EEPROMReadDouble(int p_address) {
 	byte Byte1 = EEPROM.read(p_address);
 	byte Byte2 = EEPROM.read(p_address + 1);
 	byte Byte3 = EEPROM.read(p_address + 2);

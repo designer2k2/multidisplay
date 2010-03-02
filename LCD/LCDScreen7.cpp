@@ -34,18 +34,12 @@ LCDScreen7::LCDScreen7() {
 	flags.f.loadVBar = 1;
 	flags.f.loadBigFont4 = 0;
 
-	//FIXME local variables!
 }
 
 
-#include "MultidisplayDefines.h"
 void LCDScreen7::customInit() {
-	//FIXME The Constrains:
-//	screen6Val1 = 0;
-//	screen6Val2 = 5000;
-
-	//FIXMEThe Data Selector
-//	screen6DataSel = 1;
+//	val1 = 0;
+//	val2 = 5000;
 }
 
 
@@ -76,17 +70,19 @@ void LCDScreen7::customDraw() {
 	}
 
 
-	if(ScopeVal<val2)    {
-		val2 = ScopeVal;
-	}
-
-	if(ScopeVal>val1)    {
-		val1 = ScopeVal;
-	}
+	//FIXME min and max values are needed!
+//	if(ScopeVal<val2)    {
+//		val2 = ScopeVal;
+//	}
+//
+//	if(ScopeVal>val1)    {
+//		val1 = ScopeVal;
+//	}
 
 	//Get the Data:
 	int val3;
-	val3 = map(ScopeVal, val2, val1, 0, 33);
+	//FIXME fix the data mapping
+//	val3 = map(ScopeVal, val2, val1, 0, 33);
 	//val3 = constrain(val3, 0, 32);
 
 	//Show only the rightmost bar: (live screen)

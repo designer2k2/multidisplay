@@ -20,6 +20,7 @@
 #include "MultidisplayController.h"
 #include "LCDController.h"
 #include "LCDScreen.h"
+#include "LCDScreen8.h"
 
 #include <stdlib.h>
 #include <inttypes.h>
@@ -29,6 +30,16 @@
 #include <EEPROM.h>
 #include <WProgram.h>
 
+
+/**
+ * EEPROM Layout:
+ *
+ * Start Byte | type | name
+ * 100 | byte | activeScreen
+ * 105 | byte | brightness
+ * 200 | double | calLD
+ * 205 | byte | ldCalPoint
+ */
 
  //Lookup Table for the TypK:
  //from 0-1350ï¿½C in steps of 50ï¿½C, the list is in ï¿½V according to that Temp.
@@ -402,11 +413,11 @@ void MultidisplayController::HeaderPrint() {
 		break;
 	case SERIALOUT_RAW:
 		Serial.println(" ");
-		Serial.println("Time;data.anaIn0;data.anaIn1;data.anaIn2;data.anaIn3;data.anaIn4;data.anaIn5;data.anaIn6;data.anaIn7");
+		Serial.println_P(PSTR("Time;data.anaIn0;data.anaIn1;data.anaIn2;data.anaIn3;data.anaIn4;data.anaIn5;data.anaIn6;data.anaIn7"));
 		break;
 	case SERIALOUT_ENABLED:
 		Serial.println(" ");
-		Serial.println("Time;RPM;Boost;Throttle;Lambda;LMM;CaseTemp;TypK1;TypK2;Battery");
+		Serial.println_P(PSTR("Time;RPM;Boost;Throttle;Lambda;LMM;CaseTemp;TypK1;TypK2;Battery"));
 		break;
 	default:
 		break;
@@ -458,6 +469,8 @@ void MultidisplayController::CalibrateLD()
 //This converts the thermocouple µV reading into some usable °C
 int MultidisplayController::GetTypKTemp(unsigned int microVolts)
 {
+	//TODO dont use linear search!
+
 	int LookedupValue = 0;
 	//This searches the 2 surrounding values, and then linear interpolates between them.
 	for(int i = 0; i<TEMPTYPKREADINGS;i++) 	{
@@ -472,6 +485,8 @@ int MultidisplayController::GetTypKTemp(unsigned int microVolts)
 
 //Converts the ADW Reading into �C
 int MultidisplayController::GetVDOTemp(unsigned int ADWreading) {
+	//TODO dont use linear search!
+
 	int LookedupValue = 0;
 	//This searches the 2 surrounding values, and then linear interpolates between them.
 	for(int i = 0; i<22;i++) {
@@ -575,8 +590,8 @@ void MultidisplayController::FetchTypK()  {
 //This checks certain values if they exceed limits or not, if so an alarm is triggered
 void MultidisplayController::CheckLimits()
 {
-	int Brightness = lcdController.brightness;
-	int FlashTrigger=0;
+	uint8_t Brightness = lcdController.brightness;
+	uint8_t FlashTrigger=0;
 
 	/*
   if(VDOPres1>MaxOP)
@@ -632,7 +647,7 @@ void MultidisplayController::CheckLimits()
 
 //----------------------------------------------------------------------------------------------------
 //Saves all Data to the arrays
-void MultidisplayController::SaveMax(int Num)
+void MultidisplayController::SaveMax(uint8_t Num)
 {
 	data.maxAgtValE[Num] = data.calAgt[0];
 	data.maxLdE[Num] = data.calBoost;
@@ -813,6 +828,7 @@ void MultidisplayController::buttonBPressed() {
 //		screen8Val++;	//changes the MAX screen through all values
 //		if(screen8Val >= 4)
 //			screen8Val = 1;
+		((LCDScreen8*)lcdController.myScreens[7])->toggleMax();
 		break;
 
 	default:

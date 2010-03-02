@@ -77,9 +77,6 @@ public:
 
 protected:
 	uint8_t refreshCounter;
-
-	//TODO FIXME change name
-	//used by the draw methods
 };
 
 #endif /* LCDSCREEN_H_ */

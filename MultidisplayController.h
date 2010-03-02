@@ -71,7 +71,7 @@ private:
 	int GetVDOPressure(unsigned int ADWreading);
 	void FetchTypK();
 	void CheckLimits();
-	void SaveMax(int Num);
+	void SaveMax(uint8_t Num);
 
 	//button related functions
 	unsigned long buttonTime;   //Button time

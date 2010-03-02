@@ -157,7 +157,7 @@ void LCD4Bit::printIn(char msg[]) {
 //While I don't understand why this was named printIn (PRINT IN?) in the original LiquidCrystal library, I've preserved it here to maintain the interchangeability of the two libraries.
 void LCD4Bit::printIn_P(char msg[]) {
   uint8_t i;  //fancy int.  avoids compiler warning when comparing i with strlen()'s uint8_t
-  for (i=0;i < strlen(msg);i++){
+  for (i=0;i < strlen_P(msg);i++){
     print(pgm_read_byte(msg[i]));
   }
 }
