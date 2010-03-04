@@ -20,6 +20,14 @@
 #ifndef MULTIDISPLAY_DEFINES_H_
 #define MULTIDISPLAY_DEFINES_H_
 
+
+//choose your engines ecu
+//only one of them should be defined!
+#define VR6_MOTRONIC
+//#define DIGIFANT
+
+#define LAMBDA_WIDEBAND
+
 //----------------------------------------------------------------------------------------------------
 //Max Values:
 #define MaxAGT 1200            //Maximum AGT

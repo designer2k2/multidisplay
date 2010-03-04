@@ -30,6 +30,7 @@
 #include <EEPROM.h>
 #include <WProgram.h>
 
+#include <PID_Beta6.h>
 
 /**
  * EEPROM Layout:
@@ -178,6 +179,9 @@ MultidisplayController::MultidisplayController() {
 
 	//Init the Buttons:
 	expanderWrite(0b10000011);        //This may needs to be modified when a third button is attached.
+
+	//boost PID
+	data.boostSetPoint = 1.5;
 }
 
 
@@ -271,8 +275,7 @@ byte MultidisplayController::expanderRead2() {
 	return _data;
 }
 
-void MultidisplayController::AnaConversion()
-{
+void MultidisplayController::AnaConversion() {
 	//This converts all 16 Analog Values into the real deal :)
 
 	//Boost:
@@ -286,26 +289,44 @@ void MultidisplayController::AnaConversion()
 	}
 
 	//Lambda:
+#ifdef LAMBDA_WIDEBAND
+	//TODO implement wideband lambda
+#else
 	data.calLambda = map(data.anaIn[LAMBDAPIN], LAMBDAMIN, LAMBDAMAX, 0, 200);    //gets about the 0-1V into 0-200 values
+#endif
 	data.calLambda = constrain(data.calLambda, 0, 200);
 
 	//CaseTemp: (damped)
 	data.calCaseTemp = data.calCaseTemp*0.9 + (500.0*data.anaIn[CASETEMPPIN]/4096.0)*0.1;  //thats how to get °C out from a LM35 with 12Bit ADW
 
+#ifdef VR6_MOTRONIC
 	//Throttle:
 	data.calThrottle = map(data.anaIn[THROTTLEPIN], THROTTLEMIN, THROTTLEMAX, 0, 100);
 	data.calThrottle = constrain(data.calThrottle, 0, 100);
 	data.calThrottle = 100 - data.calThrottle;                 //VR6 has 5V for closed and 0V for open throttle...
+#endif
 
+#ifdef DIGIFANT
+	//TODO implement ll/vl schalter!
+#endif
+
+#ifdef VR6_MOTRONIC
 	//LMM:
 	data.calLMM = 5.0*data.anaIn[LMMPIN]/4096.0;		   //makes 0.0 to 5.0 Volt out of it, with VagCom this could be maped to gr Air i think
+#endif
 
 	//RPM
+#ifdef VR6_MOTRONIC
 	//(from the smoothing example)
 	data.rpmTotal -= data.rpmReadings[data.rpmIndex];               // subtract the last reading
 	data.rpmReadings[data.rpmIndex] = data.anaIn[RPMPIN];           // read from the sensor
 	data.rpmTotal += data.rpmReadings[data.rpmIndex];               // add the reading to the total
 	data.rpmIndex = (data.rpmIndex + 1);                       // advance to the next index
+#endif
+
+#ifdef DIGIFANT
+	//TODO implement RPM!
+#endif
 
 	if (data.rpmIndex >= RPMSMOOTH)                       // if we're at the end of the array...
 	{
@@ -722,6 +743,9 @@ void MultidisplayController::mainLoop() {
 	} else {
 		debug++;
 	}
+
+//	boostPID.Compute();
+	//TODO write boostOutput to PWM pin!
 #endif
 }
 

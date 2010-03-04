@@ -29,7 +29,7 @@
 #include "LCDController.h"
 #include "SensorData.h"
 #include "MultidisplayController.h"
-
+#include <PID_Beta6.h>
 
 int debug = 0;
 
@@ -50,8 +50,11 @@ ToDo:
 MultidisplayController mController = MultidisplayController();
 LCDController lcdController = LCDController();
 //UserInterface ui = UserInterface();
-SensorData data;
-//SensorData data = SensorData();
+//SensorData data;
+SensorData data = SensorData();
+
+//boost PID Controller
+PID boostPID( (double*) &data.calBoost, &data.boostOutput, &data.boostSetPoint,2,5,1);
 
 int main(void) {
 //	initSensorData ( &data );

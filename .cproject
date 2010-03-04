@@ -806,6 +806,7 @@
 </profile>
 </scannerConfigBuildInfo>
 </storageModule>
+<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cconfiguration>
 <cconfiguration id="de.innot.avreclipse.configuration.app.release.875599522">
 <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="de.innot.avreclipse.configuration.app.release.875599522" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -854,6 +855,7 @@
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/arduinoDuemilanoveCore}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/multidisplay/libs}&quot;"/>
 </option>
+<option id="de.innot.avreclipse.cppcompiler.option.optimize.other.1922741277" name="Other Optimization Flags" superClass="de.innot.avreclipse.cppcompiler.option.optimize.other" value="--combine  -fno-inline-small-functions -fno-split-wide-types -fno-tree-scev-cprop" valueType="string"/>
 <inputType id="de.innot.avreclipse.cppcompiler.input.1034405056" superClass="de.innot.avreclipse.cppcompiler.input"/>
 </tool>
 <tool id="de.innot.avreclipse.tool.linker.winavr.app.release.1948021021" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.release"/>
@@ -864,7 +866,7 @@
 <option id="de.innot.avreclipse.cpplinker.option.libs.1513941840" name="Libraries (-l)" superClass="de.innot.avreclipse.cpplinker.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="arduinocore"/>
 </option>
-<option id="de.innot.avreclipse.cpplinker.option.otherlinkargs.1318766721" name="Other Arguments" superClass="de.innot.avreclipse.cpplinker.option.otherlinkargs" value="" valueType="string"/>
+<option id="de.innot.avreclipse.cpplinker.option.otherlinkargs.1318766721" name="Other Arguments" superClass="de.innot.avreclipse.cpplinker.option.otherlinkargs" value="-Wl,--relax,--gc-sections" valueType="string"/>
 <option id="de.innot.avreclipse.cpplinker.option.nostart.446730052" name="No startup or default libs (-nostdlib)" superClass="de.innot.avreclipse.cpplinker.option.nostart" value="false" valueType="boolean"/>
 </tool>
 <tool id="de.innot.avreclipse.tool.archiver.winavr.base.1464507051" name="AVR Archiver" superClass="de.innot.avreclipse.tool.archiver.winavr.base"/>
@@ -1609,6 +1611,7 @@
 </profile>
 </scannerConfigBuildInfo>
 </storageModule>
+<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cconfiguration>
 </storageModule>
 <storageModule moduleId="cdtBuildSystem" version="4.0.0">
