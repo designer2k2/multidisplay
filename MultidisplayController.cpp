@@ -743,8 +743,11 @@ void MultidisplayController::mainLoop() {
 	} else {
 		debug++;
 	}
+#endif
 
-//	boostPID.Compute();
+#ifdef BOOSTN75
+	//TODO adjust setpoint!
+	boostPID.Compute();
 	//TODO write boostOutput to PWM pin!
 #endif
 }
@@ -908,4 +911,3 @@ void MultidisplayController::buttonBPressed() {
 	 }
 	 //Thats it... easy.
  }
-
