@@ -57,12 +57,16 @@ SensorData data = SensorData();
 PID boostPID( (double*) &data.calBoost, &data.boostOutput, &data.boostSetPoint,2,5,1);
 
 int main(void) {
-//	initSensorData ( &data );
+	/* Must call init for arduino to work properly */
+    init();
+
 	for (;;) {
 		mController.mainLoop();
 	}
 	// we arent allowed to return from this main function!
 }
 
-
-//-T /usr/lib/binutils/avr/2.19.1/ldscripts/avr5.x
+//Gentoo Bug
+//http://bugs.gentoo.org/show_bug.cgi?id=147155
+//ln -s /usr/i686-pc-linux-gnu/avr/lib/ldscripts in Debug and Release dir!
+//or -T /usr/lib/binutils/avr/2.19.1/ldscripts/avr5.x as linker option

@@ -46,6 +46,7 @@ public:
 	//convertet values:
 	float calBoost;
 	float calRAWBoost;
+	float calLambdaF;
 	int calLambda;
 	long calRPM;
 	int calThrottle;

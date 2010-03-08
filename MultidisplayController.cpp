@@ -290,8 +290,13 @@ void MultidisplayController::AnaConversion() {
 
 	//Lambda:
 #ifdef LAMBDA_WIDEBAND
-	//TODO implement wideband lambda
+	//http://www.plxdevices.com/InstallationInstructions/SM-AFRUsersGuide.pdf
+	// air fuel ratio = 2*Voltage + 10
+
+	//i think we read milli volt!
+	data.calLambdaF = ( data.anaIn[LAMBDAPIN]/1000 * 2 + 10 ) / 14.7;
 #else
+	//TODO convert it right here into the float lambda value!
 	data.calLambda = map(data.anaIn[LAMBDAPIN], LAMBDAMIN, LAMBDAMAX, 0, 200);    //gets about the 0-1V into 0-200 values
 #endif
 	data.calLambda = constrain(data.calLambda, 0, 200);

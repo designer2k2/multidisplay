@@ -48,6 +48,7 @@ SensorData::SensorData () {
 	calBoost = 0.0;
 	calRAWBoost = 0.0;
 	calLambda = 0;
+	calLambdaF = 0;
 	calRPM = 0;
 	calThrottle = 0;
 	calCaseTemp = 0.0;
