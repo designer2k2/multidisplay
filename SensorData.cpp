@@ -71,14 +71,6 @@ SensorData::SensorData () {
 	}
 
 
-	//Read the Values from the EEPROM back
-	lcdController.activeScreen = EEPROM.read(100);        //what screen was last shown?
-
-	lcdController.setBrightness( EEPROM.read(105) );    //The Brightness from the LCD
-	ldCalPoint = EEPROM.read(205);
-	calLd = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
-
-
 	//rpm Smoothing init:
 	for (uint8_t i = 0; i < RPMSMOOTH; i++) {
 		rpmReadings[i] = 0;                      // initialize all the readings to 0

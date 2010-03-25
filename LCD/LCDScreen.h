@@ -26,6 +26,9 @@
 
 #include <LCDController.h>
 
+class SensorData;
+class LCDController;
+
 struct s_screen_flags_t {
 	uint8_t doCal : 1;
 	uint8_t doTypK : 1;
@@ -77,6 +80,8 @@ public:
 
 protected:
 	uint8_t refreshCounter;
+	SensorData *dataP;
+	LCDController *lcdControllerP;
 };
 
 #endif /* LCDSCREEN_H_ */

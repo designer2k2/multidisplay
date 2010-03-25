@@ -57,16 +57,16 @@ void LCDScreen2::customDraw()  {
 
 	//FIXME why do we need to print 2 blanks? if we need them, we should do it with a custom format string
 	//A1
-	lcdController.printInt(0x80+4, data.anaIn[1+mcp]);
+	lcdControllerP->printInt(0x80+4, dataP->anaIn[1+mcp]);
 	//A2
-	lcdController.printInt(0x80+14, data.anaIn[2+mcp]);
+	lcdControllerP->printInt(0x80+14, dataP->anaIn[2+mcp]);
 	//A3
-	lcdController.printInt(0xC0+4, data.anaIn[3+mcp]);
-	lcdController.printInt(0xC0+14, data.anaIn[4+mcp]);
-	lcdController.printInt(0x94+4, data.anaIn[5+mcp]);
-	lcdController.printInt(0x94+14, data.anaIn[6+mcp]);
-	lcdController.printInt(0xD4+4, data.anaIn[7+mcp]);
-	lcdController.printInt(0xD4+14, data.anaIn[8+mcp]);
+	lcdControllerP->printInt(0xC0+4, dataP->anaIn[3+mcp]);
+	lcdControllerP->printInt(0xC0+14, dataP->anaIn[4+mcp]);
+	lcdControllerP->printInt(0x94+4, dataP->anaIn[5+mcp]);
+	lcdControllerP->printInt(0x94+14, dataP->anaIn[6+mcp]);
+	lcdControllerP->printInt(0xD4+4, dataP->anaIn[7+mcp]);
+	lcdControllerP->printInt(0xD4+14, dataP->anaIn[8+mcp]);
 }
 
 

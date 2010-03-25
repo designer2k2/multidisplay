@@ -24,12 +24,14 @@
 #include "MultidisplayController.h"
 
 LCDScreen::LCDScreen() {
-	// TODO Auto-generated constructor stub
+	dataP = &(mControllerP->data);
+	lcdControllerP = mControllerP->lcdControllerP;
 }
 
 LCDScreen::LCDScreen(LCD4Bit *lcdp, uint16_t flags) : lcdp(lcdp) {
 	this->flags.all = flags;
-
+	dataP = &(mControllerP->data);
+	lcdControllerP = mControllerP->lcdControllerP;
 }
 
 void LCDScreen::init() {
@@ -37,25 +39,25 @@ void LCDScreen::init() {
 
 	//Load the specific data:
 	if (flags.f.loadBar)
-		lcdController.cgramBar();
+		lcdControllerP->cgramBar();
 	if (flags.f.loadDot)
-		lcdController.cgramDot();
+		lcdControllerP->cgramDot();
 	if (flags.f.loadBigFont4)
-		lcdController.cgramBigFont4();
+		lcdControllerP->cgramBigFont4();
 
 
  	if (flags.f.doCal)
- 		mController.DoCal = 1;
+ 		mControllerP->DoCal = 1;
 
  	//Fetch Typ K
  	if (flags.f.doTypK)
- 		mController.DoTypK = 1;
+ 		mControllerP->DoTypK = 1;
 
  	//Select Serial Out Mode "Convertet":
- 	mController.SerOut = flags.f.serial;
+ 	mControllerP->SerOut = flags.f.serial;
 
  	//print the Serial Header:
- 	mController.HeaderPrint();
+ 	mControllerP->HeaderPrint();
 
  	refreshCounter = flags.f.refreshRate;
 

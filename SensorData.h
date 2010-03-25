@@ -70,7 +70,6 @@ public:
 	SensorData();
 };
 
-
-extern SensorData data;
+//extern SensorData *dataP;
 
 #endif

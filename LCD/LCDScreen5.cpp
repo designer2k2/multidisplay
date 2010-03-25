@@ -46,7 +46,7 @@ void LCDScreen5::customInit() {
 void LCDScreen5::customDraw() {
 
 	lcdp->commandWrite(0xC0+7);
-	if( data.calBoost < 0.0 ) {
+	if(dataP->calBoost < 0.0 ) {
 		lcdp->print(2);
 		lcdp->print(2);
 	} else {
@@ -55,15 +55,15 @@ void LCDScreen5::customDraw() {
 
 	//bigNum(abs(CalBoost)*1000,0,9,1);
 
-	lcdController.printBigNum ( (double) data.calBoost, LCD_WIDTH-9, 9, 0, LCD_BIGFONT_4);
+	lcdControllerP->printBigNum ( (double)dataP->calBoost, LCD_WIDTH-9, 9, 0, LCD_BIGFONT_4);
 
 
 	//Check for new MaxLD
-	if( data.calBoost > data.maxLd) {
-		data.maxLd  = data.calBoost;
+	if(dataP->calBoost > dataP->maxLd) {
+		dataP->maxLd  = dataP->calBoost;
 	}
 
 //	lcdp->commandWrite(0xD4);
-//	lcdController.printFloat2DP(data.maxLd);                    //Max Boost
-	lcdController.printFloat2DP(0xD4, data.maxLd);                    //Max Boost
+//	lcdControllerP->printFloat2DP(data.maxLd);                    //Max Boost
+	lcdControllerP->printFloat2DP(0xD4,dataP->maxLd);                    //Max Boost
  }

@@ -26,6 +26,10 @@
 
 class LCDScreen;
 
+//9
+#define SCREENCOUNT 8
+//#define SCREENCOUNT 1
+
 /**
  * cvoid LCDController::printFloat2DP(uint8_t pos, float f) {
 	printFloat (pos, f, "%.2f");
@@ -57,7 +61,7 @@ public:
 	 * screen9: vdo temp and pressures
 	 */
 
-	LCDScreen* myScreens[9];
+	LCDScreen* myScreens[SCREENCOUNT];
 
 	void init ();
 	void draw ();
@@ -73,7 +77,20 @@ public:
 
     void lcdShowIntro(int delayValue);
 
+    static const uint8_t PROGMEM bigfont2data1[];
+    static const uint8_t PROGMEM bigfont2data2[];
+    static const uint8_t PROGMEM bigfont2data3[];
+    static const uint8_t PROGMEM bigfont2data6[];
 	void cgramBigFont2();
+
+
+	static const uint8_t PROGMEM bigfont4data1[];
+	static const uint8_t PROGMEM bigfont4data2[];
+	static const uint8_t PROGMEM bigfont4data3[];
+	static const uint8_t PROGMEM bigfont4data4[];
+	static const uint8_t PROGMEM bigfont4data5[];
+	static const uint8_t PROGMEM bigfont4data6[];
+	static const uint8_t PROGMEM bigfont4data7[];
 	void cgramBigFont4();
 
 	void printInt (uint8_t pos, int value);
@@ -109,9 +126,39 @@ public:
 	// data has to point to PMEM!
 	void lcdUploadUdef5x8_P (uint8_t charIndex, const uint8_t *data);
 
+	void lcdUploadUdef5x8(uint8_t charIndex, const uint8_t *data);
+
+	static const uint8_t PROGMEM dotdata1[];
+	static const uint8_t PROGMEM dotdata2[];
+	static const uint8_t PROGMEM dotdata3[];
+	static const uint8_t PROGMEM dotdata4[];
 	void cgramDot();
+
+	static const uint8_t PROGMEM bardata1[];
+	static const uint8_t PROGMEM bardata2[];
+	static const uint8_t PROGMEM bardata3[];
+	static const uint8_t PROGMEM bardata4[];
 	void cgramBar();
+
+	static const uint8_t PROGMEM vbardata1[];
+	static const uint8_t PROGMEM vbardata2[];
+	static const uint8_t PROGMEM vbardata3[];
+	static const uint8_t PROGMEM vbardata4[];
+	static const uint8_t PROGMEM vbardata5[];
+	static const uint8_t PROGMEM vbardata6[];
+	static const uint8_t PROGMEM vbardata7[];
 	void cgramVertBar();
+
+	static const unsigned char PROGMEM idata1[];
+	static const unsigned char PROGMEM idata2[];
+	static const uint8_t PROGMEM idata3[];
+	static const uint8_t PROGMEM idata4[];
+	static const unsigned char PROGMEM i2data1[];
+	static const unsigned char PROGMEM i2data2[];
+	static const unsigned char PROGMEM i2data3[];
+	static const unsigned char PROGMEM i2data4[];
+
+
 
 	void cgramIntro();
 	void cgramIntro2();
@@ -129,6 +176,6 @@ private:
 
 };
 
-extern LCDController lcdController;
+//extern LCDController *lcdControllerP;
 
 #endif /* LCDCONTROLLER_H_ */

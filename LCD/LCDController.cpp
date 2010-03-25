@@ -54,7 +54,7 @@ LCDController::LCDController() : activeScreen(0), brightness(2) {
     myScreens[5] = new LCDScreen6();
     myScreens[6] = new LCDScreen7();
     myScreens[7] = new LCDScreen8();
-    myScreens[8] = new LCDScreen9();
+//    myScreens[8] = new LCDScreen9();
 }
 
 void LCDController::init() {
@@ -64,7 +64,7 @@ void LCDController::init() {
 
 
 void LCDController::draw() {
-	myScreens[activeScreen]->init();
+	myScreens[activeScreen]->draw();
 }
 
 //The LCD brightness, what could be cycled through
@@ -87,7 +87,7 @@ void LCDController::setBrightness(uint8_t bright)  {
 
 void LCDController::toggleScreen () {
 	// 9 screens atm -> 0..8!
-	if ( activeScreen == 8 )
+	if ( activeScreen == SCREENCOUNT-1 )
 		activeScreen = 0;
 	else
 		activeScreen++;
@@ -108,47 +108,46 @@ char LCDController::bn44[]={4,6,5,0,       6,6,6,0,       4,6,6,0,       4,6,5,0
 
 
 
+
+//255 is the "Full Block" Code, and 254 is blank
+const uint8_t LCDController::bigfont2data1[] = {31,31,31,0,0,0,0,0};    //Small Block on top
+const uint8_t LCDController::bigfont2data2[] = {0,0,0,0,0,31,31,31};    //Small Block on bottom
+const uint8_t LCDController::bigfont2data3[] = {31,31,31,0,0,0,31,31};  //Small Block on top and bottom
+// const prog_uint8_t bigfont2data4[] = {28,30,31,31,31,31,30,28};  //Full Block roundet right
+// const prog_uint8_t bigfont2data5[] = {7,15,31,31,31,31,15,7};  //Full Block roundet left
+const uint8_t LCDController::bigfont2data6[] = {0,0,0,14,14,14,12,8};  //Dot, for Decimal.
+
 //Bigfont Code
 //
 //BIG parts from http://opengauge.googlecode.com/svn/trunk/mpguino/mpguino.pde
-
 void LCDController::cgramBigFont2() {
-	//255 is the "Full Block" Code, and 254 is blank
-	const prog_uint8_t data1[] = {31,31,31,0,0,0,0,0};    //Small Block on top
-	const prog_uint8_t data2[] = {0,0,0,0,0,31,31,31};    //Small Block on bottom
-	const prog_uint8_t data3[] = {31,31,31,0,0,0,31,31};  //Small Block on top and bottom
-	// const prog_uint8_t data4[] = {28,30,31,31,31,31,30,28};  //Full Block roundet right
-	// const prog_uint8_t data5[] = {7,15,31,31,31,31,15,7};  //Full Block roundet left
-	const prog_uint8_t data6[] = {0,0,0,14,14,14,12,8};  //Dot, for Decimal.
-
-	lcdUploadUdef5x8_P (1,data1);
-	lcdUploadUdef5x8_P (2,data2);
-	lcdUploadUdef5x8_P (3,data3);
+	lcdUploadUdef5x8_P (1,bigfont2data1);
+	lcdUploadUdef5x8_P (2,bigfont2data2);
+	lcdUploadUdef5x8_P (3,bigfont2data3);
 	// LcdUploadUdef5x8_P (4,data4);
 	// LcdUploadUdef5x8_P (5,data5);
-	lcdUploadUdef5x8_P (6,data6);
+	lcdUploadUdef5x8_P (6,bigfont2data6);
 }
 //-------------------------------------------------------------------------------------------------------
 
+//255 is the "Full Block" Code, and 254 is blank
+const uint8_t LCDController::bigfont4data1[] = {0,0,0,0,3,15,15,31};    //Small Block on bottom left
+const uint8_t LCDController::bigfont4data2[] = {0,0,0,0,31,31,31,31};    //Small Block on bottom right
+const uint8_t LCDController::bigfont4data3[] = {0,0,0,0,24,30,30,31};  //Small Block on bottom full
+const uint8_t LCDController::bigfont4data4[] = {31,15,15,3,0,0,0,0};  //Small Block on top left
+const uint8_t LCDController::bigfont4data5[] = {31,30,30,24,0,0,0,0};  //Small Block on top right
+const uint8_t LCDController::bigfont4data6[] = {31,31,31,31,0,0,0,0};  //Small Block on top full
+const uint8_t LCDController::bigfont4data7[] = {14,14,14,14,12,8,0,0};  //Dot, for Decimal.
+
 void LCDController::cgramBigFont4() {
 
-	//255 is the "Full Block" Code, and 254 is blank
-	const prog_uint8_t data1[] = {0,0,0,0,3,15,15,31};    //Small Block on bottom left
-	const prog_uint8_t data2[] = {0,0,0,0,31,31,31,31};    //Small Block on bottom right
-	const prog_uint8_t data3[] = {0,0,0,0,24,30,30,31};  //Small Block on bottom full
-	const prog_uint8_t data4[] = {31,15,15,3,0,0,0,0};  //Small Block on top left
-	const prog_uint8_t data5[] = {31,30,30,24,0,0,0,0};  //Small Block on top right
-	const prog_uint8_t data6[] = {31,31,31,31,0,0,0,0};  //Small Block on top full
-	const prog_uint8_t data7[] = {14,14,14,14,12,8,0,0};  //Dot, for Decimal.
-
-	lcdUploadUdef5x8_P (1,data1);
-	lcdUploadUdef5x8_P (2,data2);
-	lcdUploadUdef5x8_P (3,data3);
-	lcdUploadUdef5x8_P (4,data4);
-	lcdUploadUdef5x8_P (5,data5);
-	lcdUploadUdef5x8_P (6,data6);
-	lcdUploadUdef5x8_P (7,data7);
-
+	lcdUploadUdef5x8_P (1,bigfont4data1);
+	lcdUploadUdef5x8_P (2,bigfont4data2);
+	lcdUploadUdef5x8_P (3,bigfont4data3);
+	lcdUploadUdef5x8_P (4,bigfont4data4);
+	lcdUploadUdef5x8_P (5,bigfont4data5);
+	lcdUploadUdef5x8_P (6,bigfont4data6);
+	lcdUploadUdef5x8_P (7,bigfont4data7);
 }
 
 /**
@@ -238,61 +237,61 @@ void LCDController::printFloat(uint8_t pos, float f, char* formatstring) {
 }
 
 
-//-------------------------------------------------------------------------------------------------------
-//
-//void LCDController::cgramIntro() {
-//	const prog_uint8_t data1[] = {28,28,28,30,30,31,31,31};  // 1--- k
-//	const prog_uint8_t data2[] = {7,7,7,15,15,31,31,31};     // -1-- k
-//	const prog_uint8_t data3[] = {31,31,31,28,28,28,28,28};  // --1- k
-//	const prog_uint8_t data4[] = {24,28,30,15,7,7,7,7};      // ---1 k
-//
-//	lcdUploadUdef5x8_P (1,data1);
-//	lcdUploadUdef5x8_P (2,data2);
-//	lcdUploadUdef5x8_P (3,data3);
-//	lcdUploadUdef5x8_P (4,data4);
-//}
-//
-//void LCDController::cgramIntro2() {
-//	const prog_uint8_t data1[] = {31,29,29,28,28,28,28,28};  // 2--- k
-//	const prog_uint8_t data2[] = {31,23,23,7,7,7,7,7};       // -2-- k
-//	const prog_uint8_t data3[] = {28,28,28,28,28,31,31,31};  // --2- k
-//	const prog_uint8_t data4[] = {7,7,7,7,15,30,28,24};      // ---2 k
-//
-//	lcdUploadUdef5x8_P (5,data1);
-//	lcdUploadUdef5x8_P (6,data2);
-//	lcdUploadUdef5x8_P (7,data3);
-//	lcdUploadUdef5x8_P (8,data4);
-//}
+const unsigned char LCDController::idata1[] = {28,28,28,30,30,31,31,31};  // 1--- k
+const unsigned char LCDController::idata2[] = {7,7,7,15,15,31,31,31};     // -1-- k
+const prog_uint8_t LCDController::idata3[] = {31,31,31,28,28,28,28,28};  // --1- k
+const prog_uint8_t LCDController::idata4[] = {24,28,30,15,7,7,7,7};      // ---1 k
+
+void LCDController::cgramIntro() {
+	lcdUploadUdef5x8_P (1,idata1);
+	lcdUploadUdef5x8_P (2,idata2);
+	lcdUploadUdef5x8_P (3,idata3);
+	lcdUploadUdef5x8_P (4,idata4);
+}
+
+const unsigned char LCDController::i2data1[] = {31,29,29,28,28,28,28,28};  // 2--- k
+const unsigned char LCDController::i2data2[] = {31,23,23,7,7,7,7,7};       // -2-- k
+const unsigned char LCDController::i2data3[] = {28,28,28,28,28,31,31,31};  // --2- k
+const unsigned char LCDController::i2data4[] = {7,7,7,7,15,30,28,24};      // ---2 k
+void LCDController::cgramIntro2() {
+
+	lcdUploadUdef5x8_P (5,i2data1);
+	lcdUploadUdef5x8_P (6,i2data2);
+	lcdUploadUdef5x8_P (7,i2data3);
+	lcdUploadUdef5x8_P (8,i2data4);
+}
 
 
 void LCDController::lcdShowIntro(int delayValue) {
-//
-//	//Must load this in 2 steps, somehow its not possible to load 8 chars at once...
-//	cgramIntro();
-//	cgramIntro2();
-//
-//	//Show the Intro:
-//	lcdp->commandWrite(0x80+2);                  //Line1
-//	lcdp->print(1);
-//	lcdp->print(2);
-//	lcdp->commandWrite(0x80+10);                  //Line1
-//	lcdp->print(3);
-//	lcdp->print(4);
-//
-//	lcdp->commandWrite(0xC0+2); 			//Line2
-//	lcdp->print(5);
-//	lcdp->print(6);
-//	lcdp->printIn_P ( PSTR("ulti") );
-//	lcdp->commandWrite(0xC0+10); 			//Line2
-//	lcdp->print(7);
-//	lcdp->print(8);
-//	lcdp->printIn_P ( PSTR("isplay") );
-//
-//	lcdp->commandWrite(0xD4+1);                  //Line=4
-//	lcdp->printIn_P ( PSTR("www.designer2k2.at") );
+
+	//Must load this in 2 steps, somehow its not possible to load 8 chars at once...
+	cgramIntro();
+	cgramIntro2();
+
+	//Show the Intro:
+	lcdp->commandWrite(0x80+2);                  //Line1
+	lcdp->print(1);
+	lcdp->print(2);
+	lcdp->commandWrite(0x80+10);                  //Line1
+	lcdp->print(3);
+	lcdp->print(4);
+
+	lcdp->commandWrite(0xC0+2); 			//Line2
+	lcdp->print(5);
+	lcdp->print(6);
+	lcdp->printIn_P ( PSTR("ulti") );
+	lcdp->commandWrite(0xC0+10); 			//Line2
+	lcdp->print(7);
+	lcdp->print(8);
+//	lcdp->printIn ( "isplay" );
+	lcdp->printIn_P ( PSTR("isplay") );
+
+	lcdp->commandWrite(0xD4+1);                  //Line=4
+	lcdp->printIn_P ( PSTR("www.designer2k2.at") );
+//	lcdp->printIn ( "www.designer2k2.at" );
 
 	//Set the LCD brightness: (This turns on the Light, looks nice)
-	lcdController.setBrightness(2);
+	setBrightness(2);
 
 	//Flash the Shiftlight:
 
@@ -323,10 +322,23 @@ void LCDController::lcdUploadUdef5x8_P(uint8_t charIndex, const uint8_t *data) {
 	charIndex = charIndex << 3;
 	for (uint8_t i = 0; i < 8; i++) {
 		lcdp->commandWrite(0x40 | charIndex | i);
-		lcdp->print( pgm_read_byte (data[i]) );
+		lcdp->print( pgm_read_byte (data+i) );
 	}
 }
 
+void LCDController::lcdUploadUdef5x8(uint8_t charIndex, const uint8_t *data) {
+	charIndex = charIndex << 3;
+	for (uint8_t i = 0; i < 8; i++) {
+		lcdp->commandWrite(0x40 | charIndex | i);
+		lcdp->print( data[i] );
+	}
+}
+
+
+const uint8_t LCDController::dotdata1[] = {31,0,0,0,0,0,0,31};        //only 2 dots
+const uint8_t LCDController::dotdata2[] = {31,0,0,14,0,0,0,31};       //the 2 dots with a minus
+const uint8_t LCDController::dotdata3[] = {31,0,4,14,4,0,0,31};       //the 2 dots with a plus
+const uint8_t LCDController::dotdata4[] = {31,14,31,31,31,31,14,31};  //thats a block with little rounded edges
 
 /**
  * uploads dots to cgram
@@ -334,32 +346,26 @@ void LCDController::lcdUploadUdef5x8_P(uint8_t charIndex, const uint8_t *data) {
  */
 void LCDController::cgramDot() {
 
-	const prog_uint8_t data1[] = {31,0,0,0,0,0,0,31};        //only 2 dots
-	const prog_uint8_t data2[] = {31,0,0,14,0,0,0,31};       //the 2 dots with a minus
-	const prog_uint8_t data3[] = {31,0,4,14,4,0,0,31};       //the 2 dots with a plus
-	const prog_uint8_t data4[] = {31,14,31,31,31,31,14,31};  //thats a block with little rounded edges
-
-	lcdUploadUdef5x8_P (5,data1);
-	lcdUploadUdef5x8_P (6,data2);
-	lcdUploadUdef5x8_P (7,data3);
-	lcdUploadUdef5x8_P (8,data4);
+	lcdUploadUdef5x8_P (5,dotdata1);
+	lcdUploadUdef5x8_P (6,dotdata2);
+	lcdUploadUdef5x8_P (7,dotdata3);
+	lcdUploadUdef5x8_P (8,dotdata4);
 }
 //-------------------------------------------------------------------------------------------------------
 
+const uint8_t LCDController::bardata1[] = {16,16,16,16,16,16,16,16};  //1 line
+const uint8_t LCDController::bardata2[] = {24,24,24,24,24,24,24,24};  //2 line
+const uint8_t LCDController::bardata3[] = {28,28,28,28,28,28,28,28};  //3 line
+const uint8_t LCDController::bardata4[] = {30,30,30,30,30,30,30,30};  //4 line
 
 /**
  * uploads bar chars to cgram
  */
 void LCDController::cgramBar() {
-	const prog_uint8_t data1[] = {16,16,16,16,16,16,16,16};  //1 line
-	const prog_uint8_t data2[] = {24,24,24,24,24,24,24,24};  //2 line
-	const prog_uint8_t data3[] = {28,28,28,28,28,28,28,28};  //3 line
-	const prog_uint8_t data4[] = {30,30,30,30,30,30,30,30};  //4 line
-
-	lcdUploadUdef5x8_P (1,data1);
-	lcdUploadUdef5x8_P (2,data2);
-	lcdUploadUdef5x8_P (3,data3);
-	lcdUploadUdef5x8_P (4,data4);
+	lcdUploadUdef5x8_P (1,bardata1);
+	lcdUploadUdef5x8_P (2,bardata2);
+	lcdUploadUdef5x8_P (3,bardata3);
+	lcdUploadUdef5x8_P (4,bardata4);
 }
 
 
@@ -393,27 +399,25 @@ void LCDController::drawBar(uint8_t digits, uint8_t value) {
 	}
 }
 
+const uint8_t LCDController::vbardata1[] = {0,0,0,0,0,0,0,31};              //1 row
+const uint8_t LCDController::vbardata2[] = {0,0,0,0,0,0,31,31};             //2 rows
+const uint8_t LCDController::vbardata3[] = {0,0,0,0,0,31,31,31};            //3 rows
+const uint8_t LCDController::vbardata4[] = {0,0,0,0,31,31,31,31};           //4 rows
+const uint8_t LCDController::vbardata5[] = {0,0,0,31,31,31,31,31};          //5 rows
+const uint8_t LCDController::vbardata6[] = {0,0,31,31,31,31,31,31};         //6 rows
+const uint8_t LCDController::vbardata7[] = {0,31,31,31,31,31,31,31};        //7 rows
 
 /**
  * uploads vertical bars to cgram
  */
 void LCDController::cgramVertBar() {
-
-	const prog_uint8_t data1[] = {0,0,0,0,0,0,0,31};              //1 row
-	const prog_uint8_t data2[] = {0,0,0,0,0,0,31,31};             //2 rows
-	const prog_uint8_t data3[] = {0,0,0,0,0,31,31,31};            //3 rows
-	const prog_uint8_t data4[] = {0,0,0,0,31,31,31,31};           //4 rows
-	const prog_uint8_t data5[] = {0,0,0,31,31,31,31,31};          //5 rows
-	const prog_uint8_t data6[] = {0,0,31,31,31,31,31,31};         //6 rows
-	const prog_uint8_t data7[] = {0,31,31,31,31,31,31,31};        //7 rows
-
-	lcdUploadUdef5x8_P (1,data1);
-	lcdUploadUdef5x8_P (2,data2);
-	lcdUploadUdef5x8_P (3,data3);
-	lcdUploadUdef5x8_P (4,data4);
-	lcdUploadUdef5x8_P (5,data5);
-	lcdUploadUdef5x8_P (6,data6);
-	lcdUploadUdef5x8_P (7,data7);
+	lcdUploadUdef5x8_P (1,vbardata1);
+	lcdUploadUdef5x8_P (2,vbardata2);
+	lcdUploadUdef5x8_P (3,vbardata3);
+	lcdUploadUdef5x8_P (4,vbardata4);
+	lcdUploadUdef5x8_P (5,vbardata5);
+	lcdUploadUdef5x8_P (6,vbardata6);
+	lcdUploadUdef5x8_P (7,vbardata7);
 }
 //-------------------------------------------------------------------------------------------------------
 
@@ -622,3 +626,5 @@ void LCDController::printString (uint8_t pos, char* str) {
 		lcdp->commandWrite (pos);
 	lcdp->printIn (str);
 }
+
+//LCDController lcdController = LCDController();

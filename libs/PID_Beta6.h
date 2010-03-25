@@ -107,8 +107,6 @@ class PID
     bool justCalced;              // * flag gets set for one cycle after the pid calculates
 };
 
-//PID controller for the boost
-extern PID boostPID;
 
 #endif
 

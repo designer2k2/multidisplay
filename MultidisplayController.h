@@ -26,6 +26,9 @@
 #include<Wire.h>
 #include <avr/pgmspace.h>
 #include"SensorData.h"
+#include <LCD/LCDController.h>
+
+class PID;
 
 class MultidisplayController {
 public:
@@ -37,6 +40,10 @@ public:
     uint8_t DoCheck;
     unsigned long ScreenSave;
     unsigned long time;
+
+    SensorData data;
+    LCDController lcdController;
+    LCDController *lcdControllerP;
 
 	void mainLoop();
 	void ChangeSerOut();
@@ -53,6 +60,9 @@ private:
     TwoWire wire;
     unsigned long FlashETimeU;
     unsigned long FlashTimeU;
+
+    //PID controller for the boost
+    PID *boostPidP;
 
 //    int val3;
 
@@ -84,6 +94,6 @@ private:
 	void buttonBPressed();
 };
 
-extern MultidisplayController mController;
+extern MultidisplayController *mControllerP;
 
 #endif /* MULTIDISPLAYCONTROLLER_H_ */

@@ -31,9 +31,6 @@
 #include "MultidisplayController.h"
 #include <PID_Beta6.h>
 
-int debug = 0;
-
-
 
 /*
 ToDo:
@@ -46,22 +43,17 @@ ToDo:
 - (1) Change tge Typ K reading for the selection to work together with the MCP3208 Chip select !!  be aware read_adc has some debug on the led´s going on!!!
 */
 
-
-MultidisplayController mController = MultidisplayController();
-LCDController lcdController = LCDController();
-//UserInterface ui = UserInterface();
-//SensorData data;
-SensorData data = SensorData();
-
-//boost PID Controller
-PID boostPID( (double*) &data.calBoost, &data.boostOutput, &data.boostSetPoint,2,5,1);
+MultidisplayController *mControllerP;
 
 int main(void) {
 	/* Must call init for arduino to work properly */
     init();
 
+    mControllerP = new MultidisplayController();
+
+
 	for (;;) {
-		mController.mainLoop();
+		mControllerP->mainLoop();
 	}
 	// we arent allowed to return from this main function!
 }

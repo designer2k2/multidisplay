@@ -27,7 +27,9 @@
 //#define DIGIFANT
 
 #define LAMBDA_WIDEBAND
-#define BOOSTN75
+//#define BOOSTN75
+
+//#define READFROMEEPROM
 
 //----------------------------------------------------------------------------------------------------
 //Max Values:
@@ -37,6 +39,7 @@
 
 //Options:
 
+#define DEBUG 1
 #define RPM_DEBUG 0             //Little Frequency Generator
 #define FREEMEM 0              //Outputs how much free RAM is
 

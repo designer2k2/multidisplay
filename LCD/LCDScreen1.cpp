@@ -31,6 +31,13 @@ LCDScreen1::LCDScreen1() {
 	flags.f.doTypK = 1;
 	flags.f.serial = SERIALOUT_ENABLED;
 	flags.f.refreshRate = 0;
+	flags.f.mode = 0;
+
+	flags.f.loadBar=0;
+	flags.f.loadDot=0;
+	flags.f.loadVBar=0;
+	flags.f.loadBigFont4=0;
+	flags.f.loadBigFont2=0;
 }
 
 void LCDScreen1::customInit() {
@@ -45,8 +52,8 @@ void LCDScreen1::customDraw() {
 	int boostMapped = 0;
 
 	//Calibrate it:
-	val = data.calLambda/10;
-	boostMapped = map(data.anaIn[BOOSTPIN], 0, 4096, 0, 200);
+	val = dataP->calLambda/10;
+	boostMapped = map(dataP->anaIn[BOOSTPIN], 0, 4096, 0, 200);
 	boostMapped = constrain(boostMapped, 0, 200);
 
 	lcdp->commandWrite(0x80+5);               //Line 1, position 5!
@@ -54,65 +61,68 @@ void LCDScreen1::customDraw() {
 	//AGT1+AGT2/2 thats because off my 2 Probes
 //	char buf[12];
 //	lcdp->printIn( itoa((data.calAgt[0]+data.calAgt[1])/2, buf, 10));
-	lcdController.printInt( 0x80+5, (data.calAgt[0]+data.calAgt[1])/2);
+	lcdControllerP->printInt( 0x80+5, (dataP->calAgt[0] + dataP->calAgt[1])/2);
 
 	lcdp->print(32);                           //Print a " " at the end, to clear in case its needed
 
 	lcdp->commandWrite(0x80+14);              //Line 3,
 
-	lcdController.printFloat2DP (data.calCaseTemp);
+	lcdControllerP->printFloat2DP (dataP->calCaseTemp);
 
 	lcdp->print(223);                         //Print a " " at the end, to clear in case its needed
 	lcdp->printIn_P( PSTR("C") );                       //Print a " " at the end, to clear in case its needed
 
 	lcdp->commandWrite(0x94+3);
 
-	if(data.calBoost < 0.0) {
+	if (dataP->calBoost < 0.0) {
 		lcdp->printIn_P (PSTR("-"));
 	} else {
 		lcdp->printIn_P (PSTR(" "));
 	}
-	lcdController.printFloat2DP(abs(data.calBoost));              //Shows current Boost
+	lcdControllerP->printFloat2DP (abs(dataP->calBoost));              //Shows current Boost
 
 	//Check for new MaxLD, and then save the point where to make the square
-	if(data.calBoost > data.maxLd) {
-		data.maxLd  = data.calBoost;
-		data.maxLdt = boostMapped/10;
+	if(dataP->calBoost > dataP->maxLd) {
+		dataP->maxLd  = dataP->calBoost;
+		dataP->maxLdt = boostMapped/10;
 	}
 
 //	lcdp->commandWrite(0x94+16);
-	lcdController.printFloat2DP(0x94+16, data.maxLd);                    //Max Boost
+	lcdControllerP->printFloat2DP(0x94+16, dataP->maxLd);                    //Max Boost
 
 	//Lets draw the dot:
 	lcdp->commandWrite(0xC0);              // Line 2
-	for (int i=0; i <= 19; i++) {
-		if(i==val) {
-			lcdp->print(8);        //thats the Dot
-		} else {
-			if(i <= LAMBDALOWERLIMIT) {
-				//from 0-4 a minus then nothing
-				lcdp->print(6);
-			} else {
-				if(i <= LAMBDAUPPERLIMIT) {
-					//from 5-15 ist nothing and then a plus
-					lcdp->print(5);
-				} else {
-					lcdp->print(7);
-				}
-			}
-		}
-	}
+
+	//FIXME
+//	for (int i=0; i <= 19; i++) {
+//		if(i==val) {
+//			lcdp->print(8);        //thats the Dot
+//		} else {
+//			if(i <= LAMBDALOWERLIMIT) {
+//				//from 0-4 a minus then nothing
+//				lcdp->print(6);
+//			} else {
+//				if(i <= LAMBDAUPPERLIMIT) {
+//					//from 5-15 ist nothing and then a plus
+//					lcdp->print(5);
+//				} else {
+//					lcdp->print(7);
+//				}
+//			}
+//		}
+//	}
 
 	//Now lets make the Bar:
 	lcdp->commandWrite(0xD4);                // Line 4
-	lcdController.drawBar(20,boostMapped);
+	//FIXME
+//	lcdControllerP->drawBar(20,boostMapped);
 
 	//And draw a Dot at the max pos & 0 Pos
 
-	lcdp->commandWrite(0xD4 + data.maxLdt);                // Line 4
+	lcdp->commandWrite(0xD4 + dataP->maxLdt);                // Line 4
 	lcdp->print(255);
 
-	lcdp->commandWrite(0xD4 + data.ldCalPoint);                // Line 4
+	lcdp->commandWrite(0xD4 + dataP->ldCalPoint);                // Line 4
 	lcdp->print(255);
 
 }

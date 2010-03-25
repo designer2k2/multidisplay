@@ -42,93 +42,101 @@
  * 205 | byte | ldCalPoint
  */
 
- //Lookup Table for the TypK:
- //from 0-1350ï¿½C in steps of 50ï¿½C, the list is in ï¿½V according to that Temp.
- const unsigned int MultidisplayController::tempTypK[] =
- {
-  0,
-  1922,
-  3891,
-  5831,
-  7731,
-  9645,
-  11599,
-  13578,
-  15577,
-  17590,
-  19612,
-  21637,
-  23660,
-  25674,
-  27673,
-  29652,
-  31611,
-  33547,
-  35460,
-  37348,
-  39212,
-  41050,
-  42863,
-  44645,
-  46396,
-  48112,
-  49790,
-  51431
+//Lookup Table for the TypK:
+//from 0-1350ï¿½C in steps of 50ï¿½C, the list is in ï¿½V according to that Temp.
+const unsigned int MultidisplayController::tempTypK[] =
+{
+		0,
+		1922,
+		3891,
+		5831,
+		7731,
+		9645,
+		11599,
+		13578,
+		15577,
+		17590,
+		19612,
+		21637,
+		23660,
+		25674,
+		27673,
+		29652,
+		31611,
+		33547,
+		35460,
+		37348,
+		39212,
+		41050,
+		42863,
+		44645,
+		46396,
+		48112,
+		49790,
+		51431
 };
 
- //Lookup Table for the Oilpressure: (12 Values)
- //from 0-10Bar in steps of 1Bar, the list is in 12Bit Digital Reading when supplyed with 5V and a 200Ohm Resistor in series
- //(measuring the Voltage on the Sensor)
- //it has a increasing Resistance with the Pressure.
- const unsigned int MultidisplayController::tempVDOPressure[] =
- {
-  0,
-  195,
-  549,
-  845,
-  1073,
-  1271,
-  1427,
-  1567,
-  1686,
-  1794,
-  1881,
-  1962
+//Lookup Table for the Oilpressure: (12 Values)
+//from 0-10Bar in steps of 1Bar, the list is in 12Bit Digital Reading when supplyed with 5V and a 200Ohm Resistor in series
+//(measuring the Voltage on the Sensor)
+//it has a increasing Resistance with the Pressure.
+const unsigned int MultidisplayController::tempVDOPressure[] =
+{
+		0,
+		195,
+		549,
+		845,
+		1073,
+		1271,
+		1427,
+		1567,
+		1686,
+		1794,
+		1881,
+		1962
 };
 
- //Lookup Table for the VDOtemperature (22 Values) Its Calibration curve 92-027-006
- //from -30C-180C in steps of 10C, the list is in 12Bit Digital Reading when supplyed with 5V and a 200Ohm Resistor in series
- //(measuring the Voltage on the Sensor)
- //it has a decreasing Resistance with the Temperature
- const unsigned int MultidisplayController::tempVDOTemp[] =
- {
-  4053,
-  4019,
-  3957,
-  3857,
-  3706,
-  3497,
-  3224,
-  2893,
-  2527,
-  2150,
-  1790,
-  1471,
-  1200,
-  968,
-  782,
-  632,
-  515,
-  422,
-  348,
-  287,
-  238,
-  199
+//Lookup Table for the VDOtemperature (22 Values) Its Calibration curve 92-027-006
+//from -30C-180C in steps of 10C, the list is in 12Bit Digital Reading when supplyed with 5V and a 200Ohm Resistor in series
+//(measuring the Voltage on the Sensor)
+//it has a decreasing Resistance with the Temperature
+const unsigned int MultidisplayController::tempVDOTemp[] =
+{
+		4053,
+		4019,
+		3957,
+		3857,
+		3706,
+		3497,
+		3224,
+		2893,
+		2527,
+		2150,
+		1790,
+		1471,
+		1200,
+		968,
+		782,
+		632,
+		515,
+		422,
+		348,
+		287,
+		238,
+		199
 };
 
 
 MultidisplayController::MultidisplayController() {
-	// TODO Auto-generated constructor stub
+	data = SensorData();
+
+#ifdef BOOSTN75
+	//boost PID Controller
+	boostPidP = new PID ( (double*) &data.calBoost, &data.boostOutput, &data.boostSetPoint,2,5,1);
+#else
+	boostPidP = NULL;
+#endif
+
 	IOport2 = 0b11111111;
 	wire = TwoWire();
 
@@ -136,12 +144,13 @@ MultidisplayController::MultidisplayController() {
 	FlashTimeU = 0;
 	ScreenSave = 0;
 	time = 0;
-//	val3=0;
+	//	val3=0;
 	data.calLd = 0.0;          //calibration from the Boost
 	data.maxLd = 0;
 	data.maxLdt=0;               //max LD for the screen
 
 	DoCheck = 1;
+	SerOut = SERIALOUT_RAW;
 
 	buttonTime = 0;
 
@@ -165,23 +174,30 @@ MultidisplayController::MultidisplayController() {
 	Serial.println(" ");
 	Serial.println("MultiDisplay PRE!");
 
+	lcdController = LCDController();
+	lcdControllerP = &lcdController;
+
+#ifdef READFROMEEPROM
 	//Read the Values from the EEPROM back
 	lcdController.activeScreen = EEPROM.read(100);        //what screen was last shown?
 
 	lcdController.setBrightness (EEPROM.read(105));    //The Brightness from the LCD
 	data.ldCalPoint = EEPROM.read(205);
 	data.calLd = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
+#endif
 
-	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
+	Serial.println("intro");
+	lcdControllerP->lcdShowIntro(INITTIME);                      //Shows the Into
+	Serial.println("init");
+	lcdControllerP->init();
 
-	lcdController.init();
-
-
+	Serial.println("init buttons");
 	//Init the Buttons:
 	expanderWrite(0b10000011);        //This may needs to be modified when a third button is attached.
 
 	//boost PID
 	data.boostSetPoint = 1.5;
+
 }
 
 
@@ -427,7 +443,6 @@ void MultidisplayController::SerialPrint() {
 
 void MultidisplayController::HeaderPrint() {
 
-
 	switch(SerOut){
 	case SERIALOUT_DISABLED:
 		//This prints Debugging stuff:
@@ -448,7 +463,6 @@ void MultidisplayController::HeaderPrint() {
 	default:
 		break;
 	}
-
 }
 
 void MultidisplayController::ChangeSerOut()
@@ -616,7 +630,7 @@ void MultidisplayController::FetchTypK()  {
 //This checks certain values if they exceed limits or not, if so an alarm is triggered
 void MultidisplayController::CheckLimits()
 {
-	uint8_t Brightness = lcdController.brightness;
+	uint8_t Brightness = lcdControllerP->brightness;
 	uint8_t FlashTrigger=0;
 
 	/*
@@ -657,15 +671,15 @@ void MultidisplayController::CheckLimits()
 			}
 
 			FlashTimeU = millis() + FLASH_TIME;      //And save the Next Changetime
-			lcdController.setBrightness(Brightness);              //And set the Brightness
+			lcdControllerP->setBrightness(Brightness);              //And set the Brightness
 		}
 	}
 	else {
 		//?!?
 		Brightness = EEPROM.read(105);           //Set back the Brightness
-		lcdController.setBrightness(Brightness);              //And set the Brightness
+		lcdControllerP->setBrightness(Brightness);              //And set the Brightness
 	}
-	lcdController.setBrightness(Brightness);
+	lcdControllerP->setBrightness(Brightness);
 
 }
 
@@ -689,6 +703,7 @@ void MultidisplayController::SaveMax(uint8_t Num)
 
 
 void MultidisplayController::mainLoop() {
+	Serial.println("MultidisplayController::mainLoop");
 
 	//Current Time:
 	time = millis();
@@ -710,14 +725,14 @@ void MultidisplayController::mainLoop() {
 	//Check for Limits:
 	//if(DoCheck == 1)
 	// {
-	CheckLimits();
+//	CheckLimits();
 	// }
 
 	//Print it:
 	SerialPrint();
 
 	// ui knows what screen is active and draws it!
-	lcdController.draw();
+	lcdControllerP->draw();
 
 	//My own Button Check Function
 
@@ -727,12 +742,12 @@ void MultidisplayController::mainLoop() {
 
 	if(millis()>= ScreenSave) {
 		//and now save it:
-		EEPROM.write(100, lcdController.activeScreen);
+//		EEPROM.write(100, lcdControllerP->activeScreen);
 		//And also prevent a double save!
 		ScreenSave = 429400000;        // (thats close to 50days of runtime...)
 	}
 
-#if FreeMem
+#if FREEMEM
 	//Free Mem Debug:
 	Serial.print("FM ");
 	Serial.println( freeMem());
@@ -764,60 +779,71 @@ void MultidisplayController::mainLoop() {
  *============================================================================*/
 
 void MultidisplayController::buttonAHold() {
-	lcdController.toggleScreen();
+
+#ifdef DEBUG
+	Serial.println ("A Hold");
+#endif
+
+	lcdControllerP->toggleScreen();
 	//Set the Timestamp for the Save:
-	mController.ScreenSave = millis() + SCREENSAVEDELAY;
+	ScreenSave = millis() + SCREENSAVEDELAY;
 }
 
 //-------------------------------------------------------------------------------------------------------
 
 void MultidisplayController::buttonAPressed() {
 
-  //Serial.print(time*1);
-  //Serial.print(";");
-  //Serial.println("Button A Pressed");
+	//Serial.print(time*1);
+	//Serial.print(";");
+	//Serial.println("Button A Pressed");
+#ifdef DEBUG
+	Serial.println ("A pressed");
+#endif
 
-  switch(lcdController.activeScreen){
-   case 1:
-      mController.ChangeSerOut();      //Switch from RAW to Cal to Nothing and vise versa.
-      break;
-   case 2:
-       //Toggle A and B MCP
-      lcdController.myScreens[1]->toggleScreenAB();
-      break;
-   case 3:
-	   mController.ChangeSerOut();      //Switch from RAW to Cal to Nothing and vise versa.
-      break;
-   case 6:                 //Switches the 2 Row Screen
-	   lcdController.myScreens[5]->toggleScreenAB();
-      break;
-   case 7:
-	   lcdController.myScreens[6]->toggleRefreshCounter();
-      break;
-   default:
-      break;
-  }
+	switch(lcdControllerP->activeScreen){
+	case 1:
+		ChangeSerOut();      //Switch from RAW to Cal to Nothing and vise versa.
+		break;
+	case 2:
+		//Toggle A and B MCP
+		lcdControllerP->myScreens[1]->toggleScreenAB();
+		break;
+	case 3:
+		ChangeSerOut();      //Switch from RAW to Cal to Nothing and vise versa.
+		break;
+	case 6:                 //Switches the 2 Row Screen
+		lcdControllerP->myScreens[5]->toggleScreenAB();
+		break;
+	case 7:
+		lcdControllerP->myScreens[6]->toggleRefreshCounter();
+		break;
+	default:
+		break;
+	}
 }
 
 //-------------------------------------------------------------------------------------------------------
 
-void MultidisplayController::buttonBHold()
-{
+void MultidisplayController::buttonBHold() {
 
-  //Serial.print(time*1);
-  //Serial.print(";");
-  //Serial.println("Button B Hold");
+#ifdef DEBUG
+	Serial.println ("B Hold");
+#endif
 
-  switch(lcdController.activeScreen){
-   case 0:
-      break;
-   case 1:
-      //The Calibration from the LD will be done
-      mController.CalibrateLD();
-      break;
-   default:
-   break;
-  }
+	//Serial.print(time*1);
+	//Serial.print(";");
+	//Serial.println("Button B Hold");
+
+	switch(lcdControllerP->activeScreen){
+	case 0:
+		break;
+	case 1:
+		//The Calibration from the LD will be done
+		CalibrateLD();
+		break;
+	default:
+		break;
+	}
 
 }
 
@@ -825,11 +851,15 @@ void MultidisplayController::buttonBHold()
 
 void MultidisplayController::buttonBPressed() {
 
+#ifdef DEBUG
+	Serial.println ("B pressed");
+#endif
+
 	//Serial.print(time*1);
 	//Serial.print(";");
 	//Serial.println("Button B Pressed");
 
-	switch(lcdController.activeScreen){
+	switch(lcdControllerP->activeScreen){
 	case 0:
 		break;
 	case 1:
@@ -839,28 +869,28 @@ void MultidisplayController::buttonBPressed() {
 		break;
 	case 2:
 		//Change LCD brightness
-		lcdController.toggleBrightness();
+		lcdControllerP->toggleBrightness();
 
 		//and save the new value:
-		EEPROM.write(105,lcdController.brightness);
+		EEPROM.write(105,lcdControllerP->brightness);
 		break;
 	case 7:
 		//FIXME integrate into LCDSCreen6 its broken atm!
-//		screen6DataSel++;      //Change the Scope Screen
-//		if(screen6DataSel >= 5)
-//			screen6DataSel = 1;
-//
-//		//Reset the Constrains:
-//		//FIXME global ?!?
-//		screen6Val1 = 0;
-//		screen6Val2 = 5000;
+		//		screen6DataSel++;      //Change the Scope Screen
+		//		if(screen6DataSel >= 5)
+		//			screen6DataSel = 1;
+		//
+		//		//Reset the Constrains:
+		//		//FIXME global ?!?
+		//		screen6Val1 = 0;
+		//		screen6Val2 = 5000;
 		break;
 	case 8:
 		//FIXME integrate into LCDSCreen8 its broken atm!
-//		screen8Val++;	//changes the MAX screen through all values
-//		if(screen8Val >= 4)
-//			screen8Val = 1;
-		((LCDScreen8*)lcdController.myScreens[7])->toggleMax();
+		//		screen8Val++;	//changes the MAX screen through all values
+		//		if(screen8Val >= 4)
+		//			screen8Val = 1;
+		((LCDScreen8*)lcdControllerP->myScreens[7])->toggleMax();
 		break;
 
 	default:
@@ -870,49 +900,49 @@ void MultidisplayController::buttonBPressed() {
 
 //-------------------------------------------------------------------------------------------------------
 
- void MultidisplayController::buttonCheck(int buttonState)  {
-	 /**
-	  * A hold : switch screens
-	  */
+void MultidisplayController::buttonCheck(int buttonState)  {
+	/**
+	 * A hold : switch screens
+	 */
 
-	 /*
+	/*
 	3 = open
 	1 = s1
 	2 = s2
-	  */
+	 */
 
-	 //compensate for the LED:
-	 buttonState -= 128;
+	//compensate for the LED:
+	buttonState -= 128;
 
-	 //now a little inteligent stuff:
-	 switch(buttonState) {
-	 case 1:
-		 if(buttonTime == 0) {
-			 buttonAPressed();
-			 buttonTime = millis();
-		 } else {
-			 if(millis()>=buttonTime+BUTTONHOLD) {
-				 buttonAHold();
-				 buttonTime = millis();
-			 }
-		 }
-		 break;
+	//now a little inteligent stuff:
+	switch(buttonState) {
+	case 1:
+		if(buttonTime == 0) {
+			buttonAPressed();
+			buttonTime = millis();
+		} else {
+			if(millis()>=buttonTime+BUTTONHOLD) {
+				buttonAHold();
+				buttonTime = millis();
+			}
+		}
+		break;
 
-	 case 2:
-		 if(buttonTime == 0) {
-			 buttonBPressed();
-			 buttonTime = millis();
-		 } else {
-			 if(millis()>=buttonTime+BUTTONHOLD) {
-				 buttonBHold();
-				 buttonTime = millis();
-			 }
-		 }
-		 break;
+	case 2:
+		if(buttonTime == 0) {
+			buttonBPressed();
+			buttonTime = millis();
+		} else {
+			if(millis()>=buttonTime+BUTTONHOLD) {
+				buttonBHold();
+				buttonTime = millis();
+			}
+		}
+		break;
 
-	 case 3:
-		 buttonTime = 0;
-		 break;
-	 }
-	 //Thats it... easy.
- }
+	case 3:
+		buttonTime = 0;
+		break;
+	}
+	//Thats it... easy.
+}

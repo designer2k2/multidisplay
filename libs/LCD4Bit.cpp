@@ -44,11 +44,11 @@ extern "C" {
 int USING_RW = false;
 
 //RS, RW and Enable can be set to whatever you like
-int RS = 12;
+int RS = 4;
 int RW = 11;
 int Enable = 2;
 //DB should be an unseparated group of pins  - because of lazy coding in pushNibble()
-int DB[] = {7, 8, 9, 10};  //wire these to DB4~7 on LCD.
+int DB[] = {6, 7, 8, 9};  //wire these to DB4~7 on LCD.
 
 //--------------------------------------------------------
 
@@ -155,10 +155,11 @@ void LCD4Bit::printIn(char msg[]) {
 
 //print the given string to the LCD at the current cursor position.  overwrites, doesn't insert.
 //While I don't understand why this was named printIn (PRINT IN?) in the original LiquidCrystal library, I've preserved it here to maintain the interchangeability of the two libraries.
-void LCD4Bit::printIn_P(char msg[]) {
+void LCD4Bit::printIn_P(const char *msg) {
   uint8_t i;  //fancy int.  avoids compiler warning when comparing i with strlen()'s uint8_t
-  for (i=0;i < strlen_P(msg);i++){
-    print(pgm_read_byte(msg[i]));
+//  for (i=0;i < strlen_P(msg);i++){
+  while (pgm_read_byte(msg) != 0x00) {
+    print(pgm_read_byte(msg++));
   }
 }
 

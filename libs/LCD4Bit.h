@@ -15,7 +15,7 @@ public:
   void print_P(uint8_t value[], uint8_t len);
 
   void printIn(char value[]);
-  void printIn_P(char value[]);
+  void printIn_P(const char *msg);
 
   void printInBlank();
 
