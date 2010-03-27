@@ -191,13 +191,14 @@ MultidisplayController::MultidisplayController() {
 	Serial.println("init");
 	lcdControllerP->init();
 
-	Serial.println("init buttons");
+//	Serial.println("init buttons");
 	//Init the Buttons:
-	expanderWrite(0b10000011);        //This may needs to be modified when a third button is attached.
+//	expanderWrite(0b10000011);        //This may needs to be modified when a third button is attached.
 
 	//boost PID
 	data.boostSetPoint = 1.5;
 
+	serialTime = millis();
 }
 
 
@@ -398,7 +399,74 @@ void MultidisplayController::Shiftlight()
 
 
 
-void MultidisplayController::SerialPrint() {
+
+
+void MultidisplayController::serialReceive() {
+
+	// read the bytes sent from Processing
+	int index=0;
+	byte Auto_Man = -1;
+	while(Serial.available()&&index<25)
+	{
+		if(index==0) {
+			Auto_Man = Serial.read();
+		} else
+			srData.asBytes[index-1] = Serial.read();
+		index++;
+	}
+
+	// if the information we got was in the correct format,
+	// read it into the system
+	// case 1: command for pid lib
+	if(index==25  && (Auto_Man==0 || Auto_Man==1))
+	{
+#ifdef BOOSTN75
+		data.boostSetPoint = double(srData.asFloat[0]);
+		//Input=double(srData.asFloat[1]);       // * the user has the ability to send the
+		//   value of "Input"  in most cases (as
+		//   in this one) this is not needed.
+		if(Auto_Man==0)                       // * only change the output if we are in
+		{                                     //   manual mode.  otherwise we'll get an
+			data.boostOutput = double(srData.asFloat[2]);      //   output blip, then the controller will
+		}                                     //   overwrite.
+
+		double p, i, d;                       // * read in and set the controller tunings
+		p = double(srData.asFloat[3]);           //
+		i = double(srData.asFloat[4]);           //
+		d = double(srData.asFloat[5]);           //
+		boostPidP->SetTunings(p, i, d);            //
+
+		if(Auto_Man==0)
+			myPID.SetMode(MANUAL);// * set the controller mode
+		else
+			myPID.SetMode(AUTO);             //
+#endif
+	} else 	if (Auto_Man==2 && index >= 2) {
+		//case 2: command for multidisplay
+//		Serial.print("multidisplay command ");
+//		Serial.println(srData.asBytes[0]);
+
+		switch ( srData.asBytes[0] ) {
+			case 1:
+				buttonAPressed();
+				break;
+			case 2:
+				buttonAHold();
+				break;
+			case 3:
+				buttonBPressed();
+				break;
+			case 4:
+				buttonBHold();
+				break;
+		}
+	}
+
+	Serial.flush();                         // * clear any random data from the serial buffer
+}
+
+
+void MultidisplayController::serialSend() {
 	switch(SerOut){
 	case SERIALOUT_DISABLED:
 		break;
@@ -703,8 +771,6 @@ void MultidisplayController::SaveMax(uint8_t Num)
 
 
 void MultidisplayController::mainLoop() {
-	Serial.println("MultidisplayController::mainLoop");
-
 	//Current Time:
 	time = millis();
 
@@ -727,9 +793,6 @@ void MultidisplayController::mainLoop() {
 	// {
 //	CheckLimits();
 	// }
-
-	//Print it:
-	SerialPrint();
 
 	// ui knows what screen is active and draws it!
 	lcdControllerP->draw();
@@ -770,6 +833,21 @@ void MultidisplayController::mainLoop() {
 	boostPID.Compute();
 	//TODO write boostOutput to PWM pin!
 #endif
+
+	if ( millis() > serialTime ) {
+		//Print it:
+		serialReceive();
+		serialSend();
+		serialTime += SERIALFREQ;
+//#ifdef DEBUG
+//		Serial.println("MultidisplayController::mainLoop serial time!");
+//#endif
+	}
+//#ifdef DEBUG
+//	else {
+//		Serial.println("MultidisplayController::mainLoop");
+//	}
+//#endif
 }
 
 

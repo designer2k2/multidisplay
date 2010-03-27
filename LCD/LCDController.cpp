@@ -51,9 +51,9 @@ LCDController::LCDController() : activeScreen(0), brightness(2) {
     myScreens[2] = new LCDScreen3();
     myScreens[3] = new LCDScreen4();
     myScreens[4] = new LCDScreen5();
-    myScreens[5] = new LCDScreen6();
-    myScreens[6] = new LCDScreen7();
-    myScreens[7] = new LCDScreen8();
+//    myScreens[5] = new LCDScreen6();
+//    myScreens[6] = new LCDScreen7();
+//    myScreens[7] = new LCDScreen8();
 //    myScreens[8] = new LCDScreen9();
 }
 

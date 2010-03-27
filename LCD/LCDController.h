@@ -27,7 +27,7 @@
 class LCDScreen;
 
 //9
-#define SCREENCOUNT 8
+#define SCREENCOUNT 5
 //#define SCREENCOUNT 1
 
 /**
