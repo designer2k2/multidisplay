@@ -51,19 +51,19 @@ void LCDScreen7::customDraw() {
 
 	switch(flags.f.mode){
 	case SCOPE_BOOST:
-		ScopeVal = dataP->anaIn[BOOSTPIN];
+		ScopeVal = data.anaIn[BOOSTPIN];
 		break;
 	case SCOPE_THROTTLE:
-		ScopeVal = dataP->calThrottle;
+		ScopeVal = data.calThrottle;
 		break;
 	case SCOPE_LMM:
-		ScopeVal = dataP->calLMM;
+		ScopeVal = data.calLMM;
 		break;
 	case SCOPE_RPM:
-		ScopeVal = dataP->calRPM;
+		ScopeVal = data.calRPM;
 		break;
 	case SCOPE_LAMBDA:
-			ScopeVal = dataP->calLambda;
+			ScopeVal = data.calLambda;
 			break;
 	default:
 		break;
@@ -86,11 +86,11 @@ void LCDScreen7::customDraw() {
 	//val3 = constrain(val3, 0, 32);
 
 	//Show only the rightmost bar: (live screen)
-	lcdControllerP->drawVertBar(val3,19);
+	lcdController.drawVertBar(val3,19);
 
 	//Feed it into the Buffer (on the right side)
-	lcdControllerP->scopeInt[19] = val3;
-	lcdControllerP->scopeMode();
+	lcdController.scopeInt[19] = val3;
+	lcdController.scopeMode();
 
 
 
@@ -98,12 +98,12 @@ void LCDScreen7::customDraw() {
 	//Line1
 //	lcdp->commandWrite(0x80);
 //	lcdp->printIn(itoa(flags.f.mode, buf, 10));
-	lcdControllerP->printInt(0x80, flags.f.mode);
+	lcdController.printInt(0x80, flags.f.mode);
 	lcdp->printIn(":");
 //	lcdp->printIn(itoa(refreshCounter, buf, 10));
-	lcdControllerP->printInt (0, refreshCounter);
+	lcdController.printInt (0, refreshCounter);
 
-	Serial.println(mControllerP->time);
+	Serial.println(mController.time);
 }
 
 

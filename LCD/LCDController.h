@@ -24,27 +24,23 @@
 #include <avr/pgmspace.h>
 #include <LCD4Bit.h>
 
+
 class LCDScreen;
 
 //9
-#define SCREENCOUNT 5
+#define SCREENCOUNT 9
 //#define SCREENCOUNT 1
 
 /**
- * cvoid LCDController::printFloat2DP(uint8_t pos, float f) {
-	printFloat (pos, f, "%.2f");
-}
-
-void LCDController::printFloat(uint8_t pos, float f, char* formatstring) {
-	lcdp->commandWrite(pos);
-	printFloat (f, formatstring);
-}
- * ontrolls the LCD screen
+ *  controlls the LCD screen
  * provides helper methods for drawing
  */
 class LCDController {
 public:
+
 	LCDController();
+	//dont use the constructor because I want to control when the global objects get initialized
+	void myconstructor();
 
 	LCD4Bit* lcdp;
 
@@ -176,6 +172,6 @@ private:
 
 };
 
-//extern LCDController *lcdControllerP;
+extern LCDController lcdController;
 
 #endif /* LCDCONTROLLER_H_ */

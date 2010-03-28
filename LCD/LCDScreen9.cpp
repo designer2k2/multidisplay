@@ -48,17 +48,17 @@ void LCDScreen9::customDraw() {
 
 	//FIXME removed lcdController.print2Blanks(); after each print. if we need it -> custom formatstring!
 
-	lcdControllerP->printInt(0xC0+4, dataP->VDOTemp1);
+	lcdController.printInt(0xC0+4, data.VDOTemp1);
 
 	 //P1
-	lcdControllerP->printFloat2DP(0xC0+14, float(dataP->VDOPres1/10.0));
+	lcdController.printFloat2DP(0xC0+14, float(data.VDOPres1/10.0));
 	//T2
-	lcdControllerP->printInt(0x94+4, dataP->VDOTemp2);
+	lcdController.printInt(0x94+4, data.VDOTemp2);
 	//P2
-	lcdControllerP->printFloat2DP(0x94+14, float(dataP->VDOPres2/10.0));
+	lcdController.printFloat2DP(0x94+14, float(data.VDOPres2/10.0));
 	//T3
-	lcdControllerP->printInt(0xD4+4, dataP->VDOTemp3);
+	lcdController.printInt(0xD4+4, data.VDOTemp3);
 	//P3
-	lcdControllerP->printFloat2DP(0xD4+14, float(dataP->VDOPres3/10.0));
+	lcdController.printFloat2DP(0xD4+14, float(data.VDOPres3/10.0));
 }
 

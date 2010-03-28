@@ -26,7 +26,7 @@
 #include<Wire.h>
 #include <avr/pgmspace.h>
 #include"SensorData.h"
-#include <LCD/LCDController.h>
+#include "LCD/LCDController.h"
 
 class PID;
 
@@ -67,6 +67,8 @@ class PID;
 class MultidisplayController {
 public:
 	MultidisplayController();
+	//dont use the constructor because I want to control when the global objects get initialized
+	void myconstructor();
 
 	uint8_t SerOut;
     uint8_t DoCal;
@@ -76,8 +78,6 @@ public:
     unsigned long time;
 
     SensorData data;
-    LCDController lcdController;
-    LCDController *lcdControllerP;
 
 	void mainLoop();
 	void ChangeSerOut();
@@ -135,6 +135,9 @@ private:
 	void buttonBPressed();
 };
 
-extern MultidisplayController *mControllerP;
+
+extern MultidisplayController mController;
+
+
 
 #endif /* MULTIDISPLAYCONTROLLER_H_ */

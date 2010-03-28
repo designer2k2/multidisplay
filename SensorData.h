@@ -67,9 +67,13 @@ public:
 	float maxLmmE[4];         //maximum LMM
 	int maxOilE[4];             //maximum Oilpressure
 
+
 	SensorData();
+
+	//dont use the constructor because I want to control when the global objects get initialized
+	void myconstructor();
 };
 
-//extern SensorData *dataP;
+extern SensorData data;
 
 #endif

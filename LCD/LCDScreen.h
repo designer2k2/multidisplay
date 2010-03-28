@@ -80,8 +80,6 @@ public:
 
 protected:
 	uint8_t refreshCounter;
-	SensorData *dataP;
-	LCDController *lcdControllerP;
 };
 
 #endif /* LCDSCREEN_H_ */

@@ -126,8 +126,10 @@ const unsigned int MultidisplayController::tempVDOTemp[] =
 		199
 };
 
-
 MultidisplayController::MultidisplayController() {
+}
+
+void  MultidisplayController::myconstructor() {
 	data = SensorData();
 
 #ifdef BOOSTN75
@@ -174,8 +176,6 @@ MultidisplayController::MultidisplayController() {
 	Serial.println(" ");
 	Serial.println("MultiDisplay PRE!");
 
-	lcdController = LCDController();
-	lcdControllerP = &lcdController;
 
 #ifdef READFROMEEPROM
 	//Read the Values from the EEPROM back
@@ -187,13 +187,13 @@ MultidisplayController::MultidisplayController() {
 #endif
 
 	Serial.println("intro");
-	lcdControllerP->lcdShowIntro(INITTIME);                      //Shows the Into
+	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
 	Serial.println("init");
-	lcdControllerP->init();
+	lcdController.init();
 
-//	Serial.println("init buttons");
+	Serial.println("init buttons disabled");
 	//Init the Buttons:
-//	expanderWrite(0b10000011);        //This may needs to be modified when a third button is attached.
+	expanderWrite(0b10000011);        //This may needs to be modified when a third button is attached.
 
 	//boost PID
 	data.boostSetPoint = 1.5;
@@ -421,6 +421,7 @@ void MultidisplayController::serialReceive() {
 	if(index==25  && (Auto_Man==0 || Auto_Man==1))
 	{
 #ifdef BOOSTN75
+		//TODO print pid data
 		data.boostSetPoint = double(srData.asFloat[0]);
 		//Input=double(srData.asFloat[1]);       // * the user has the ability to send the
 		//   value of "Input"  in most cases (as
@@ -443,8 +444,6 @@ void MultidisplayController::serialReceive() {
 #endif
 	} else 	if (Auto_Man==2 && index >= 2) {
 		//case 2: command for multidisplay
-//		Serial.print("multidisplay command ");
-//		Serial.println(srData.asBytes[0]);
 
 		switch ( srData.asBytes[0] ) {
 			case 1:
@@ -698,7 +697,7 @@ void MultidisplayController::FetchTypK()  {
 //This checks certain values if they exceed limits or not, if so an alarm is triggered
 void MultidisplayController::CheckLimits()
 {
-	uint8_t Brightness = lcdControllerP->brightness;
+	uint8_t Brightness = lcdController.brightness;
 	uint8_t FlashTrigger=0;
 
 	/*
@@ -739,15 +738,15 @@ void MultidisplayController::CheckLimits()
 			}
 
 			FlashTimeU = millis() + FLASH_TIME;      //And save the Next Changetime
-			lcdControllerP->setBrightness(Brightness);              //And set the Brightness
+			lcdController.setBrightness(Brightness);              //And set the Brightness
 		}
 	}
 	else {
 		//?!?
 		Brightness = EEPROM.read(105);           //Set back the Brightness
-		lcdControllerP->setBrightness(Brightness);              //And set the Brightness
+		lcdController.setBrightness(Brightness);              //And set the Brightness
 	}
-	lcdControllerP->setBrightness(Brightness);
+	lcdController.setBrightness(Brightness);
 
 }
 
@@ -791,21 +790,20 @@ void MultidisplayController::mainLoop() {
 	//Check for Limits:
 	//if(DoCheck == 1)
 	// {
-//	CheckLimits();
+	CheckLimits();
 	// }
 
 	// ui knows what screen is active and draws it!
-	lcdControllerP->draw();
+	lcdController.draw();
 
 	//My own Button Check Function
-
 	buttonCheck(expanderRead());
 
 	//Saves the Screen when needed:
 
 	if(millis()>= ScreenSave) {
 		//and now save it:
-//		EEPROM.write(100, lcdControllerP->activeScreen);
+//		EEPROM.write(100, lcdController.activeScreen);
 		//And also prevent a double save!
 		ScreenSave = 429400000;        // (thats close to 50days of runtime...)
 	}
@@ -839,15 +837,7 @@ void MultidisplayController::mainLoop() {
 		serialReceive();
 		serialSend();
 		serialTime += SERIALFREQ;
-//#ifdef DEBUG
-//		Serial.println("MultidisplayController::mainLoop serial time!");
-//#endif
 	}
-//#ifdef DEBUG
-//	else {
-//		Serial.println("MultidisplayController::mainLoop");
-//	}
-//#endif
 }
 
 
@@ -862,7 +852,7 @@ void MultidisplayController::buttonAHold() {
 	Serial.println ("A Hold");
 #endif
 
-	lcdControllerP->toggleScreen();
+	lcdController.toggleScreen();
 	//Set the Timestamp for the Save:
 	ScreenSave = millis() + SCREENSAVEDELAY;
 }
@@ -878,22 +868,22 @@ void MultidisplayController::buttonAPressed() {
 	Serial.println ("A pressed");
 #endif
 
-	switch(lcdControllerP->activeScreen){
+	switch(lcdController.activeScreen){
 	case 1:
 		ChangeSerOut();      //Switch from RAW to Cal to Nothing and vise versa.
 		break;
 	case 2:
 		//Toggle A and B MCP
-		lcdControllerP->myScreens[1]->toggleScreenAB();
+		lcdController.myScreens[1]->toggleScreenAB();
 		break;
 	case 3:
 		ChangeSerOut();      //Switch from RAW to Cal to Nothing and vise versa.
 		break;
 	case 6:                 //Switches the 2 Row Screen
-		lcdControllerP->myScreens[5]->toggleScreenAB();
+		lcdController.myScreens[5]->toggleScreenAB();
 		break;
 	case 7:
-		lcdControllerP->myScreens[6]->toggleRefreshCounter();
+		lcdController.myScreens[6]->toggleRefreshCounter();
 		break;
 	default:
 		break;
@@ -912,7 +902,7 @@ void MultidisplayController::buttonBHold() {
 	//Serial.print(";");
 	//Serial.println("Button B Hold");
 
-	switch(lcdControllerP->activeScreen){
+	switch(lcdController.activeScreen){
 	case 0:
 		break;
 	case 1:
@@ -937,7 +927,7 @@ void MultidisplayController::buttonBPressed() {
 	//Serial.print(";");
 	//Serial.println("Button B Pressed");
 
-	switch(lcdControllerP->activeScreen){
+	switch(lcdController.activeScreen){
 	case 0:
 		break;
 	case 1:
@@ -947,10 +937,10 @@ void MultidisplayController::buttonBPressed() {
 		break;
 	case 2:
 		//Change LCD brightness
-		lcdControllerP->toggleBrightness();
+		lcdController.toggleBrightness();
 
 		//and save the new value:
-		EEPROM.write(105,lcdControllerP->brightness);
+		EEPROM.write(105,lcdController.brightness);
 		break;
 	case 7:
 		//FIXME integrate into LCDSCreen6 its broken atm!
@@ -968,7 +958,7 @@ void MultidisplayController::buttonBPressed() {
 		//		screen8Val++;	//changes the MAX screen through all values
 		//		if(screen8Val >= 4)
 		//			screen8Val = 1;
-		((LCDScreen8*)lcdControllerP->myScreens[7])->toggleMax();
+		((LCDScreen8*)lcdController.myScreens[7])->toggleMax();
 		break;
 
 	default:
@@ -1024,3 +1014,5 @@ void MultidisplayController::buttonCheck(int buttonState)  {
 	}
 	//Thats it... easy.
 }
+
+

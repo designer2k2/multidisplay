@@ -20,17 +20,9 @@
 
 #include <wiring.h>
 
-#include <EEPROM.h>            //for Settings / Max Value storage
-#include <LCD4Bit.h>           //to output to the LCD
-//#include <AFSoftSerial.h>      //The Serial Lib  24150
-#include <avr/pgmspace.h>      //for PROGMEN
-#include <Wire.h>              //to get the I2C working.
-#include "HardwareSerial.h"
 #include "LCDController.h"
-#include "SensorData.h"
 #include "MultidisplayController.h"
-#include <PID_Beta6.h>
-
+#include "SensorData.h"
 
 /*
 ToDo:
@@ -43,18 +35,21 @@ ToDo:
 - (1) Change tge Typ K reading for the selection to work together with the MCP3208 Chip select !!  be aware read_adc has some debug on the led´s going on!!!
 */
 
-MultidisplayController *mControllerP;
+SensorData data;
+LCDController lcdController;
+MultidisplayController mController;
 
 int main(void) {
 	/* Must call init for arduino to work properly */
     init();
 
-    mControllerP = new MultidisplayController();
+    data.myconstructor();
+    lcdController.myconstructor();
+	mController.myconstructor();
 
+	for (;;)
+		mController.mainLoop();
 
-	for (;;) {
-		mControllerP->mainLoop();
-	}
 	// we arent allowed to return from this main function!
 }
 

@@ -57,24 +57,24 @@ void LCDScreen8::toggleMax () {
 void LCDScreen8::customDraw()  {
 
 	//Header:
-	lcdControllerP->printInt(0x80+4, maxr);
+	lcdController.printInt(0x80+4, maxr);
 
 
 	lcdp->commandWrite(0xC0+3);                  //Max1LD
 
-	if(dataP->maxLdE[maxr]<0.0)  {
+	if(data.maxLdE[maxr]<0.0)  {
 		lcdp->printIn("-");
 	} else {
 		lcdp->printIn(" ");
 	}
-	lcdControllerP->printFloat2DP(abs(dataP->maxLdE[maxr]));
+	lcdController.printFloat2DP(abs(data.maxLdE[maxr]));
 
 	//Max1RPM
-	lcdControllerP->printInt(0xC0+14, dataP->maxRpmE[maxr]);
-	//FIXME removed lcdControllerP->print2Blanks(); after each print. if we need it -> custom formatstring!
+	lcdController.printInt(0xC0+14, data.maxRpmE[maxr]);
+	//FIXME removed lcdController.print2Blanks(); after each print. if we need it -> custom formatstring!
 
 	//LMM
-	lcdControllerP->printInt(0x94+4, dataP->maxLmmE[maxr]);
+	lcdController.printInt(0x94+4, data.maxLmmE[maxr]);
 
-	lcdControllerP->printInt(0x94+14, dataP->maxAgtValE[maxr]);
+	lcdController.printInt(0x94+14, data.maxAgtValE[maxr]);
 }

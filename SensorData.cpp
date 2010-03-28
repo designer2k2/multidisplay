@@ -24,6 +24,10 @@
 #include <stdint.h>
 
 SensorData::SensorData () {
+}
+
+
+void SensorData::myconstructor () {
 //	IOport2 = 0b11111111;
 
 	for ( uint8_t i = 0 ; i <= 16 ; i++ )
