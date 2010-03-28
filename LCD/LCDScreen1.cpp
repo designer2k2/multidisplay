@@ -33,8 +33,8 @@ LCDScreen1::LCDScreen1() {
 	flags.f.refreshRate = 0;
 	flags.f.mode = 0;
 
-	flags.f.loadBar=0;
-	flags.f.loadDot=0;
+	flags.f.loadBar=1;
+	flags.f.loadDot=1;
 	flags.f.loadVBar=0;
 	flags.f.loadBigFont4=0;
 	flags.f.loadBigFont2=0;
@@ -93,7 +93,6 @@ void LCDScreen1::customDraw() {
 	//Lets draw the dot:
 	lcdp->commandWrite(0xC0);              // Line 2
 
-	//FIXME
 	for (int i=0; i <= 19; i++) {
 		if(i==val) {
 			lcdp->print(8);        //thats the Dot
@@ -114,8 +113,7 @@ void LCDScreen1::customDraw() {
 
 	//Now lets make the Bar:
 	lcdp->commandWrite(0xD4);                // Line 4
-	//FIXME
-//	lcdController.drawBar(20,boostMapped);
+	lcdController.drawBar(20,boostMapped);
 
 	//And draw a Dot at the max pos & 0 Pos
 
