@@ -28,7 +28,7 @@
 class LCDScreen;
 
 //9
-#define SCREENCOUNT 9
+#define SCREENCOUNT 10
 //#define SCREENCOUNT 1
 
 /**
@@ -101,6 +101,8 @@ public:
 
 	void blanks(uint8_t c);
 
+	void float2string ( char* buffer, float f, int dp );
+
 	// Array index into parts of big numbers. Numbers consist of 6 custom characters in 2 lines
 	//              0             1          2        3          4             5         6       7               8       9
 //	static const prog_uchar bn12[];
@@ -164,11 +166,14 @@ public:
 
 	int scopeInt[20];      //needed for the Scrolling Scope
 
+	//todo make private again!
+	void printOneNumber2(uint8_t digit, uint8_t x_offset, uint8_t y_offset=0);
+	void printOneNumber4(uint8_t digit, uint8_t x_offset, uint8_t y_offset=0);
+
+
 private:
 	char *cbuf;
 
-	void printOneNumber2(uint8_t digit, uint8_t x_offset, uint8_t y_offset=0);
-	void printOneNumber4(uint8_t digit, uint8_t x_offset, uint8_t y_offset=0);
 
 };
 

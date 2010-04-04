@@ -39,6 +39,8 @@ void LCDScreen::init() {
 		lcdController.cgramBar();
 	if (flags.f.loadDot)
 		lcdController.cgramDot();
+	if (flags.f.loadBigFont2)
+		lcdController.cgramBigFont2();
 	if (flags.f.loadBigFont4)
 		lcdController.cgramBigFont4();
 

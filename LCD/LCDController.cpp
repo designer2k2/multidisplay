@@ -19,6 +19,8 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "wiring.h"
 
@@ -33,6 +35,7 @@
 #include "LCDScreen7.h"
 #include "LCDScreen8.h"
 #include "LCDScreen9.h"
+#include "LCDScreen10.h"
 
 const uint8_t	LCDController::ystart[] = { 0x80, 0xC0, 0x94, 0xD4 };
 
@@ -40,7 +43,7 @@ LCDController::LCDController() {
 }
 
 void  LCDController::myconstructor() {
-	activeScreen = 0;
+	activeScreen = 9;
 	brightness = 2;
 	lcdp = new LCD4Bit(4);
 	cbuf = (char*) malloc (sizeof(char) * LCD_BUFSIZE);
@@ -59,6 +62,7 @@ void  LCDController::myconstructor() {
     myScreens[6] = new LCDScreen7();
     myScreens[7] = new LCDScreen8();
     myScreens[8] = new LCDScreen9();
+    myScreens[9] = new LCDScreen10();
 }
 
 void LCDController::init() {
@@ -184,33 +188,33 @@ void LCDController::printOneNumber2(uint8_t digit, uint8_t x_offset, uint8_t y_o
  * @param x_offset 1 unit is one lcd char, not one big char!
  * @param y_offset lcd lines!
  * TODO do we need boundary check?
- * TODO untested!
  */
 void LCDController::printOneNumber4(uint8_t digit, uint8_t x_offset, uint8_t y_offset) {
+	//TODO do we need the 4. col in the bnx4 arrays?
 
 	// Line 1 of the one digit number
 	lcdp->commandWrite( ystart[y_offset] + x_offset);                  //Line 1
-	lcdp->print(bn14[digit*3]);
-	lcdp->print(bn14[digit*3+1]);
-	lcdp->print(bn14[digit*3+2]);
+	lcdp->print(bn14[digit*4]);
+	lcdp->print(bn14[digit*4+1]);
+	lcdp->print(bn14[digit*4+2]);
 
 	// Line 2 of the one-digit number
 	lcdp->commandWrite( ystart[y_offset+1] + x_offset);
-	lcdp->print(bn24[digit*3]);
-	lcdp->print(bn24[digit*3+1]);
-	lcdp->print(bn24[digit*3+2]);
+	lcdp->print(bn24[digit*4]);
+	lcdp->print(bn24[digit*4+1]);
+	lcdp->print(bn24[digit*4+2]);
 
 	// Line 3 of the one digit number
 	lcdp->commandWrite( ystart[y_offset+2] + x_offset);
-	lcdp->print(bn34[digit*3]);
-	lcdp->print(bn34[digit*3+1]);
-	lcdp->print(bn34[digit*3+2]);
+	lcdp->print(bn34[digit*4]);
+	lcdp->print(bn34[digit*4+1]);
+	lcdp->print(bn34[digit*4+2]);
 
 	// Line 4 of the one-digit number
 	lcdp->commandWrite( ystart[y_offset+3] + x_offset);
-	lcdp->print(bn44[digit*3]);
-	lcdp->print(bn44[digit*3+1]);
-	lcdp->print(bn44[digit*3+2]);
+	lcdp->print(bn44[digit*4]);
+	lcdp->print(bn44[digit*4+1]);
+	lcdp->print(bn44[digit*4+2]);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -222,12 +226,29 @@ void LCDController::blanks(uint8_t c) {
 }
 
 
+void LCDController::float2string ( char* buffer, float f, int dp ) {
+	//TODO implement negative values! do wee need them?
+	int v = (int) f;
+	double n = f - v;
+	n *= dp;
+	int ni = (int) n;
+	char a[15];
+	char b[15];
+	itoa(v, &(a[0]), 10);
+	itoa(ni, &(b[0]), 10);
+	//buffer = a + ',' + b;
+	strcpy (buffer, &a[0]);
+	strcat (buffer, ".");
+	strcat (buffer, &b[0]);
+}
+
 void LCDController::printFloat2DP(float f) {
 	printFloat (f, "%.2f");
 }
 
 void LCDController::printFloat(float f, char* formatstring) {
-	snprintf (cbuf, LCD_BUFSIZE, formatstring, f);
+	float2string ( cbuf, f, 100 );
+//	snprintf (cbuf, LCD_BUFSIZE, formatstring, f);
 	lcdp->printIn(cbuf);
 }
 
@@ -535,12 +556,14 @@ void LCDController::scopeMode() {
 }
 
 void LCDController::printBigNum (uint16_t value, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type) {
-	snprintf(cbuf, LCD_BUFSIZE, "%d", value);
+//	snprintf(cbuf, LCD_BUFSIZE, "%d", value);
+	itoa (value, cbuf, 10);
 	printBigNum ( cbuf, length, x_offset, y_offset, type );
 }
 
 void LCDController::printBigNum (double value, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type) {
-	snprintf(cbuf, LCD_BUFSIZE, "%.2f", value);
+//	snprintf(cbuf, LCD_BUFSIZE, "%.2f", value);
+	float2string ( cbuf, value, 100 );
 	printBigNum ( cbuf, length, x_offset, y_offset, type );
 }
 
@@ -562,53 +585,54 @@ void LCDController::printBigNum (char* str, uint8_t length, uint8_t x_offset, ui
 	uint8_t dp_pos = 99;
 
 
-	uint8_t strlen = 0;
-
-	//TODO do we need one blank between 4 row numbers ?!?
+	//string length
+	uint8_t stringlen = 0;
+	//length of the string on the lcd screen (one char needs 3 or 4 positions on screen!)
+	uint8_t screenlen = 0;
 
 	//compute array of uint8_t out of the char array
 	uint8_t value_i[21];
     char c[2];
     c[1] = '\0';
-    for ( uint8_t i = 0 ; i < sizeof(&str) ; i++ ) {
+    for ( uint8_t i = 0 ; i < strlen(str) ; i++ ) {
     	c[0] = str[i];
-    	if (c[0]=='.' || c[0]==';') {
+    	if (c[0]=='.' || c[0]==';' || c[0]==',') {
     		value_i[i]=c[0];
     		dp_pos = i;
-    		if (type==LCD_BIGFONT_2)
-    			strlen++;
+   			stringlen++;
     	} else {
-    		if ( c[0] != ' ') {
+    		// 0-9 in ascii table
+    		if ( c[0] >= 48 && c[0] <= 57 ) {
     			value_i[i] = atoi(&c[0]);
-    			if (type==LCD_BIGFONT_4)
-    				strlen += 4;
-    			else
-    				strlen += 3;
+   				stringlen++;
+   				screenlen += 4;
     		}
     	}
 	 }
 
     //clear digits in front
-    for ( uint8_t l = 0 ; l < type ; l++ ) {
-    	lcdp->commandWrite( ystart[l + y_offset] + x_offset);
-    	//TODO boundary check!
-    	blanks( length - strlen );
+    if ( length - screenlen > 0 ) {
+    	for ( uint8_t l = 0 ; l < type ; l++ ) {
+    		lcdp->commandWrite( ystart[l + y_offset] + x_offset);
+    		blanks( length - stringlen );
+    	}
     }
 
     //now set x_offset to x_offset + blanks!
-    x_offset += length - strlen;
-	for ( uint8_t i = 0 ; i < strlen ; i++ ) {
+    if ( length - screenlen > 0 )
+    	x_offset += length - screenlen;
+
+	for ( uint8_t i = 0 ; i < stringlen ; i++ ) {
 		if ( i == dp_pos ) {
 			//TODO print bigger decimal point!
 			lcdp->print(5);
-			if ( type == LCD_BIGFONT_2 )
-				x_offset++;
 		} else {
 			if ( type == LCD_BIGFONT_2 ) {
 				printOneNumber2(value_i[i], x_offset, y_offset );
 				x_offset += 3;
+//				x_offset += 4;
 			} else {
-				printOneNumber4(value_i[i], 0, x_offset);
+				printOneNumber4(value_i[i], x_offset, y_offset );
 				x_offset += 4;
 			}
 		}
@@ -619,7 +643,8 @@ void LCDController::printBigNum (char* str, uint8_t length, uint8_t x_offset, ui
  * prints a integer value to postion pos
  */
 void LCDController::printInt (uint8_t pos, int value) {
-	snprintf (cbuf, LCD_BUFSIZE, "%d", value);
+//	snprintf (cbuf, LCD_BUFSIZE, "%d", value);
+	itoa (value, cbuf, 10);
 	printString (pos, cbuf);
 }
 /**

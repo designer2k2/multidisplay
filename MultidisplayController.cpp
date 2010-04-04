@@ -855,6 +855,11 @@ void MultidisplayController::buttonAHold() {
 	lcdController.toggleScreen();
 	//Set the Timestamp for the Save:
 	ScreenSave = millis() + SCREENSAVEDELAY;
+
+#ifdef DEBUG
+	Serial.print ("screen ");
+	Serial.println (lcdController.activeScreen);
+#endif
 }
 
 //-------------------------------------------------------------------------------------------------------
