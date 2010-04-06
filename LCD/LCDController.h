@@ -64,6 +64,8 @@ public:
 
 	void toggleScreen ();
 
+	LCDScreen* getLCDScreen ( uint8_t num );
+
 	uint8_t activeScreen;
 	uint8_t brightness;
 

@@ -43,7 +43,7 @@ LCDController::LCDController() {
 }
 
 void  LCDController::myconstructor() {
-	activeScreen = 9;
+	activeScreen = 6;
 	brightness = 2;
 	lcdp = new LCD4Bit(4);
 	cbuf = (char*) malloc (sizeof(char) * LCD_BUFSIZE);
@@ -69,7 +69,11 @@ void LCDController::init() {
 	myScreens[activeScreen]->init();
 }
 
-
+LCDScreen* LCDController::getLCDScreen ( uint8_t num ) {
+	if ( num > SCREENCOUNT )
+		return NULL;
+	return myScreens[num];
+}
 
 void LCDController::draw() {
 	myScreens[activeScreen]->draw();
@@ -465,76 +469,76 @@ void LCDController::drawVertBar(uint8_t val, uint8_t pos) {
 	if(mod == 0)
 		mod=254;
 
-	for ( uint8_t i = 0 ; i < 4 ; i++ ) {
-		//blank
-		uint8_t  draw = 254;
-		if (printPos == i)
-			draw = mod;
-		else if ( i < printPos )
-			draw = 255;
-		//now draw it!
-		lcdp->commandWrite( ystart[i] + pos);
-		lcdp->print( draw );
-	}
-
-//	//now lets make a switch case depending on the PrintPos.
-//	switch(printPos){
-//	case 0:
-//		//so there is only one character /3 blanks and the character in the lowest position
-//		lcdp->commandWrite(0x80+pos);              //Line 1
-//		lcdp->print(254); //Blank
-//		lcdp->commandWrite(0xC0+pos);              //Line 2
-//		lcdp->print(254); //Blank
-//		lcdp->commandWrite(0x94+pos);              //Line 3
-//		lcdp->print(254); //Blank
-//		lcdp->commandWrite(0xD4+pos);              //Line 4
-//		lcdp->print(mod); //The Custom Character presenting the value
-//		break;
-//	case 1:
-//		//so there is only one character /1 fulls and the character in the 2nd position
-//		lcdp->commandWrite(0x80+pos);              //Line 1
-//		lcdp->print(254); //Blank
-//		lcdp->commandWrite(0xC0+pos);              //Line 2
-//		lcdp->print(254); //Blank
-//		lcdp->commandWrite(0x94+pos);              //Line 3
-//		lcdp->print(mod); //The Custom Character presenting the value
-//		lcdp->commandWrite(0xD4+pos);              //Line 4
-//		lcdp->print(255); //Full
-//		break;
-//	case 2:
-//		//so there is only one character /2 fulls and the character in the 3rd position
-//		lcdp->commandWrite(0x80+pos);              //Line 1
-//		lcdp->print(254); //Blank
-//		lcdp->commandWrite(0xC0+pos);              //Line 2
-//		lcdp->print(mod); //The Custom Character presenting the value
-//		lcdp->commandWrite(0x94+pos);              //Line 3
-//		lcdp->print(255); //Full
-//		lcdp->commandWrite(0xD4+pos);              //Line 4
-//		lcdp->print(255); //Full
-//		break;
-//	case 3:
-//		//so there is only one character /3 fulls and the character in the highest position
-//		lcdp->commandWrite(0x80+pos);              //Line 1
-//		lcdp->print(mod); //The Custom Character presenting the value
-//		lcdp->commandWrite(0xC0+pos);              //Line 2
-//		lcdp->print(255); //Full
-//		lcdp->commandWrite(0x94+pos);              //Line 3
-//		lcdp->print(255); //Full
-//		lcdp->commandWrite(0xD4+pos);              //Line 4
-//		lcdp->print(255); //Full
-//		break;
-//	case 4:
-//		//easy, eveything is full!
-//		lcdp->commandWrite(0x80+pos);              //Line 1
-//		lcdp->print(255); //Full
-//		lcdp->commandWrite(0xC0+pos);              //Line 2
-//		lcdp->print(255); //Full
-//		lcdp->commandWrite(0x94+pos);              //Line 3
-//		lcdp->print(255); //Full
-//		lcdp->commandWrite(0xD4+pos);              //Line 4
-//		lcdp->print(255); //Full
-//		break;
+//	for ( uint8_t i = 3 ; i > 0 ; i-- ) {
+//		//blank
+//		uint8_t  draw = 254;
+//		if (printPos == i)
+//			draw = mod;
+//		else if ( i < printPos )
+//			draw = 255;
+//		//now draw it!
+//		lcdp->commandWrite( ystart[i] + pos);
+//		lcdp->print( draw );
 //	}
+
+	//now lets make a switch case depending on the PrintPos.
+	switch(printPos){
+	case 0:
+		//so there is only one character /3 blanks and the character in the lowest position
+		lcdp->commandWrite(0x80+pos);              //Line 1
+		lcdp->print(254); //Blank
+		lcdp->commandWrite(0xC0+pos);              //Line 2
+		lcdp->print(254); //Blank
+		lcdp->commandWrite(0x94+pos);              //Line 3
+		lcdp->print(254); //Blank
+		lcdp->commandWrite(0xD4+pos);              //Line 4
+		lcdp->print(mod); //The Custom Character presenting the value
+		break;
+	case 1:
+		//so there is only one character /1 fulls and the character in the 2nd position
+		lcdp->commandWrite(0x80+pos);              //Line 1
+		lcdp->print(254); //Blank
+		lcdp->commandWrite(0xC0+pos);              //Line 2
+		lcdp->print(254); //Blank
+		lcdp->commandWrite(0x94+pos);              //Line 3
+		lcdp->print(mod); //The Custom Character presenting the value
+		lcdp->commandWrite(0xD4+pos);              //Line 4
+		lcdp->print(255); //Full
+		break;
+	case 2:
+		//so there is only one character /2 fulls and the character in the 3rd position
+		lcdp->commandWrite(0x80+pos);              //Line 1
+		lcdp->print(254); //Blank
+		lcdp->commandWrite(0xC0+pos);              //Line 2
+		lcdp->print(mod); //The Custom Character presenting the value
+		lcdp->commandWrite(0x94+pos);              //Line 3
+		lcdp->print(255); //Full
+		lcdp->commandWrite(0xD4+pos);              //Line 4
+		lcdp->print(255); //Full
+		break;
+	case 3:
+		//so there is only one character /3 fulls and the character in the highest position
+		lcdp->commandWrite(0x80+pos);              //Line 1
+		lcdp->print(mod); //The Custom Character presenting the value
+		lcdp->commandWrite(0xC0+pos);              //Line 2
+		lcdp->print(255); //Full
+		lcdp->commandWrite(0x94+pos);              //Line 3
+		lcdp->print(255); //Full
+		lcdp->commandWrite(0xD4+pos);              //Line 4
+		lcdp->print(255); //Full
+		break;
+	case 4:
+		//easy, eveything is full!
+		lcdp->commandWrite(0x80+pos);              //Line 1
+		lcdp->print(255); //Full
+		lcdp->commandWrite(0xC0+pos);              //Line 2
+		lcdp->print(255); //Full
+		lcdp->commandWrite(0x94+pos);              //Line 3
+		lcdp->print(255); //Full
+		lcdp->commandWrite(0xD4+pos);              //Line 4
+		lcdp->print(255); //Full
+		break;
+	}
 
 	//thats it, easy :)
 

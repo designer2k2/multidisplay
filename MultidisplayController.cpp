@@ -21,6 +21,7 @@
 #include "LCDController.h"
 #include "LCDScreen.h"
 #include "LCDScreen8.h"
+#include "LCDScreen7.h"
 
 #include <stdlib.h>
 #include <inttypes.h>
@@ -202,8 +203,10 @@ void  MultidisplayController::myconstructor() {
 }
 
 
-
-//http://www.arduino.cc/playground/Code/MCP3208
+/**
+ * reads the 12bit adc -> analog values between 0 and 2^12
+ * \see http://www.arduino.cc/playground/Code/MCP3208
+ */
 int MultidisplayController::read_adc(uint8_t channel){
 	int adcvalue = 0;
 	byte commandbits = B11000000; //command bits - start, mode, chn (3), dont care (3)
@@ -296,6 +299,8 @@ void MultidisplayController::AnaConversion() {
 	//This converts all 16 Analog Values into the real deal :)
 
 	//Boost:
+	//see http://plxdevices.com/images/SM-VacBoostVolts.jpg
+	//or Motorola MPX 4250 datasheet
 	data.calRAWBoost = 5.0*data.anaIn[BOOSTPIN]/4096.0;             //only gets 0-5V
 	data.calRAWBoost = (data.calRAWBoost * 50 - 10)/100;     	//makes 0-250kPa out of it
 	data.calBoost = data.calRAWBoost - data.calLd;			//apply the offset (ambient pressure)
@@ -310,10 +315,9 @@ void MultidisplayController::AnaConversion() {
 	//http://www.plxdevices.com/InstallationInstructions/SM-AFRUsersGuide.pdf
 	// air fuel ratio = 2*Voltage + 10
 
-	//i think we read milli volt!
-	data.calLambdaF = ( data.anaIn[LAMBDAPIN]/1000 * 2 + 10 ) / 14.7;
+	data.calLambdaF = ( 5.0*(data.anaIn[LAMBDAPIN]/4096) * 2 + 10 ) / 14.7;
+	data.calLambda = map(data.anaIn[LAMBDAPIN], 0, 4096, 0, 200);
 #else
-	//TODO convert it right here into the float lambda value!
 	data.calLambda = map(data.anaIn[LAMBDAPIN], LAMBDAMIN, LAMBDAMAX, 0, 200);    //gets about the 0-1V into 0-200 values
 #endif
 	data.calLambda = constrain(data.calLambda, 0, 200);
@@ -783,9 +787,10 @@ void MultidisplayController::mainLoop() {
 		AnaConversion();
 
 #if RPMShiftLight
-		Shiftlight();
+	Shiftlight();
 #endif //RPMShiftLight
 	}
+
 
 	//Check for Limits:
 	//if(DoCheck == 1)
@@ -932,6 +937,8 @@ void MultidisplayController::buttonBPressed() {
 	//Serial.print(";");
 	//Serial.println("Button B Pressed");
 
+	LCDScreen* l;
+
 	switch(lcdController.activeScreen){
 	case 0:
 		break;
@@ -947,23 +954,22 @@ void MultidisplayController::buttonBPressed() {
 		//and save the new value:
 		EEPROM.write(105,lcdController.brightness);
 		break;
+
 	case 7:
-		//FIXME integrate into LCDSCreen6 its broken atm!
-		//		screen6DataSel++;      //Change the Scope Screen
-		//		if(screen6DataSel >= 5)
-		//			screen6DataSel = 1;
-		//
-		//		//Reset the Constrains:
-		//		//FIXME global ?!?
-		//		screen6Val1 = 0;
-		//		screen6Val2 = 5000;
+		l = lcdController.getLCDScreen(6);
+		if ( l ) {
+			((LCDScreen7*)l)->min = 0;
+			((LCDScreen7*)l)->max = 5000;
+
+			((LCDScreen7*)l)->toggleMode();
+		}
 		break;
+
 	case 8:
-		//FIXME integrate into LCDSCreen8 its broken atm!
-		//		screen8Val++;	//changes the MAX screen through all values
-		//		if(screen8Val >= 4)
-		//			screen8Val = 1;
-		((LCDScreen8*)lcdController.myScreens[7])->toggleMax();
+		l = lcdController.getLCDScreen(7);
+		if ( l ) {
+			((LCDScreen8*)l)->toggleMax();
+		}
 		break;
 
 	default:

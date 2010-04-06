@@ -56,6 +56,12 @@ void LCDScreen1::customDraw() {
 	boostMapped = map(data.anaIn[BOOSTPIN], 0, 4096, 0, 200);
 	boostMapped = constrain(boostMapped, 0, 200);
 
+#ifdef LCDTEST
+	//just to test the output :-)
+	boostMapped = random (200);
+	val = random (20);
+#endif
+
 	lcdp->commandWrite(0x80+5);               //Line 1, position 5!
 
 	//AGT1+AGT2/2 thats because off my 2 Probes

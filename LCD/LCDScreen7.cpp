@@ -25,6 +25,7 @@
 #include "LCDController.h"
 
 LCDScreen7::LCDScreen7() {
+	flags.f.doCal=SCOPE_BOOST;
 	flags.f.doCal=0;
 	flags.f.doTypK = 0;
 	flags.f.serial = SERIALOUT_DISABLED;
@@ -38,12 +39,16 @@ LCDScreen7::LCDScreen7() {
 
 
 void LCDScreen7::customInit() {
-//	val1 = 0;
-//	val2 = 5000;
+	max = 0;
+	min = 5000;
 }
 
+void LCDScreen7::toggleMode() {
+	flags.f.mode++;
+	if ( flags.f.mode > SCOPE_LAMBDA )
+		flags.f.mode = SCOPE_BOOST;
+}
 
-//FIXME i think i broke it !
 void LCDScreen7::customDraw() {
 
 	//new Constrains if needed
@@ -69,38 +74,35 @@ void LCDScreen7::customDraw() {
 		break;
 	}
 
+#ifdef LCDTEST
+	ScopeVal = random (5000);
+#endif
 
-	//FIXME min and max values are needed!
-//	if(ScopeVal<val2)    {
-//		val2 = ScopeVal;
-//	}
-//
-//	if(ScopeVal>val1)    {
-//		val1 = ScopeVal;
-//	}
+	if(ScopeVal<min)    {
+		min = ScopeVal;
+	}
+	if(ScopeVal>max)    {
+		max = ScopeVal;
+	}
 
 	//Get the Data:
-	int val3 = 0;
-	//FIXME fix the data mapping
-//	val3 = map(ScopeVal, val2, val1, 0, 33);
-	//val3 = constrain(val3, 0, 32);
+	int d = 0;
+	d = map(ScopeVal, min, max, 0, 33);
+	d = constrain(d, 0, 32);
 
 	//Show only the rightmost bar: (live screen)
-	lcdController.drawVertBar(val3,19);
+	lcdController.drawVertBar(d,19);
 
 	//Feed it into the Buffer (on the right side)
-	lcdController.scopeInt[19] = val3;
+	lcdController.scopeInt[19] = d;
 	lcdController.scopeMode();
 
 
 
 	//Draw the Caption:
 	//Line1
-//	lcdp->commandWrite(0x80);
-//	lcdp->printIn(itoa(flags.f.mode, buf, 10));
 	lcdController.printInt(0x80, flags.f.mode);
 	lcdp->printIn(":");
-//	lcdp->printIn(itoa(refreshCounter, buf, 10));
 	lcdController.printInt (0, refreshCounter);
 
 	Serial.println(mController.time);

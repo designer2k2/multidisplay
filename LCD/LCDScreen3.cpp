@@ -46,6 +46,13 @@ void LCDScreen3::customInit() {
 
 void LCDScreen3::customDraw()  {
 
+#ifdef LCDTEST
+	data.anaIn[BOOSTPIN] = random (4096);
+	data.anaIn[RPMPIN] = random (RPMMAX);
+	data.calLambda = random (200);
+	data.calThrottle = random (100);
+#endif
+
 	//First, show the Bars on the last 10 Chars:
 
 	int boostMapped  = map(data.anaIn[BOOSTPIN], 0, 4096, 0, 100);

@@ -35,10 +35,13 @@ public:
 	void customInit ();
 	void customDraw ();
 
+	void toggleMode();
+
+	int min;
+	int max;
+
 private:
-	//FIXME needed ?!?
-//	int val1;
-//	int val2;
+
 };
 
 #endif /* LCDSCREEN7_H_ */

@@ -37,6 +37,8 @@ void LCDScreen::init() {
 	//Load the specific data:
 	if (flags.f.loadBar)
 		lcdController.cgramBar();
+	if (flags.f.loadVBar)
+		lcdController.cgramVertBar();
 	if (flags.f.loadDot)
 		lcdController.cgramDot();
 	if (flags.f.loadBigFont2)
