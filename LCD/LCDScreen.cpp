@@ -25,6 +25,7 @@
 
 LCDScreen::LCDScreen() {
 	lcdp = lcdController.lcdp;
+	this->flags.all = 0;
 }
 
 LCDScreen::LCDScreen(LCD4Bit *lcdp, uint16_t flags) : lcdp(lcdp) {

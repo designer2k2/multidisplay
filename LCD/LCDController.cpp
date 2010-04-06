@@ -43,7 +43,7 @@ LCDController::LCDController() {
 }
 
 void  LCDController::myconstructor() {
-	activeScreen = 6;
+	activeScreen = 2;
 	brightness = 2;
 	lcdp = new LCD4Bit(4);
 	cbuf = (char*) malloc (sizeof(char) * LCD_BUFSIZE);
