@@ -35,9 +35,11 @@ void LCDScreen10::customInit() {
 void LCDScreen10::customDraw() {
 //	lcdController.printBigNum ( (double)data.calBoost, LCD_WIDTH-9, 9, 0, LCD_BIGFONT_4);
 	lcdp->commandWrite(0x80);
+//	lcdController.printFloat2DP(-1.56789);
 
-	lcdController.printBigNum ( 1.55432, LCD_WIDTH-0, 0, 0, LCD_BIGFONT_4);
-//	lcdController.printBigNum ( 1.554, LCD_WIDTH-10, 5, 0, LCD_BIGFONT_2);
+	lcdController.printBigNum ( -1.594, LCD_WIDTH-0, 0, 0, LCD_BIGFONT_4);
+//	lcdController.printBigNum ( -1.55432, LCD_WIDTH-0, 0, 0, LCD_BIGFONT_2);
+//	lcdController.printBigNum ( -1.554, LCD_WIDTH-10, 5, 0, LCD_BIGFONT_2);
 //	lcdController.printBigNum ( 0.864, LCD_WIDTH-10, 5, 2, LCD_BIGFONT_2);
 
 //	lcdController.printOneNumber2 (0, 0, 0);

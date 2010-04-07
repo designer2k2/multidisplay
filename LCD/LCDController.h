@@ -79,6 +79,7 @@ public:
     static const uint8_t PROGMEM bigfont2data2[];
     static const uint8_t PROGMEM bigfont2data3[];
     static const uint8_t PROGMEM bigfont2data6[];
+    static const uint8_t PROGMEM bigfont2data8[];
 	void cgramBigFont2();
 
 
@@ -89,6 +90,7 @@ public:
 	static const uint8_t PROGMEM bigfont4data5[];
 	static const uint8_t PROGMEM bigfont4data6[];
 	static const uint8_t PROGMEM bigfont4data7[];
+	static const uint8_t PROGMEM bigfont4data8[];
 	void cgramBigFont4();
 
 	void printInt (uint8_t pos, int value);

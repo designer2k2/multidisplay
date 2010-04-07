@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <math.h>
 #include "wiring.h"
 
 #include "MultidisplayDefines.h"
@@ -43,7 +43,7 @@ LCDController::LCDController() {
 }
 
 void  LCDController::myconstructor() {
-	activeScreen = 2;
+	activeScreen = 9;
 	brightness = 2;
 	lcdp = new LCD4Bit(4);
 	cbuf = (char*) malloc (sizeof(char) * LCD_BUFSIZE);
@@ -128,6 +128,7 @@ const uint8_t LCDController::bigfont2data3[] = {31,31,31,0,0,0,31,31};  //Small 
 // const prog_uint8_t bigfont2data4[] = {28,30,31,31,31,31,30,28};  //Full Block roundet right
 // const prog_uint8_t bigfont2data5[] = {7,15,31,31,31,31,15,7};  //Full Block roundet left
 const uint8_t LCDController::bigfont2data6[] = {0,0,0,14,14,14,12,8};  //Dot, for Decimal.
+const uint8_t LCDController::bigfont2data8[] = {0,0,0,0,0,0,31,31};  //minus sign
 
 //Bigfont Code
 //
@@ -139,6 +140,7 @@ void LCDController::cgramBigFont2() {
 	// LcdUploadUdef5x8_P (4,data4);
 	// LcdUploadUdef5x8_P (5,data5);
 	lcdUploadUdef5x8_P (6,bigfont2data6);
+	lcdUploadUdef5x8_P (8,bigfont2data8);
 }
 //-------------------------------------------------------------------------------------------------------
 
@@ -150,6 +152,7 @@ const uint8_t LCDController::bigfont4data4[] = {31,15,15,3,0,0,0,0};  //Small Bl
 const uint8_t LCDController::bigfont4data5[] = {31,30,30,24,0,0,0,0};  //Small Block on top right
 const uint8_t LCDController::bigfont4data6[] = {31,31,31,31,0,0,0,0};  //Small Block on top full
 const uint8_t LCDController::bigfont4data7[] = {14,14,14,14,12,8,0,0};  //Dot, for Decimal.
+const uint8_t LCDController::bigfont4data8[] = {0,0,0,0,0,0,31,31};  //minus sign
 
 void LCDController::cgramBigFont4() {
 
@@ -160,6 +163,7 @@ void LCDController::cgramBigFont4() {
 	lcdUploadUdef5x8_P (5,bigfont4data5);
 	lcdUploadUdef5x8_P (6,bigfont4data6);
 	lcdUploadUdef5x8_P (7,bigfont4data7);
+	lcdUploadUdef5x8_P (8,bigfont4data8);
 }
 
 /**
@@ -231,16 +235,29 @@ void LCDController::blanks(uint8_t c) {
 
 
 void LCDController::float2string ( char* buffer, float f, int dp ) {
-	//TODO implement negative values! do wee need them?
-	int v = (int) f;
-	double n = f - v;
-	n *= dp;
-	int ni = (int) n;
+	int v = 0;
+	if ( f >= 0 )
+		v = floor (f);
+	else
+		v = ceil (f);
+
+	float t = (f - v) * dp;
+	int ni = (int) t;
+
+	bool makenegative = false;
+	if ( ni < 0)
+		ni = abs (ni);
+	if ( v == 0 && ni < 0 )
+		makenegative = true;
+
 	char a[15];
 	char b[15];
-	itoa(v, &(a[0]), 10);
+	if ( makenegative ) {
+		a[0] = '-';
+		itoa(v, &(a[1]), 10);
+	} else
+		itoa(v, &(a[0]), 10);
 	itoa(ni, &(b[0]), 10);
-	//buffer = a + ',' + b;
 	strcpy (buffer, &a[0]);
 	strcat (buffer, ".");
 	strcat (buffer, &b[0]);
@@ -250,9 +267,9 @@ void LCDController::printFloat2DP(float f) {
 	printFloat (f, "%.2f");
 }
 
+//TODO change signature
 void LCDController::printFloat(float f, char* formatstring) {
 	float2string ( cbuf, f, 100 );
-//	snprintf (cbuf, LCD_BUFSIZE, formatstring, f);
 	lcdp->printIn(cbuf);
 }
 
@@ -587,12 +604,13 @@ void LCDController::printBigNum (char* str, uint8_t length, uint8_t x_offset, ui
 
 	//set to pos where decimal point should be, 0 if no
 	uint8_t dp_pos = 99;
-
+	bool negative = false;
 
 	//string length
 	uint8_t stringlen = 0;
 	//length of the string on the lcd screen (one char needs 3 or 4 positions on screen!)
 	uint8_t screenlen = 0;
+	uint8_t end = x_offset + length;
 
 	//compute array of uint8_t out of the char array
 	uint8_t value_i[21];
@@ -600,6 +618,12 @@ void LCDController::printBigNum (char* str, uint8_t length, uint8_t x_offset, ui
     c[1] = '\0';
     for ( uint8_t i = 0 ; i < strlen(str) ; i++ ) {
     	c[0] = str[i];
+    	if ( i == 0 && str[i] == '-') {
+    		//we are negative
+    		negative = true;
+    		stringlen++;
+    		screenlen++;
+    	}
     	if (c[0]=='.' || c[0]==';' || c[0]==',') {
     		value_i[i]=c[0];
     		dp_pos = i;
@@ -627,17 +651,29 @@ void LCDController::printBigNum (char* str, uint8_t length, uint8_t x_offset, ui
     	x_offset += length - screenlen;
 
 	for ( uint8_t i = 0 ; i < stringlen ; i++ ) {
-		if ( i == dp_pos ) {
-			//TODO print bigger decimal point!
-			lcdp->print(5);
+		if ( i == 0 && negative ) {
+			if ( type == LCD_BIGFONT_4 )
+				lcdp->commandWrite( ystart[y_offset+1] + x_offset);
+			else
+				lcdp->commandWrite( ystart[y_offset] + x_offset);
+			lcdp->print(8);
+			x_offset++;
 		} else {
-			if ( type == LCD_BIGFONT_2 ) {
-				printOneNumber2(value_i[i], x_offset, y_offset );
-				x_offset += 3;
-//				x_offset += 4;
+			if ( i == dp_pos ) {
+				//TODO print bigger decimal point!
+				if ( type == LCD_BIGFONT_4 )
+					lcdp->print (255);
+				else
+					lcdp->print(5);
 			} else {
-				printOneNumber4(value_i[i], x_offset, y_offset );
-				x_offset += 4;
+				//draw only of we have space
+				if ( ! ((x_offset + 4) > end) ) {
+					if ( type == LCD_BIGFONT_2 )
+						printOneNumber2(value_i[i], x_offset, y_offset );
+					else
+						printOneNumber4(value_i[i], x_offset, y_offset );
+					x_offset += 4;
+				}
 			}
 		}
 	}
