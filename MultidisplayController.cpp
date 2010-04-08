@@ -425,7 +425,6 @@ void MultidisplayController::serialReceive() {
 	if(index==25  && (Auto_Man==0 || Auto_Man==1))
 	{
 #ifdef BOOSTN75
-		//TODO print pid data
 		data.boostSetPoint = double(srData.asFloat[0]);
 		//Input=double(srData.asFloat[1]);       // * the user has the ability to send the
 		//   value of "Input"  in most cases (as
@@ -442,9 +441,9 @@ void MultidisplayController::serialReceive() {
 		boostPidP->SetTunings(p, i, d);            //
 
 		if(Auto_Man==0)
-			myPID.SetMode(MANUAL);// * set the controller mode
+			boostPidP->SetMode(MANUAL);// * set the controller mode
 		else
-			myPID.SetMode(AUTO);             //
+			boostPidP->SetMode(AUTO);             //
 #endif
 	} else 	if (Auto_Man==2 && index >= 2) {
 		//case 2: command for multidisplay
@@ -470,6 +469,26 @@ void MultidisplayController::serialReceive() {
 
 
 void MultidisplayController::serialSend() {
+#ifdef BOOSTN75
+	  Serial.print("PID ");
+	  Serial.print(data.boostSetPoint);
+	  Serial.print(" ");
+	  Serial.print(data.calBoost);
+	  Serial.print(" ");
+	  Serial.print(data.boostOutput);
+	  Serial.print(" ");
+	  Serial.print(boostPidP->GetP_Param());
+	  Serial.print(" ");
+	  Serial.print(boostPidP->GetI_Param());
+	  Serial.print(" ");
+	  Serial.print(boostPidP->GetD_Param());
+	  Serial.print(" ");
+	  if (boostPidP->GetMode()==AUTO)
+		  Serial.println("Automatic");
+	  else
+		  Serial.println("Manual");
+#endif /* BOOSTN75 */
+
 	switch(SerOut){
 	case SERIALOUT_DISABLED:
 		break;
@@ -833,7 +852,7 @@ void MultidisplayController::mainLoop() {
 
 #ifdef BOOSTN75
 	//TODO adjust setpoint!
-	boostPID.Compute();
+	boostPidP->Compute();
 	//TODO write boostOutput to PWM pin!
 #endif
 
