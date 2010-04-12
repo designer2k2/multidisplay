@@ -105,7 +105,6 @@ public:
 
 	void blanks(uint8_t c);
 
-	void float2string ( char* buffer, float f, int dp );
 
 	// Array index into parts of big numbers. Numbers consist of 6 custom characters in 2 lines
 	//              0             1          2        3          4             5         6       7               8       9
@@ -122,8 +121,8 @@ public:
 
 	void printFloat2DP(uint8_t pos, float f);
 	void printFloat2DP(float f);
-	void printFloat(uint8_t pos, float f, char* formatstring="%.2f");
-	void printFloat(float f, char* formatstring="%.2f");
+	void printFloat(uint8_t pos, float f, uint16_t dp);
+	void printFloat(float f, uint16_t dp=100);
 
 	// data has to point to PMEM!
 	void lcdUploadUdef5x8_P (uint8_t charIndex, const uint8_t *data);
@@ -170,15 +169,13 @@ public:
 
 	int scopeInt[20];      //needed for the Scrolling Scope
 
-	//todo make private again!
-	void printOneNumber2(uint8_t digit, uint8_t x_offset, uint8_t y_offset=0);
-	void printOneNumber4(uint8_t digit, uint8_t x_offset, uint8_t y_offset=0);
-
 
 private:
 	char *cbuf;
 
-
+	void printOneNumber2(uint8_t digit, uint8_t x_offset, uint8_t y_offset=0);
+	void printOneNumber4(uint8_t digit, uint8_t x_offset, uint8_t y_offset=0);
+	void float2string ( char* buffer, float f, int dp );
 };
 
 extern LCDController lcdController;

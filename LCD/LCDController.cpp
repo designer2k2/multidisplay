@@ -133,6 +133,10 @@ const uint8_t LCDController::bigfont2data8[] = {0,0,0,0,0,0,31,31};  //minus sig
 //Bigfont Code
 //
 //BIG parts from http://opengauge.googlecode.com/svn/trunk/mpguino/mpguino.pde
+
+/**
+ * load custom fonts for 2 line bigfonts
+ */
 void LCDController::cgramBigFont2() {
 	lcdUploadUdef5x8_P (1,bigfont2data1);
 	lcdUploadUdef5x8_P (2,bigfont2data2);
@@ -154,6 +158,10 @@ const uint8_t LCDController::bigfont4data6[] = {31,31,31,31,0,0,0,0};  //Small B
 const uint8_t LCDController::bigfont4data7[] = {14,14,14,14,12,8,0,0};  //Dot, for Decimal.
 const uint8_t LCDController::bigfont4data8[] = {0,0,0,0,0,0,31,31};  //minus sign
 
+
+/**
+ * load custom fonts for 4 line bigfonts
+ */
 void LCDController::cgramBigFont4() {
 
 	lcdUploadUdef5x8_P (1,bigfont4data1);
@@ -171,7 +179,6 @@ void LCDController::cgramBigFont4() {
  * @param digit
  * @param x_offset 1 unit is one lcd char, not one big char!
  * @param y_offset lcd lines!
- * TODO do we need boundary check?
  */
 void LCDController::printOneNumber2(uint8_t digit, uint8_t x_offset, uint8_t y_offset) {
 	// Line 1 of the one digit number
@@ -195,7 +202,6 @@ void LCDController::printOneNumber2(uint8_t digit, uint8_t x_offset, uint8_t y_o
  * @param digit
  * @param x_offset 1 unit is one lcd char, not one big char!
  * @param y_offset lcd lines!
- * TODO do we need boundary check?
  */
 void LCDController::printOneNumber4(uint8_t digit, uint8_t x_offset, uint8_t y_offset) {
 	//TODO do we need the 4. col in the bnx4 arrays?
@@ -227,13 +233,22 @@ void LCDController::printOneNumber4(uint8_t digit, uint8_t x_offset, uint8_t y_o
 
 //-------------------------------------------------------------------------------------------------------
 
-
+/**
+ * prints blanks
+ * \param c count of blanks to be printed
+ */
 void LCDController::blanks(uint8_t c) {
 	for ( uint8_t i = 0 ; i < c ; i++ )
 		lcdp->print(254);
 }
 
 
+/**
+ * converts a float to a string
+ * \param buffer storage for the string
+ * \param f float val to convert
+ * \param dp factor for the decimal places: 10^x for x decimal places, e.g. 10^2 = 100 to get 2 decimal places
+ */
 void LCDController::float2string ( char* buffer, float f, int dp ) {
 	int v = 0;
 	if ( f >= 0 )
@@ -263,23 +278,39 @@ void LCDController::float2string ( char* buffer, float f, int dp ) {
 	strcat (buffer, &b[0]);
 }
 
+/**
+ * prints a float value with 2 decimal places
+ */
 void LCDController::printFloat2DP(float f) {
-	printFloat (f, "%.2f");
+	printFloat (f, 100);
 }
 
-//TODO change signature
-void LCDController::printFloat(float f, char* formatstring) {
-	float2string ( cbuf, f, 100 );
+/**
+ * prints a float value with configurable decimal places
+ * \param f value to print
+ * \param dp factor for the decimal places: 10^x for x decimal places, e.g. 10^2 = 100 to get 2 decimal places
+ */
+void LCDController::printFloat(float f, uint16_t dp) {
+	float2string ( cbuf, f, dp );
 	lcdp->printIn(cbuf);
 }
 
+/**
+ * prints a float value with 2 decimal places to position pos
+ */
 void LCDController::printFloat2DP(uint8_t pos, float f) {
-	printFloat (pos, f, "%.2f");
+	printFloat (pos, f, 100);
 }
 
-void LCDController::printFloat(uint8_t pos, float f, char* formatstring) {
+/**
+ * prints a float value with configurable decimal places to position pos
+ * \param pos position
+ * \param f value to print
+ * \param dp factor for the decimal places: 10^x for x decimal places, e.g. 10^2 = 100 to get 2 decimal places
+ */
+void LCDController::printFloat(uint8_t pos, float f, uint16_t dp ) {
 	lcdp->commandWrite(pos);
-	printFloat (f, formatstring);
+	printFloat (f, dp);
 }
 
 
@@ -308,6 +339,9 @@ void LCDController::cgramIntro2() {
 }
 
 
+/**
+ * shows the intro animation on the lcd
+ */
 void LCDController::lcdShowIntro(int delayValue) {
 
 	//Must load this in 2 steps, somehow its not possible to load 8 chars at once...
@@ -372,6 +406,10 @@ void LCDController::lcdUploadUdef5x8_P(uint8_t charIndex, const uint8_t *data) {
 	}
 }
 
+/**
+ * /**
+ * Upload a user-defined character stored in ram to character generator RAM of LCD (5x8)
+ */
 void LCDController::lcdUploadUdef5x8(uint8_t charIndex, const uint8_t *data) {
 	charIndex = charIndex << 3;
 	for (uint8_t i = 0; i < 8; i++) {
@@ -418,7 +456,7 @@ void LCDController::cgramBar() {
 /**
  * draws a bar to the lcd
  * @param Digits number of chars the bar has on the lcd screen
- * @param Value the actual value. 0 <= value <= 10 x Digits ?!?
+ * @param Value the actual value. 0 <= value <= 10 x Digits
  */
 void LCDController::drawBar(uint8_t digits, uint8_t value) {
 
@@ -562,7 +600,9 @@ void LCDController::drawVertBar(uint8_t val, uint8_t pos) {
 }
 
 
-
+/**
+ * scope mode drawing method
+ */
 void LCDController::scopeMode() {
 
 	//but work the screen from left side
@@ -577,13 +617,11 @@ void LCDController::scopeMode() {
 }
 
 void LCDController::printBigNum (uint16_t value, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type) {
-//	snprintf(cbuf, LCD_BUFSIZE, "%d", value);
 	itoa (value, cbuf, 10);
 	printBigNum ( cbuf, length, x_offset, y_offset, type );
 }
 
 void LCDController::printBigNum (double value, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type) {
-//	snprintf(cbuf, LCD_BUFSIZE, "%.2f", value);
 	float2string ( cbuf, value, 100 );
 	printBigNum ( cbuf, length, x_offset, y_offset, type );
 }

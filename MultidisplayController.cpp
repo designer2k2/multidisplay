@@ -44,7 +44,7 @@
  */
 
 //Lookup Table for the TypK:
-//from 0-1350ï¿½C in steps of 50ï¿½C, the list is in ï¿½V according to that Temp.
+//from 0-1350°C in steps of 50°C, the list is in microV according to that Temp.
 const unsigned int MultidisplayController::tempTypK[] =
 {
 		0,
@@ -78,7 +78,7 @@ const unsigned int MultidisplayController::tempTypK[] =
 };
 
 //Lookup Table for the Oilpressure: (12 Values)
-//from 0-10Bar in steps of 1Bar, the list is in 12Bit Digital Reading when supplyed with 5V and a 200Ohm Resistor in series
+//from 0-10Bar in steps of 1Bar, the list is in 12Bit Digital Reading when supplied with 5V and a 200Ohm Resistor in series
 //(measuring the Voltage on the Sensor)
 //it has a increasing Resistance with the Pressure.
 const unsigned int MultidisplayController::tempVDOPressure[] =
@@ -98,7 +98,7 @@ const unsigned int MultidisplayController::tempVDOPressure[] =
 };
 
 //Lookup Table for the VDOtemperature (22 Values) Its Calibration curve 92-027-006
-//from -30C-180C in steps of 10C, the list is in 12Bit Digital Reading when supplyed with 5V and a 200Ohm Resistor in series
+//from -30C-180C in steps of 10C, the list is in 12Bit Digital Reading when supplied with 5V and a 200Ohm Resistor in series
 //(measuring the Voltage on the Sensor)
 //it has a decreasing Resistance with the Temperature
 const unsigned int MultidisplayController::tempVDOTemp[] =
@@ -134,7 +134,6 @@ void  MultidisplayController::myconstructor() {
 	data = SensorData();
 
 #ifdef BOOSTN75
-	//boost PID Controller
 	boostPidP = new PID ( (double*) &data.calBoost, &data.boostOutput, &data.boostSetPoint,2,5,1);
 #else
 	boostPidP = NULL;
@@ -147,17 +146,16 @@ void  MultidisplayController::myconstructor() {
 	FlashTimeU = 0;
 	ScreenSave = 0;
 	time = 0;
-	//	val3=0;
-	data.calLd = 0.0;          //calibration from the Boost
+
+	data.calLd = 0.0;          //calibration of boost
 	data.maxLd = 0;
-	data.maxLdt=0;               //max LD for the screen
+	data.maxLdt=0;             //max LD for the screen
 
 	DoCheck = 1;
 	SerOut = SERIALOUT_RAW;
 
 	buttonTime = 0;
 
-	// the following was method void setup() {
 	pinMode(LCDBRIGHTPIN, OUTPUT);
 
 	//set pin modes
@@ -180,6 +178,7 @@ void  MultidisplayController::myconstructor() {
 
 #ifdef READFROMEEPROM
 	//Read the Values from the EEPROM back
+	//TODO plausi check!
 	lcdController.activeScreen = EEPROM.read(100);        //what screen was last shown?
 
 	lcdController.setBrightness (EEPROM.read(105));    //The Brightness from the LCD
@@ -208,6 +207,8 @@ void  MultidisplayController::myconstructor() {
  * \see http://www.arduino.cc/playground/Code/MCP3208
  */
 int MultidisplayController::read_adc(uint8_t channel){
+	//TODO replace digital write http://code.google.com/p/multidisplay/issues/detail?id=3
+
 	int adcvalue = 0;
 	byte commandbits = B11000000; //command bits - start, mode, chn (3), dont care (3)
 	uint8_t savedChannel = channel;  //Save the channel, to make it possible to deselect the MCP later.
@@ -333,11 +334,11 @@ void MultidisplayController::AnaConversion() {
 #endif
 
 #ifdef DIGIFANT
-	//TODO implement ll/vl schalter!
+	//TODO implement ll/vl schalter for digifant!
 #endif
 
 #ifdef VR6_MOTRONIC
-	//LMM:
+	//LMM
 	data.calLMM = 5.0*data.anaIn[LMMPIN]/4096.0;		   //makes 0.0 to 5.0 Volt out of it, with VagCom this could be maped to gr Air i think
 #endif
 
@@ -351,7 +352,7 @@ void MultidisplayController::AnaConversion() {
 #endif
 
 #ifdef DIGIFANT
-	//TODO implement RPM!
+	//TODO implement RPM for digifant!
 #endif
 
 	if (data.rpmIndex >= RPMSMOOTH)                       // if we're at the end of the array...
