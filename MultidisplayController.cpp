@@ -334,7 +334,17 @@ void MultidisplayController::AnaConversion() {
 #endif
 
 #ifdef DIGIFANT
-	//TODO implement ll/vl schalter for digifant!
+    //digifant full throttle switch (VL-Schalter) gets 5V for open throttle valve; ~ 0,48V if not
+    // assumption: if > 4 V: open
+    if ( data.anaIn[THROTTLEPIN] > 3276 )
+            data.calThrottle = 100;
+    else {
+            //idle ?
+            if ( data.anaIn[LMMPIN] > 3276 )
+                    data.calThrottle = 0;
+            else
+                    data.calThrottle = 50;
+    }
 #endif
 
 #ifdef VR6_MOTRONIC
@@ -351,16 +361,13 @@ void MultidisplayController::AnaConversion() {
 	data.rpmIndex = (data.rpmIndex + 1);                       // advance to the next index
 #endif
 
-#ifdef DIGIFANT
-	//TODO implement RPM for digifant!
-#endif
-
 	if (data.rpmIndex >= RPMSMOOTH)                       // if we're at the end of the array...
 	{
 		data.rpmIndex = 0;                                  // ...wrap around to the beginning
 	}
 
 	data.rpmAverage = data.rpmTotal / RPMSMOOTH;               // calculate the average
+	//digifant and motronic have the same rpmFactor
 	data.calRPM = data.rpmAverage*RPMFACTOR;                   // apply the factor for calibration
 
 	//Check if the RPM is a new Max RPM Event

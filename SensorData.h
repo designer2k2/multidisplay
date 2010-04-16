@@ -21,6 +21,7 @@
 #ifndef SENSORDATA_H
 #define SENSORDATA_H
 
+#include <stdint.h>
 #include "MultidisplayDefines.h"
 
 class SensorData {
@@ -48,7 +49,7 @@ public:
 	float calRAWBoost;
 	float calLambdaF;
 	int calLambda;
-	long calRPM;
+	uint16_t calRPM;
 	int calThrottle;
 	float calCaseTemp;
 	float calLMM;
