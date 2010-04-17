@@ -45,8 +45,6 @@ public:
     unsigned long ScreenSave;
     unsigned long time;
 
-    SensorData data;
-
 	void mainLoop();
 	void ChangeSerOut();
 	void CalibrateLD();

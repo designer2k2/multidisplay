@@ -48,17 +48,12 @@ void LCDScreen::init() {
 		lcdController.cgramBigFont4();
 
 
- 	if (flags.f.doCal)
- 		mController.DoCal = 1;
+ 	mController.DoCal = flags.f.doCal;
 
- 	//Fetch Typ K
- 	if (flags.f.doTypK)
- 		mController.DoTypK = 1;
+ 	mController.DoTypK = flags.f.doTypK;
 
- 	//Select Serial Out Mode "Convertet":
  	mController.SerOut = flags.f.serial;
 
- 	//print the Serial Header:
  	mController.HeaderPrint();
 
  	refreshCounter = flags.f.refreshRate;

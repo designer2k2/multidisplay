@@ -23,8 +23,8 @@
 
 //choose your engines ecu
 //only one of them should be defined!
-#define VR6_MOTRONIC
-//#define DIGIFANT
+//#define VR6_MOTRONIC
+#define DIGIFANT
 
 #define LAMBDA_WIDEBAND
 //#define BOOSTN75
@@ -40,7 +40,7 @@
 //Options:
 
 #define DEBUG 1
-#define LCDTEST 1
+//#define LCDTEST 1
 #define RPM_DEBUG 0             //Little Frequency Generator
 #define FREEMEM 0              //Outputs how much free RAM is
 
@@ -109,7 +109,9 @@
 #define THROTTLEMIN 620            //Calibration for Throttle
 #define THROTTLEMAX 3530
 
-#define RPMFACTOR 2.34              //Calibration for RPM (its 2.34!)
+//XXX hack!
+#define RPMFACTOR 1.17
+//#define RPMFACTOR 2.34              //Calibration for RPM (its 2.34!)
 #define RPMSMOOTH 5                 //how many readings will be taken for the smoothing (5 is quick and smooth, 10 would be supersmooth but its getting slow)
 #define RPMMAX 3400                 //its about 8k
 

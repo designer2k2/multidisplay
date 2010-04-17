@@ -73,7 +73,7 @@ void LCDScreen1::customDraw() {
 
 	lcdp->commandWrite(0x80+14);              //Line 3,
 
-	lcdController.printFloat2DP (data.calCaseTemp);
+	lcdController.printFloat (data.calCaseTemp, 10);
 
 	lcdp->print(223);                         //Print a " " at the end, to clear in case its needed
 	lcdp->printIn_P( PSTR("C") );                       //Print a " " at the end, to clear in case its needed

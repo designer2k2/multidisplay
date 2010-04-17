@@ -719,12 +719,23 @@ void LCDController::printBigNum (char* str, uint8_t length, uint8_t x_offset, ui
 
 /**
  * prints a integer value to postion pos
+ * blanks the resulting places if length is > 0 and strlen(value) < length
  */
-void LCDController::printInt (uint8_t pos, int value) {
-//	snprintf (cbuf, LCD_BUFSIZE, "%d", value);
+void LCDController::printInt (uint8_t pos, int value, uint8_t length) {
 	itoa (value, cbuf, 10);
+	uint8_t b = length - strlen ( cbuf );
 	printString (pos, cbuf);
+	if ( b > 0 && length > 0 )
+		blanks(b);
 }
+
+/**
+ * prints a integer value to postion pos
+ */
+//void LCDController::printInt (uint8_t pos, int value) {
+//	itoa (value, cbuf, 10);
+//	printString (pos, cbuf);
+//}
 /**
  * print a string to position pos
  */

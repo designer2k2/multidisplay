@@ -93,7 +93,8 @@ public:
 	static const uint8_t PROGMEM bigfont4data8[];
 	void cgramBigFont4();
 
-	void printInt (uint8_t pos, int value);
+	void printInt (uint8_t pos, int value, uint8_t length=0);
+//	void printInt (uint8_t pos, int value);
 	void printString (uint8_t pos, char* str);
 
 	void printBigNum (uint16_t value, uint8_t length, uint8_t x_offset, uint8_t y_offset, uint8_t type);

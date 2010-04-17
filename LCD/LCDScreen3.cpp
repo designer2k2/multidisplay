@@ -65,7 +65,11 @@ void LCDScreen3::customDraw()  {
 
 //	lcdp->commandWrite(0x80+5);
 //	lcdp->printIn(itoa(data.calLambda, buf, 10));
+#ifdef LAMBDA_WIDEBAND
+	lcdController.printFloat2DP(0x80+5, data.calLambdaF);
+#else
 	lcdController.printInt(0x80+5, data.calLambda);
+#endif
 	lcdp->print(32);
 	lcdp->commandWrite(0xC0+4);
 

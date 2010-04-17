@@ -131,7 +131,6 @@ MultidisplayController::MultidisplayController() {
 }
 
 void  MultidisplayController::myconstructor() {
-	data = SensorData();
 
 #ifdef BOOSTN75
 	boostPidP = new PID ( (double*) &data.calBoost, &data.boostOutput, &data.boostSetPoint,2,5,1);
@@ -173,7 +172,7 @@ void  MultidisplayController::myconstructor() {
 
 	//Print the Info:
 	Serial.println(" ");
-	Serial.println("MultiDisplay PRE!");
+	Serial.println("MultiDisplay 1.1!");
 
 
 #ifdef READFROMEEPROM
@@ -186,12 +185,9 @@ void  MultidisplayController::myconstructor() {
 	data.calLd = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
 #endif
 
-	Serial.println("intro");
 	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
-	Serial.println("init");
 	lcdController.init();
 
-	Serial.println("init buttons disabled");
 	//Init the Buttons:
 	expanderWrite(0b10000011);        //This may needs to be modified when a third button is attached.
 
@@ -305,7 +301,7 @@ void MultidisplayController::AnaConversion() {
 	data.calRAWBoost = 5.0*data.anaIn[BOOSTPIN]/4096.0;             //only gets 0-5V
 	data.calRAWBoost = (data.calRAWBoost * 50 - 10)/100;     	//makes 0-250kPa out of it
 	data.calBoost = data.calRAWBoost - data.calLd;			//apply the offset (ambient pressure)
-
+    //Calibration for RPM (its 2.34!)
 	//Check if the Boost is a new Max Boost Event
 	if( data.calBoost >= data.maxLdE[1] ) 	{
 		SaveMax(1);
@@ -316,6 +312,7 @@ void MultidisplayController::AnaConversion() {
 	//http://www.plxdevices.com/InstallationInstructions/SM-AFRUsersGuide.pdf
 	// air fuel ratio = 2*Voltage + 10
 
+	//FIXME
 	data.calLambdaF = ( 5.0*(data.anaIn[LAMBDAPIN]/4096) * 2 + 10 ) / 14.7;
 	data.calLambda = map(data.anaIn[LAMBDAPIN], 0, 4096, 0, 200);
 #else
@@ -519,6 +516,8 @@ void MultidisplayController::serialSend() {
 		Serial.print(data.calBoost);
 		Serial.print(";");
 		Serial.print(data.calThrottle);
+		Serial.print(";");
+		Serial.print(data.calLambdaF);
 		Serial.print(";");
 		Serial.print(data.calLambda);
 		Serial.print(";");
@@ -809,6 +808,7 @@ void MultidisplayController::mainLoop() {
 		data.anaIn[i] = read_adc(i);
 	}
 
+	AnaConversion();
 	//Calibrate them:
 	if(DoCal == 1) {
 		AnaConversion();
