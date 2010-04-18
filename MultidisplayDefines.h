@@ -29,7 +29,7 @@
 #define LAMBDA_WIDEBAND
 //#define BOOSTN75
 
-//#define READFROMEEPROM
+#define READFROMEEPROM
 
 //----------------------------------------------------------------------------------------------------
 //Max Values:

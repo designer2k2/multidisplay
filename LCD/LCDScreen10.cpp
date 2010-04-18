@@ -38,10 +38,12 @@ void LCDScreen10::customInit() {
 
 
 void LCDScreen10::customDraw() {
+
     lcdp->commandWrite(0x80 + 5);
     lcdController.printInt(0x80 + 5, data.calThrottle, 3 );
     lcdController.printFloat2DP(0x80 + 14, data.calCaseTemp);
     lcdController.printFloat2DP(lcdController.ystart[1] + 8, data.calLambdaF);
+    lcdController.printInt (lcdController.ystart[1]+ 14, data.anaIn[LAMBDAPIN], 4);
     lcdController.printInt(lcdController.ystart[2] + 5, data.calRPM, 4);
     lcdController.printFloat2DP(lcdController.ystart[3] + 7, data.calBoost);
 

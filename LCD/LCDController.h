@@ -27,9 +27,7 @@
 
 class LCDScreen;
 
-//9
 #define SCREENCOUNT 10
-//#define SCREENCOUNT 1
 
 /**
  *  controlls the LCD screen
@@ -63,6 +61,7 @@ public:
 	void draw ();
 
 	void toggleScreen ();
+	void setActiveScreen (uint8_t as);
 
 	LCDScreen* getLCDScreen ( uint8_t num );
 

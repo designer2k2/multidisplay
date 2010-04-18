@@ -177,12 +177,18 @@ void  MultidisplayController::myconstructor() {
 
 #ifdef READFROMEEPROM
 	//Read the Values from the EEPROM back
-	//TODO plausi check!
-	lcdController.activeScreen = EEPROM.read(100);        //what screen was last shown?
+
+	//what screen was last shown?
+	//FIXME
+//	lcdController.setActiveScreen (EEPROM.read(100));
 
 	lcdController.setBrightness (EEPROM.read(105));    //The Brightness from the LCD
-	data.ldCalPoint = EEPROM.read(205);
-	data.calLd = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
+	uint8_t ldp = EEPROM.read(205);
+	if ( ldp >= 0 && ldp <= 20 )
+		data.ldCalPoint = ldp;
+	float ldt = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
+	if ( ldt > 0.0 && ldt < 1.2 )
+		data.calLd = ldt;
 #endif
 
 	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
@@ -298,7 +304,7 @@ void MultidisplayController::AnaConversion() {
 	//Boost:
 	//see http://plxdevices.com/images/SM-VacBoostVolts.jpg
 	//or Motorola MPX 4250 datasheet
-	data.calRAWBoost = 5.0*data.anaIn[BOOSTPIN]/4096.0;             //only gets 0-5V
+	data.calRAWBoost = 5.0* ((float) data.anaIn[BOOSTPIN])/4096.0;             //only gets 0-5V
 	data.calRAWBoost = (data.calRAWBoost * 50 - 10)/100;     	//makes 0-250kPa out of it
 	data.calBoost = data.calRAWBoost - data.calLd;			//apply the offset (ambient pressure)
     //Calibration for RPM (its 2.34!)
@@ -311,12 +317,11 @@ void MultidisplayController::AnaConversion() {
 #ifdef LAMBDA_WIDEBAND
 	//http://www.plxdevices.com/InstallationInstructions/SM-AFRUsersGuide.pdf
 	// air fuel ratio = 2*Voltage + 10
-
-	//FIXME
-	data.calLambdaF = ( 5.0*(data.anaIn[LAMBDAPIN]/4096) * 2 + 10 ) / 14.7;
+	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /4096)) * 2 + 10 ) / 14.7;
 	data.calLambda = map(data.anaIn[LAMBDAPIN], 0, 4096, 0, 200);
 #else
 	data.calLambda = map(data.anaIn[LAMBDAPIN], LAMBDAMIN, LAMBDAMAX, 0, 200);    //gets about the 0-1V into 0-200 values
+	data.calLambdaF = (flaot) data.calLambda;
 #endif
 	data.calLambda = constrain(data.calLambda, 0, 200);
 
@@ -350,13 +355,11 @@ void MultidisplayController::AnaConversion() {
 #endif
 
 	//RPM
-#ifdef VR6_MOTRONIC
 	//(from the smoothing example)
 	data.rpmTotal -= data.rpmReadings[data.rpmIndex];               // subtract the last reading
 	data.rpmReadings[data.rpmIndex] = data.anaIn[RPMPIN];           // read from the sensor
 	data.rpmTotal += data.rpmReadings[data.rpmIndex];               // add the reading to the total
 	data.rpmIndex = (data.rpmIndex + 1);                       // advance to the next index
-#endif
 
 	if (data.rpmIndex >= RPMSMOOTH)                       // if we're at the end of the array...
 	{
@@ -518,8 +521,6 @@ void MultidisplayController::serialSend() {
 		Serial.print(data.calThrottle);
 		Serial.print(";");
 		Serial.print(data.calLambdaF);
-		Serial.print(";");
-		Serial.print(data.calLambda);
 		Serial.print(";");
 		Serial.print(data.calLMM);
 		Serial.print(";");
@@ -835,7 +836,7 @@ void MultidisplayController::mainLoop() {
 
 	if(millis()>= ScreenSave) {
 		//and now save it:
-//		EEPROM.write(100, lcdController.activeScreen);
+		EEPROM.write(100, lcdController.activeScreen);
 		//And also prevent a double save!
 		ScreenSave = 429400000;        // (thats close to 50days of runtime...)
 	}

@@ -106,6 +106,11 @@ void LCDController::toggleScreen () {
 	init();
 }
 
+void LCDController::setActiveScreen(uint8_t as) {
+	if ( as >= 0 && as < SCREENCOUNT )
+		activeScreen = as;
+}
+
 
 //TODO convert into one 2D array!
 //const prog_uchar LCDController::bn12[]={255,1,255,0, 1,255,254,0, 1,3,255,0, 1,3,255,0, 255,2,2,0, 255,3,1,0, 255,3,1,0, 1,1,255,0, 255,3,255,0, 255,3,255,0};
@@ -407,7 +412,7 @@ void LCDController::lcdUploadUdef5x8_P(uint8_t charIndex, const uint8_t *data) {
 }
 
 /**
- * /**
+ *
  * Upload a user-defined character stored in ram to character generator RAM of LCD (5x8)
  */
 void LCDController::lcdUploadUdef5x8(uint8_t charIndex, const uint8_t *data) {

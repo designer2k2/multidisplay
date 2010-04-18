@@ -49,7 +49,7 @@ public:
 	float calRAWBoost;
 	float calLambdaF;
 	int calLambda;
-	uint16_t calRPM;
+	int calRPM;
 	int calThrottle;
 	float calCaseTemp;
 	float calLMM;
