@@ -336,16 +336,16 @@ void MultidisplayController::AnaConversion() {
 #endif
 
 #ifdef DIGIFANT
-    //digifant full throttle switch (VL-Schalter) gets 5V for open throttle valve; ~ 0,48V if not
+    //digifant idle switch (LL-Schalter) gets 5V for closed throttle valve; ~ 0,48V if open
     // assumption: if > 4 V: open
-    if ( data.anaIn[THROTTLEPIN] > 3276 )
-            data.calThrottle = 100;
+    if ( data.anaIn[LMMPIN] < 3276 )
+            data.calThrottle = 0;
     else {
-            //idle ?
-            if ( data.anaIn[LMMPIN] > 3276 )
-                    data.calThrottle = 0;
-            else
+            //full throttle ?
+            if ( data.anaIn[THROTTLEPIN] > 3276 )
                     data.calThrottle = 50;
+            else
+                    data.calThrottle = 100;
     }
 #endif
 
