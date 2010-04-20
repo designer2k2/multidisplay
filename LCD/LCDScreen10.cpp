@@ -34,7 +34,7 @@ void LCDScreen10::customInit() {
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[0]+10, PSTR("CT:"));
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[1], PSTR("LAMBDA:"));
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[2], PSTR("RPM:"));
-    lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[2]+10, PSTR("BOOST:"));
+    lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[2]+10, PSTR("BST:"));
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[3], PSTR("BP:"));
 }
 
@@ -47,7 +47,7 @@ void LCDScreen10::customDraw() {
     lcdController.printFloat2DP(lcdController.ystart[1] + 8, data.calLambdaF);
     lcdController.printInt (lcdController.ystart[1]+ 14, data.anaIn[LAMBDAPIN], 4);
     lcdController.printInt(lcdController.ystart[2] + 5, data.calRPM, 4);
-    lcdController.printFloat2DP(lcdController.ystart[2] + 16, data.calBoost);
+    lcdController.printFloat2DP(lcdController.ystart[2] + 14, data.calBoost);
     lcdController.printInt(lcdController.ystart[3] + 4, digitalRead(NORDSCHLEIFENPIN), 1);
     lcdController.printFloat2DP(lcdController.ystart[3] + 6, boostController.boostSetPoint);
     lcdController.printFloat2DP(lcdController.ystart[3] + 12, boostController.boostOutput);

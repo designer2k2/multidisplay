@@ -311,8 +311,8 @@ void MultidisplayController::AnaConversion() {
 	data.calBoostBar = 5.0* ((float) data.anaIn[BOOSTPIN])/4096.0;             //only gets 0-5V
 	data.calBoostBar = (data.calBoostBar * 50 - 10)/100;     	//makes 0-250kPa out of it
 //	data.calBoostPSI = data.calBoostBar * BAR2PSI;
-#endif
 	data.calBoost = data.calBoostBar - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
+#endif
     //Calibration for RPM (its 2.34!)
 	//Check if the Boost is a new Max Boost Event
 	if( data.calBoost >= data.maxLdE[1] ) 	{
