@@ -303,15 +303,16 @@ void MultidisplayController::AnaConversion() {
 	//see http://plxdevices.com/images/SM-VacBoostVolts.jpg
 	// voltage = boost(psi)/9 + 1,66
 	// boost (psi) = voltage * 9 - 15
-	data.calBoostBar = 5.0* ( (float) data.anaIn[BOOSTPIN])/4096.0;             //only gets 0-5V
-	data.calBoostBar = data.calBoostBar * 9.0 - 15; //psi
-	data.calBoostBar = data.calBoostBar / BAR2PSI; //bar
+	data.calAbsoluteBoost = 5.0* ( (float) data.anaIn[BOOSTPIN])/4096.0;
+	data.calAbsoluteBoost = data.calAbsoluteBoost * 9.0 - 15; //psi
+	data.calAbsoluteBoost = data.calAbsoluteBoost / BAR2PSI; //bar
+	data.calBoost = data.calAbsoluteBoost; //sm vac/boost gets relative boost
 #else
 	//or Motorola MPX 4250 datasheet
-	data.calBoostBar = 5.0* ((float) data.anaIn[BOOSTPIN])/4096.0;             //only gets 0-5V
-	data.calBoostBar = (data.calBoostBar * 50 - 10)/100;     	//makes 0-250kPa out of it
+	data.calAbsoluteBoost = 5.0* ((float) data.anaIn[BOOSTPIN])/4096.0;             //only gets 0-5V
+	data.calAbsoluteBoost = (data.calAbsoluteBoost * 50 - 10)/100;     	//makes 0-250kPa out of it
 //	data.calBoostPSI = data.calBoostBar * BAR2PSI;
-	data.calBoost = data.calBoostBar - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
+	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
 #endif
     //Calibration for RPM (its 2.34!)
 	//Check if the Boost is a new Max Boost Event
@@ -592,7 +593,7 @@ void MultidisplayController::ChangeSerOut()
 
 void MultidisplayController::CalibrateLD()
 {
-	data.boostAmbientPressureBar = data.calBoostBar;
+	data.boostAmbientPressureBar = data.calAbsoluteBoost;
 	// changed from global val3 to caluclation of mapped boost
 	data.ldCalPoint = map(data.anaIn[BOOSTPIN], 0, 4096, 0, 200) / 10;
 	//and saved:
@@ -874,6 +875,7 @@ void MultidisplayController::mainLoop() {
 	boostController.boostPid->Compute();
 	analogWrite(N75PIN, (int) boostController.boostOutput);
 #endif
+//	analogWrite(N75PIN, 240);
 
 	if ( millis() > serialTime ) {
 		//Print it:

@@ -42,8 +42,8 @@ public:
 	int rpmAverage;                          // the average
 
 	//convertet values:
-	float calBoost;
-	float calBoostBar;
+	float calBoost; //relative boost
+	float calAbsoluteBoost;
 //	float calBoostPSI; //for PID
 	float calLambdaF;
 	int calLambda;

@@ -36,6 +36,7 @@
 #define BOOST_RACE 1.5
 #define BOOST_MODE_NORMAL 1
 #define BOOST_MODE_RACE 0
+
 #define READFROMEEPROM
 
 //----------------------------------------------------------------------------------------------------

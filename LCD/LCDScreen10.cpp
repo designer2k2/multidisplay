@@ -49,8 +49,10 @@ void LCDScreen10::customDraw() {
     lcdController.printInt(lcdController.ystart[2] + 5, data.calRPM, 4);
     lcdController.printFloat2DP(lcdController.ystart[2] + 14, data.calBoost);
     lcdController.printInt(lcdController.ystart[3] + 4, digitalRead(NORDSCHLEIFENPIN), 1);
+#ifdef BOOSTN75
     lcdController.printFloat2DP(lcdController.ystart[3] + 6, boostController.boostSetPoint);
     lcdController.printFloat2DP(lcdController.ystart[3] + 12, boostController.boostOutput);
+#endif
 
 //    lcdController.printInt(lcdController.ystart[3] + 13, digitalRead(FREEANALOG2), 4);
 

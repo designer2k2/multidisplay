@@ -49,7 +49,7 @@ void SensorData::myconstructor () {
 	rpmAverage = 0;                          // the average
 
 	calBoost = 0.0;
-	calBoostBar = 0.0;
+	calAbsoluteBoost = 0.0;
 	calLambda = 0;
 	calLambdaF = 0;
 	calRPM = 0;
