@@ -25,7 +25,7 @@
 #include "LCDController.h"
 
 LCDScreen7::LCDScreen7() {
-	flags.f.doCal=SCOPE_BOOST;
+	flags.f.mode=SCOPE_BOOST;
 	flags.f.doCal=0;
 	flags.f.doTypK = 0;
 	flags.f.serial = SERIALOUT_DISABLED;

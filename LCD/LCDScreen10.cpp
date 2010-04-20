@@ -11,6 +11,7 @@
 #include "MultidisplayDefines.h"
 #include "MultidisplayController.h"
 #include "LCDController.h"
+#include "BoostController.h"
 
 LCDScreen10::LCDScreen10() {
 	flags.f.doCal=1;
@@ -33,7 +34,8 @@ void LCDScreen10::customInit() {
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[0]+10, PSTR("CT:"));
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[1], PSTR("LAMBDA:"));
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[2], PSTR("RPM:"));
-    lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[3], PSTR("BOOST:"));
+    lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[2]+10, PSTR("BOOST:"));
+    lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[3], PSTR("BP:"));
 }
 
 
@@ -45,7 +47,12 @@ void LCDScreen10::customDraw() {
     lcdController.printFloat2DP(lcdController.ystart[1] + 8, data.calLambdaF);
     lcdController.printInt (lcdController.ystart[1]+ 14, data.anaIn[LAMBDAPIN], 4);
     lcdController.printInt(lcdController.ystart[2] + 5, data.calRPM, 4);
-    lcdController.printFloat2DP(lcdController.ystart[3] + 7, data.calBoost);
+    lcdController.printFloat2DP(lcdController.ystart[2] + 16, data.calBoost);
+    lcdController.printInt(lcdController.ystart[3] + 4, digitalRead(NORDSCHLEIFENPIN), 1);
+    lcdController.printFloat2DP(lcdController.ystart[3] + 6, boostController.boostSetPoint);
+    lcdController.printFloat2DP(lcdController.ystart[3] + 12, boostController.boostOutput);
+
+//    lcdController.printInt(lcdController.ystart[3] + 13, digitalRead(FREEANALOG2), 4);
 
 //	lcdController.printBigNum ( (double)data.calBoost, LCD_WIDTH-9, 9, 0, LCD_BIGFONT_4);
 //	lcdp->commandWrite(0x80);

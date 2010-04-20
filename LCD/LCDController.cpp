@@ -43,7 +43,7 @@ LCDController::LCDController() {
 }
 
 void  LCDController::myconstructor() {
-	activeScreen = 9;
+	activeScreen = 3;
 	brightness = 2;
 	lcdp = new LCD4Bit(4);
 	cbuf = (char*) malloc (sizeof(char) * LCD_BUFSIZE);
@@ -53,16 +53,17 @@ void  LCDController::myconstructor() {
     for ( int i = 0 ; i < 20 ; i++ )
             scopeInt[i]=0;
 
+    //FIXME button modes commented out
     myScreens[0] = new LCDScreen1();
-    myScreens[1] = new LCDScreen2();
-    myScreens[2] = new LCDScreen3();
-    myScreens[3] = new LCDScreen4();
-    myScreens[4] = new LCDScreen5();
-    myScreens[5] = new LCDScreen6();
-    myScreens[6] = new LCDScreen7();
-    myScreens[7] = new LCDScreen8();
-    myScreens[8] = new LCDScreen9();
-    myScreens[9] = new LCDScreen10();
+//    myScreens[1] = new LCDScreen2();
+    myScreens[1] = new LCDScreen3();
+//    myScreens[3] = new LCDScreen4();
+//    myScreens[4] = new LCDScreen5();
+//    myScreens[5] = new LCDScreen6();
+    myScreens[2] = new LCDScreen7();
+//    myScreens[7] = new LCDScreen8();
+//    myScreens[8] = new LCDScreen9();
+    myScreens[3] = new LCDScreen10();
 }
 
 void LCDController::init() {

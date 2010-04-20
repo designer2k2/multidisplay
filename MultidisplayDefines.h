@@ -27,8 +27,15 @@
 #define DIGIFANT
 
 #define LAMBDA_WIDEBAND
-//#define BOOSTN75
 
+//define this if you measure the boost with SM-VAC/Boost instead of Motorola MPX4250AP
+#define BOOST_PLX_SMVACBOOST
+
+#define BOOSTN75
+#define BOOST_NORMAL 1.0
+#define BOOST_RACE 1.5
+#define BOOST_MODE_NORMAL 1
+#define BOOST_MODE_RACE 0
 #define READFROMEEPROM
 
 //----------------------------------------------------------------------------------------------------
@@ -41,15 +48,15 @@
 
 #define DEBUG 1
 //#define LCDTEST 1
-#define RPM_DEBUG 0             //Little Frequency Generator
+//#define RPM_DEBUG 0             //Little Frequency Generator
 #define FREEMEM 0              //Outputs how much free RAM is
 
 #define INITTIME 2000          //How long the Init screen will be shown
-#define RPM_SHIFT_LIGHT 1        //Shiftlight?
 //--------------------------------------
 
 // Shiftlight Config:
 
+#define RPM_SHIFT_LIGHT
 #define RPM_SHIFT_LOW 6000             //Shiftlight half brightness
 #define RPM_LOW_BRIGHT 40
 #define RPM_SHIFT_HIGH 6500            //Shiftlight full brightness
@@ -66,15 +73,32 @@
 
 //--------------------------------------
 //Pin Config:
-
-//#define SELPIN 10               //Selection Pin (MCP3208)
-//#define SELPIN2 17              //Selection Pin (MCP3208_2)
+//arduino
 #define DATAOUT 17              //MOSI
 #define DATAIN 12               //MISO
 #define SPICLOCK 13             //Clock
 
-// The Sensors: (On the MD03 Print, see the Layout for the KLX Connectors)
+#define BATTERYPIN 0           //The Signal from the voltage divider (Analog Pin on the Arduino!)
+#define LCDBRIGHTPIN 5		     //The Pin for the Brightness of the LCD, it will be PWM.
+#define RPMSHIFTLIGHTPIN 3           //where is the Shiftlight connected
 
+/*
+ * K10 2xPWM (arduino pin 10 und 11):
+ * n75 (out) (right)
+ * free (warn led) (left)
+ *
+ * K11 2xanalog (arduino pin 1 und 2)
+ * 2xdigital: 15,16
+ * nordschleifen switch (switch must be connected to ground!) (left)
+ * free (lambda relais) (right)
+ */
+#define NORDSCHLEIFENPIN 15
+#define FREEANALOG2 16
+//left of lcd pins
+#define N75PIN 10
+#define FREEPWM2 11
+
+// The Sensors: (On the MD03 Print, see the Layout for the KLX Connectors)
 #define BOOSTPIN 1             //(KL7-2) Currently supports the Motorola 250kpa Sensor
 #define BOOST2PIN 2            //(KL7-3) Currently supports the Motorola 250kpa Sensor
 
@@ -94,9 +118,6 @@
 #define CASETEMPPIN 15         //The LM35 Signal.
 #define AGTPIN 16              //Input from the Mux
 
-#define BATTERYPIN 0           //The Signal from the voltage divider (Analog Pin on the Arduino!)
-#define LCDBRIGHTPIN 5		     //The Pin for the Brightness of the LCD, it will be PWM.
-#define RPMSHIFTLIGHTPIN 3           //where is the Shiftlight connected
 
 //--------------------------------------
 //Others:
@@ -109,9 +130,7 @@
 #define THROTTLEMIN 620            //Calibration for Throttle
 #define THROTTLEMAX 3530
 
-//XXX hack!
-#define RPMFACTOR 1.17
-//#define RPMFACTOR 2.34              //Calibration for RPM (its 2.34!)
+#define RPMFACTOR 2.34              //Calibration for RPM (its 2.34!)
 #define RPMSMOOTH 5                 //how many readings will be taken for the smoothing (5 is quick and smooth, 10 would be supersmooth but its getting slow)
 #define RPMMAX 3400                 //its about 8k
 
@@ -150,5 +169,7 @@ typedef unsigned char byte;
 #define LCD_HEIGHT 4
 #define LCD_BIGFONT_2 2
 #define LCD_BIGFONT_4 4
+
+#define BAR2PSI 14.50377
 
 #endif /* MULTIDISPLAY_DEFINES_H_ */

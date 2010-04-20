@@ -104,9 +104,6 @@ private:
       float asFloat[6];
     } srData;
 
-    //PID controller for the boost
-    PID *boostPidP;
-
 	int read_adc(uint8_t channel);
 	void expanderWrite(byte _data);
 	byte expanderRead();

@@ -22,6 +22,7 @@
 #include "LCDScreen.h"
 #include "LCDScreen8.h"
 #include "LCDScreen7.h"
+#include "BoostController.h"
 
 #include <stdlib.h>
 #include <inttypes.h>
@@ -132,12 +133,6 @@ MultidisplayController::MultidisplayController() {
 
 void  MultidisplayController::myconstructor() {
 
-#ifdef BOOSTN75
-	boostPidP = new PID ( (double*) &data.calBoost, &data.boostOutput, &data.boostSetPoint,2,5,1);
-#else
-	boostPidP = NULL;
-#endif
-
 	IOport2 = 0b11111111;
 	wire = TwoWire();
 
@@ -146,7 +141,6 @@ void  MultidisplayController::myconstructor() {
 	ScreenSave = 0;
 	time = 0;
 
-	data.calLd = 0.0;          //calibration of boost
 	data.maxLd = 0;
 	data.maxLdt=0;             //max LD for the screen
 
@@ -155,7 +149,13 @@ void  MultidisplayController::myconstructor() {
 
 	buttonTime = 0;
 
-	pinMode(LCDBRIGHTPIN, OUTPUT);
+	pinMode (LCDBRIGHTPIN, OUTPUT);
+	//test
+	pinMode (NORDSCHLEIFENPIN, INPUT);
+	digitalWrite( NORDSCHLEIFENPIN, HIGH); // turn on pullup resistors
+	pinMode (FREEANALOG2, INPUT);
+	digitalWrite( FREEANALOG2, HIGH); // turn on pullup resistors
+	pinMode (N75PIN, OUTPUT);
 
 	//set pin modes
 	pinMode(DATAOUT, OUTPUT);
@@ -171,7 +171,7 @@ void  MultidisplayController::myconstructor() {
 	expanderWrite2(IOport2); //Switch off all Devices
 
 	//Print the Info:
-	Serial.println(" ");
+//	Serial.println(" ");
 	Serial.println("MultiDisplay 1.1!");
 
 
@@ -188,7 +188,7 @@ void  MultidisplayController::myconstructor() {
 		data.ldCalPoint = ldp;
 	float ldt = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
 	if ( ldt > 0.0 && ldt < 1.2 )
-		data.calLd = ldt;
+		data.boostAmbientPressureBar = ldt;
 #endif
 
 	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
@@ -196,9 +196,6 @@ void  MultidisplayController::myconstructor() {
 
 	//Init the Buttons:
 	expanderWrite(0b10000011);        //This may needs to be modified when a third button is attached.
-
-	//boost PID
-	data.boostSetPoint = 1.5;
 
 	serialTime = millis();
 }
@@ -302,11 +299,20 @@ void MultidisplayController::AnaConversion() {
 	//This converts all 16 Analog Values into the real deal :)
 
 	//Boost:
+#ifdef BOOST_PLX_SMVACBOOST
 	//see http://plxdevices.com/images/SM-VacBoostVolts.jpg
+	// voltage = boost(psi)/9 + 1,66
+	// boost (psi) = voltage * 9 - 15
+	data.calBoostBar = 5.0* ( (float) data.anaIn[BOOSTPIN])/4096.0;             //only gets 0-5V
+	data.calBoostBar = data.calBoostBar * 9.0 - 15; //psi
+	data.calBoostBar = data.calBoostBar / BAR2PSI; //bar
+#else
 	//or Motorola MPX 4250 datasheet
-	data.calRAWBoost = 5.0* ((float) data.anaIn[BOOSTPIN])/4096.0;             //only gets 0-5V
-	data.calRAWBoost = (data.calRAWBoost * 50 - 10)/100;     	//makes 0-250kPa out of it
-	data.calBoost = data.calRAWBoost - data.calLd;			//apply the offset (ambient pressure)
+	data.calBoostBar = 5.0* ((float) data.anaIn[BOOSTPIN])/4096.0;             //only gets 0-5V
+	data.calBoostBar = (data.calBoostBar * 50 - 10)/100;     	//makes 0-250kPa out of it
+//	data.calBoostPSI = data.calBoostBar * BAR2PSI;
+#endif
+	data.calBoost = data.calBoostBar - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
     //Calibration for RPM (its 2.34!)
 	//Check if the Boost is a new Max Boost Event
 	if( data.calBoost >= data.maxLdE[1] ) 	{
@@ -336,7 +342,7 @@ void MultidisplayController::AnaConversion() {
 #endif
 
 #ifdef DIGIFANT
-    //digifant idle switch (LL-Schalter) gets 5V for closed throttle valve; ~ 0,48V if open
+    //digifant idle switch (LL-Schalter) gets 0V for closed throttle valve; ~5V if open
     // assumption: if > 4 V: open
     if ( data.anaIn[LMMPIN] < 3276 )
             data.calThrottle = 0;
@@ -433,25 +439,25 @@ void MultidisplayController::serialReceive() {
 	if(index==25  && (Auto_Man==0 || Auto_Man==1))
 	{
 #ifdef BOOSTN75
-		data.boostSetPoint = double(srData.asFloat[0]);
+		boostController.boostSetPoint = double(srData.asFloat[0]);
 		//Input=double(srData.asFloat[1]);       // * the user has the ability to send the
 		//   value of "Input"  in most cases (as
 		//   in this one) this is not needed.
 		if(Auto_Man==0)                       // * only change the output if we are in
 		{                                     //   manual mode.  otherwise we'll get an
-			data.boostOutput = double(srData.asFloat[2]);      //   output blip, then the controller will
+			boostController.boostOutput = double(srData.asFloat[2]);      //   output blip, then the controller will
 		}                                     //   overwrite.
 
 		double p, i, d;                       // * read in and set the controller tunings
 		p = double(srData.asFloat[3]);           //
 		i = double(srData.asFloat[4]);           //
 		d = double(srData.asFloat[5]);           //
-		boostPidP->SetTunings(p, i, d);            //
+		boostController.boostPid->SetTunings(p, i, d);            //
 
 		if(Auto_Man==0)
-			boostPidP->SetMode(MANUAL);// * set the controller mode
+			boostController.boostPid->SetMode(MANUAL);// * set the controller mode
 		else
-			boostPidP->SetMode(AUTO);             //
+			boostController.boostPid->SetMode(AUTO);             //
 #endif
 	} else 	if (Auto_Man==2 && index >= 2) {
 		//case 2: command for multidisplay
@@ -479,19 +485,19 @@ void MultidisplayController::serialReceive() {
 void MultidisplayController::serialSend() {
 #ifdef BOOSTN75
 	  Serial.print("PID ");
-	  Serial.print(data.boostSetPoint);
+	  Serial.print(boostController.boostSetPoint);
 	  Serial.print(" ");
 	  Serial.print(data.calBoost);
 	  Serial.print(" ");
-	  Serial.print(data.boostOutput);
+	  Serial.print(boostController.boostOutput);
 	  Serial.print(" ");
-	  Serial.print(boostPidP->GetP_Param());
+	  Serial.print(boostController.boostPid->GetP_Param());
 	  Serial.print(" ");
-	  Serial.print(boostPidP->GetI_Param());
+	  Serial.print(boostController.boostPid->GetI_Param());
 	  Serial.print(" ");
-	  Serial.print(boostPidP->GetD_Param());
+	  Serial.print(boostController.boostPid->GetD_Param());
 	  Serial.print(" ");
-	  if (boostPidP->GetMode()==AUTO)
+	  if (boostController.boostPid->GetMode()==AUTO)
 		  Serial.println("Automatic");
 	  else
 		  Serial.println("Manual");
@@ -586,12 +592,12 @@ void MultidisplayController::ChangeSerOut()
 
 void MultidisplayController::CalibrateLD()
 {
-	data.calLd = data.calRAWBoost;
+	data.boostAmbientPressureBar = data.calBoostBar;
 	// changed from global val3 to caluclation of mapped boost
 	data.ldCalPoint = map(data.anaIn[BOOSTPIN], 0, 4096, 0, 200) / 10;
 	//and saved:
 	EEPROM.write(205,data.ldCalPoint);
-	EEPROMWriteDouble(200,data.calLd*1000);    //writes the float as long, will do it.
+	EEPROMWriteDouble(200,data.boostAmbientPressureBar*1000);    //writes the float as long, will do it.
 
 	//The MaxLD will be reset!
 	data.maxLd = 0.0;
@@ -599,7 +605,7 @@ void MultidisplayController::CalibrateLD()
 
 	Serial.println(" ");
 	Serial.print("CalBoost: ");
-	Serial.println(data.calLd);
+	Serial.println(data.boostAmbientPressureBar);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -814,9 +820,9 @@ void MultidisplayController::mainLoop() {
 	if(DoCal == 1) {
 		AnaConversion();
 
-#if RPMShiftLight
-	Shiftlight();
-#endif //RPMShiftLight
+#ifdef RPM_SHIFT_LIGHT
+		Shiftlight();
+#endif //RPM_SHIFT_LIGHT
 	}
 
 
@@ -847,7 +853,7 @@ void MultidisplayController::mainLoop() {
 	Serial.println( freeMem());
 #endif
 
-#if RPMDebug
+#ifdef RPMDebug
 	//Debug RPM generator:
 	if(debug>=DEBUGRPM) {
 		debug = 0;
@@ -860,9 +866,13 @@ void MultidisplayController::mainLoop() {
 #endif
 
 #ifdef BOOSTN75
-	//TODO adjust setpoint!
-	boostPidP->Compute();
-	//TODO write boostOutput to PWM pin!
+	//normal or race mode?
+	//internal pull-up active
+	//switch connects pin to groud
+	boostController.toggleMode ( digitalRead(NORDSCHLEIFENPIN) );
+
+	boostController.boostPid->Compute();
+	analogWrite(N75PIN, (int) boostController.boostOutput);
 #endif
 
 	if ( millis() > serialTime ) {
@@ -917,12 +927,12 @@ void MultidisplayController::buttonAPressed() {
 	case 3:
 		ChangeSerOut();      //Switch from RAW to Cal to Nothing and vise versa.
 		break;
-	case 6:                 //Switches the 2 Row Screen
-		lcdController.myScreens[5]->toggleScreenAB();
-		break;
-	case 7:
-		lcdController.myScreens[6]->toggleRefreshCounter();
-		break;
+//	case 6:                 //Switches the 2 Row Screen
+//		lcdController.myScreens[5]->toggleScreenAB();
+//		break;
+//	case 7:
+//		lcdController.myScreens[6]->toggleRefreshCounter();
+//		break;
 	default:
 		break;
 	}

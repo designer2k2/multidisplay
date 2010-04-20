@@ -23,6 +23,7 @@
 #include "LCDController.h"
 #include "MultidisplayController.h"
 #include "SensorData.h"
+#include "BoostController.h"
 
 /*
 ToDo:
@@ -38,6 +39,9 @@ ToDo:
 SensorData data;
 LCDController lcdController;
 MultidisplayController mController;
+#ifdef BOOSTN75
+BoostController boostController;
+#endif
 
 int main(void) {
 	/* Must call init for arduino to work properly */
@@ -46,6 +50,9 @@ int main(void) {
     data.myconstructor();
     lcdController.myconstructor();
 	mController.myconstructor();
+#ifdef BOOSTN75
+	boostController.myconstructor();
+#endif
 
 	for (;;)
 		mController.mainLoop();

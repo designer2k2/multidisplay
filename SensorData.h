@@ -27,14 +27,11 @@
 class SensorData {
 public:
 	int anaIn[17];
-	float calLd;          //calibration from the Boost
+	float boostAmbientPressureBar;          //calibration for Boost: ambient pressur in bar
 	float maxLd;
 	int maxLdt;               //max LD for the screen
 	int ldCalPoint;             //where to draw the dot from the calibration
 
-	//	// PID Boost Controller
-	double boostSetPoint;
-	double boostOutput;
 
 	int calAgt[NUMTYPK+1];  //All Typ K Values will be stored inside this array
 
@@ -46,7 +43,8 @@ public:
 
 	//convertet values:
 	float calBoost;
-	float calRAWBoost;
+	float calBoostBar;
+//	float calBoostPSI; //for PID
 	float calLambdaF;
 	int calLambda;
 	int calRPM;

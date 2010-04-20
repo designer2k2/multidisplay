@@ -38,19 +38,18 @@ void SensorData::myconstructor () {
 //	ScreenSave = 0;
 //	time = 0;
 //	val3=0;
-	calLd = 0.0;          //calibration from the Boost
+	boostAmbientPressureBar = 1.0;
+
 	maxLd = 0;
 	maxLdt=0;               //max LD for the screen
 	ldCalPoint = 0;
-	boostOutput = 0;
-	boostSetPoint = 0;
 
 	rpmIndex = 0;                            // the index of the current reading
 	rpmTotal = 0;                            // the running total
 	rpmAverage = 0;                          // the average
 
 	calBoost = 0.0;
-	calRAWBoost = 0.0;
+	calBoostBar = 0.0;
 	calLambda = 0;
 	calLambdaF = 0;
 	calRPM = 0;
