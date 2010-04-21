@@ -155,7 +155,12 @@ void  MultidisplayController::myconstructor() {
 	digitalWrite( NORDSCHLEIFENPIN, HIGH); // turn on pullup resistors
 	pinMode (FREEANALOG2, INPUT);
 	digitalWrite( FREEANALOG2, HIGH); // turn on pullup resistors
+
 	pinMode (N75PIN, OUTPUT);
+	//http://www.arduino.cc/playground/Main/TimerPWMCheatsheet
+	//http://www.arcfn.com/2009/07/secrets-of-arduino-pwm.html
+	//set pwm freq tp 30Hz
+	TCCR1B = (TCCR1B & 0b11111000) | 0x5;
 
 	//set pin modes
 	pinMode(DATAOUT, OUTPUT);
@@ -875,7 +880,6 @@ void MultidisplayController::mainLoop() {
 	boostController.boostPid->Compute();
 	analogWrite(N75PIN, (int) boostController.boostOutput);
 #endif
-//	analogWrite(N75PIN, 240);
 
 	if ( millis() > serialTime ) {
 		//Print it:
