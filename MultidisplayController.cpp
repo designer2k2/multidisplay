@@ -490,6 +490,7 @@ void MultidisplayController::serialReceive() {
 
 void MultidisplayController::serialSend() {
 #ifdef BOOSTN75
+	  Serial.print("\2");
 	  Serial.print("PID ");
 	  Serial.print(boostController.boostSetPoint);
 	  Serial.print(" ");
@@ -504,11 +505,14 @@ void MultidisplayController::serialSend() {
 	  Serial.print(boostController.boostPid->GetD_Param());
 	  Serial.print(" ");
 	  if (boostController.boostPid->GetMode()==AUTO)
-		  Serial.println("Automatic");
+		  Serial.print("Automatic");
 	  else
-		  Serial.println("Manual");
+		  Serial.print("Manual");
+	  Serial.print("\3");
+	  Serial.println();
 #endif /* BOOSTN75 */
 
+	Serial.print("\2");
 	switch(SerOut){
 	case SERIALOUT_DISABLED:
 		break;
@@ -520,10 +524,13 @@ void MultidisplayController::serialSend() {
 			Serial.print(data.anaIn[I]);
 			Serial.print(";");
 		}
-		Serial.println(data.anaIn[16]);
+		Serial.print(data.anaIn[16]);
 		break;
 	case SERIALOUT_ENABLED:
 		//Convertet Output:
+		//TODO more output (ie VDO)
+		Serial.print(SERIALOUT_ENABLED);
+		Serial.print(":");
 		Serial.print(time);
 		Serial.print(";");
 		Serial.print(data.calRPM);
@@ -542,13 +549,14 @@ void MultidisplayController::serialSend() {
 		Serial.print(";");
 		Serial.print(data.calAgt[1]);
 		Serial.print(";");
-		Serial.println(data.batVolt);
+		Serial.print(data.batVolt);
 		break;
 	default:
 		SerOut = SERIALOUT_DISABLED;
 		break;
 	}
-
+	Serial.print("\3");
+	Serial.println();
 }
 
 void MultidisplayController::HeaderPrint() {
@@ -568,6 +576,8 @@ void MultidisplayController::HeaderPrint() {
 		break;
 	case SERIALOUT_ENABLED:
 		Serial.println(" ");
+		Serial.print(SERIALOUT_ENABLED);
+		Serial.print(":");
 		Serial.println_P(PSTR("Time;RPM;Boost;Throttle;Lambda;LMM;CaseTemp;TypK1;TypK2;Battery"));
 		break;
 	default:
