@@ -368,6 +368,7 @@ void MultidisplayController::AnaConversion() {
 
 	//RPM
 	//(from the smoothing example)
+	//TODO more smoothing below 1000 rpm
 	data.rpmTotal -= data.rpmReadings[data.rpmIndex];               // subtract the last reading
 	data.rpmReadings[data.rpmIndex] = data.anaIn[RPMPIN];           // read from the sensor
 	data.rpmTotal += data.rpmReadings[data.rpmIndex];               // add the reading to the total
