@@ -262,14 +262,21 @@ void LCDController::float2string ( char* buffer, float f, int dp ) {
 	else
 		v = ceil (f);
 
-	float t = (f - v) * dp;
+	float t = (f-v) * dp;
 	int ni = (int) t;
 
 	bool makenegative = false;
-	if ( ni < 0)
+	if ( ni < 0) {
 		ni = abs (ni);
-	if ( v == 0 && ni < 0 )
-		makenegative = true;
+		if ( v == 0 )
+			makenegative = true;
+	}
+
+	uint8_t addnull = 0;
+	for ( int i = 10 ; i <= dp/10 ; i *= 10 ) {
+		if (ni < i)
+			addnull++;
+	}
 
 	char a[15];
 	char b[15];
@@ -278,7 +285,11 @@ void LCDController::float2string ( char* buffer, float f, int dp ) {
 		itoa(v, &(a[1]), 10);
 	} else
 		itoa(v, &(a[0]), 10);
-	itoa(ni, &(b[0]), 10);
+
+	for ( uint8_t j = 0 ; j < addnull ; j++  )
+		b[j]='0';
+	itoa(ni, &(b[addnull]), 10);
+	b[dp/10] = '\0';
 	strcpy (buffer, &a[0]);
 	strcat (buffer, ".");
 	strcat (buffer, &b[0]);

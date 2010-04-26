@@ -54,6 +54,7 @@ void LCDScreen10::customDraw() {
     lcdController.printFloat2DP(lcdController.ystart[3] + 12, boostController.boostOutput);
 #endif
 
+
 //    lcdController.printInt(lcdController.ystart[3] + 13, digitalRead(FREEANALOG2), 4);
 
 //	lcdController.printBigNum ( (double)data.calBoost, LCD_WIDTH-9, 9, 0, LCD_BIGFONT_4);
