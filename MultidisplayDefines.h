@@ -152,7 +152,7 @@ typedef unsigned char byte;
 #define SERIALOUT_RAW 1
 #define SERIALOUT_ENABLED 2
 //send and receive each SERIALFREQ millisecs!
-#define SERIALFREQ 500
+#define SERIALFREQ 250
 
 #define SCREENA 1
 #define SCREENB 2

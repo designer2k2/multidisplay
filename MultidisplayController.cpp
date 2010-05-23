@@ -428,7 +428,6 @@ void MultidisplayController::Shiftlight()
 
 void MultidisplayController::serialReceive() {
 
-	// read the bytes sent from Processing
 	int index=0;
 	byte Auto_Man = -1;
 	while(Serial.available()&&index<25)
@@ -440,31 +439,37 @@ void MultidisplayController::serialReceive() {
 		index++;
 	}
 
+//	if ( index > 0 ) {
+//		Serial.print ("DEBUG rcv");
+//		Serial.print (index);
+//		Serial.println();
+//	}
+
 	// if the information we got was in the correct format,
 	// read it into the system
 	// case 1: command for pid lib
 	if(index==25  && (Auto_Man==0 || Auto_Man==1))
 	{
 #ifdef BOOSTN75
-		boostController.boostSetPoint = double(srData.asFloat[0]);
-		//Input=double(srData.asFloat[1]);       // * the user has the ability to send the
-		//   value of "Input"  in most cases (as
-		//   in this one) this is not needed.
-		if(Auto_Man==0)                       // * only change the output if we are in
-		{                                     //   manual mode.  otherwise we'll get an
-			boostController.boostOutput = double(srData.asFloat[2]);      //   output blip, then the controller will
-		}                                     //   overwrite.
 
-		double p, i, d;                       // * read in and set the controller tunings
-		p = double(srData.asFloat[3]);           //
-		i = double(srData.asFloat[4]);           //
-		d = double(srData.asFloat[5]);           //
-		boostController.boostPid->SetTunings(p, i, d);            //
+		/* we get fixed point values (base 1000) from the pc ! */
+
+		boostController.boostSetPoint = double(srData.asFixedInt32[0] / 1000.0);
+		if(Auto_Man==0) {
+			// * only change the output if we are in manual mode
+			boostController.boostOutput = double(srData.asFixedInt32[2] / 1000.0);
+		}
+
+		double p, i, d;  // * read in and set the controller tunings
+		p = double(srData.asFixedInt32[3] / 1000.0);
+		i = double(srData.asFixedInt32[4] / 1000.0);
+		d = double(srData.asFixedInt32[5] / 1000.0);
+		boostController.boostPid->SetTunings(p, i, d);
 
 		if(Auto_Man==0)
 			boostController.boostPid->SetMode(MANUAL);// * set the controller mode
 		else
-			boostController.boostPid->SetMode(AUTO);             //
+			boostController.boostPid->SetMode(AUTO);
 #endif
 	} else 	if (Auto_Man==2 && index >= 2) {
 		//case 2: command for multidisplay
@@ -893,8 +898,8 @@ void MultidisplayController::mainLoop() {
 #endif
 
 	if ( millis() > serialTime ) {
-		//Print it:
 		serialReceive();
+		//Print it:
 		serialSend();
 		serialTime += SERIALFREQ;
 	}

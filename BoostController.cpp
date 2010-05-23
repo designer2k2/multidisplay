@@ -36,6 +36,7 @@ void BoostController::myconstructor() {
 	boostPid->SetMode(AUTO);
 }
 
+
 void BoostController::toggleMode (uint8_t nmode) {
 	if (mode != nmode) {
 //		if ( nmode == BOOST_MODE_NORMAL || nmode == BOOST_MODE_RACE )

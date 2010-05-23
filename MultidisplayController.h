@@ -64,32 +64,17 @@ private:
     unsigned long serialTime;
 
     /**
-     * taken from the PID lib...
-     *
-     * This Data structure lets us take the byte array
-     * sent from processing and easily convert it to a float array
-     *
-     * getting float values from processing into the arduino
-     * was no small task.  the way this program does it is
-     * as follows:
-     *  * a float takes up 4 bytes.  in processing, convert
-     *    the array of floats we want to send, into an array
-     *    of bytes.
-     *  * send the bytes to the arduino
-     *  * use a data structure known as a union to convert
-     *    the array of bytes back into an array of floats
-     *
      *  ============ pc -> arduino ==================
      *  the messages to the arduino follow the following format:
      *  0: 0=Manual, 1=Auto, 2=multidisplay command, else = ignore
      *
      *  for pid lib
-     *  1-4: float setpoint
-     *  5-8: float input
-     *  9-12: float output
-     *  13-16: float P_Param
-     *  17-20: float I_Param
-     *  21-24: float D_Param
+     *  1-4: fixed point value (scale factor 1000) setpoint
+     *  5-8: fixed point value (scale factor 1000) input
+     *  9-12: fixed point value (scale factor 1000) output
+     *  13-16: fixed point value (scale factor 1000) P_Param
+     *  17-20: fixed point value (scale factor 1000) I_Param
+     *  21-24: fixed point value (scale factor 1000) D_Param
      *
      *  multidisplay command (from pc to arduino)
      *  1: buttons: 1=a pressed, 2=a hold, 3=b pressed, 4=b hold
@@ -102,6 +87,7 @@ private:
     union {
       byte asBytes[24];
       float asFloat[6];
+      int32_t asFixedInt32[6];
     } srData;
 
 	int read_adc(uint8_t channel);
