@@ -34,6 +34,7 @@ void BoostController::myconstructor() {
 	boostPid->SetOutputLimits(0,255);
 	boostPid->SetInputLimits(-1.0, 2.0);
 	boostPid->SetMode(AUTO);
+	boostPid->SetSampleTime(10);
 }
 
 
