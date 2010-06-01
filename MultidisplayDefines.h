@@ -96,8 +96,8 @@
 #define NORDSCHLEIFENPIN 15
 #define FREEANALOG2 16
 //left of lcd pins
-#define N75PIN 10
-#define FREEPWM2 11
+#define FREEPWM2 10
+#define N75PIN 11
 
 // The Sensors: (On the MD03 Print, see the Layout for the KLX Connectors)
 #define BOOSTPIN 1             //(KL7-2) Currently supports the Motorola 250kpa Sensor
@@ -152,7 +152,8 @@ typedef unsigned char byte;
 #define SERIALOUT_RAW 1
 #define SERIALOUT_ENABLED 2
 //send and receive each SERIALFREQ millisecs!
-#define SERIALFREQ 250
+#define SERIALFREQ 10
+
 
 #define SCREENA 1
 #define SCREENB 2

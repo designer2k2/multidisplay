@@ -30,7 +30,7 @@ void BoostController::myconstructor() {
 	boostOutput = 0;
 	boostSetPoint = BOOST_NORMAL;
 	mode = BOOST_MODE_NORMAL;
-	boostPid = new PID ( (double*) &data.calBoost, &boostOutput, &boostSetPoint,2,5,1);
+	boostPid = new PID ( (double*) &data.calBoost, &boostOutput, &boostSetPoint,10,5,0;
 	boostPid->SetOutputLimits(0,255);
 	boostPid->SetInputLimits(-1.0, 2.0);
 	boostPid->SetMode(AUTO);
