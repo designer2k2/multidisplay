@@ -29,9 +29,13 @@ public:
 
 	void myconstructor ();
 	void toggleMode (uint8_t nmode);
+	void compute ();
 
 	PID *boostPid;
 	double boostSetPoint;
+	//used to save the setpoint while throttle is closed
+	double boostSetPointSave;
+	uint8_t idleSetPointActive;
 	double boostOutput;
 	uint8_t mode;
 };

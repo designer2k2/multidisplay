@@ -897,7 +897,8 @@ void MultidisplayController::mainLoop() {
 	//switch connects pin to groud
 	boostController.toggleMode ( digitalRead(NORDSCHLEIFENPIN) );
 
-	boostController.boostPid->Compute();
+	boostController.compute();
+//	boostController.boostPid->Compute();
 	analogWrite(N75PIN, (int) boostController.boostOutput);
 //	analogWrite(FREEPWM2, (int) boostController.boostOutput);
 #endif

@@ -30,11 +30,13 @@ void BoostController::myconstructor() {
 	boostOutput = 0;
 	boostSetPoint = BOOST_NORMAL;
 	mode = BOOST_MODE_NORMAL;
+	boostSetPointSave = 0.0;
+	idleSetPointActive = 0;
 	boostPid = new PID ( (double*) &data.calBoost, &boostOutput, &boostSetPoint,10,5,1 );
 	boostPid->SetOutputLimits(0,255);
 	boostPid->SetInputLimits(-1.0, 2.0);
 	boostPid->SetMode(AUTO);
-	boostPid->SetSampleTime(10);
+	boostPid->SetSampleTime(20);
 }
 
 
@@ -47,4 +49,16 @@ void BoostController::toggleMode (uint8_t nmode) {
 		else
 			boostSetPoint = BOOST_RACE;
 	}
+}
+
+void BoostController::compute () {
+	if ((data.calThrottle == 0) && !idleSetPointActive) {
+		idleSetPointActive = 1;
+		boostSetPointSave = boostSetPoint;
+		boostSetPoint = 0.0;
+	} else if ((data.calThrottle >= 0) && idleSetPointActive) {
+		idleSetPointActive = 0;
+		boostSetPoint = boostSetPointSave;
+	}
+	boostPid->Compute();
 }
