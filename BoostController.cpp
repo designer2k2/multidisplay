@@ -47,10 +47,15 @@ void BoostController::toggleMode (uint8_t nmode) {
 	if (mode != nmode) {
 //		if ( nmode == BOOST_MODE_NORMAL || nmode == BOOST_MODE_RACE )
 		mode = nmode;
-		if ( nmode == BOOST_MODE_NORMAL )
+		if ( nmode == BOOST_MODE_NORMAL ) {
 			boostSetPoint = BOOST_NORMAL;
-		else
+			if ( boostPid->GetMode() == MANUAL )
+				boostOutput = BOOST_MANUAL_NORMAL;
+		} else {
 			boostSetPoint = BOOST_RACE;
+			if ( boostPid->GetMode() == MANUAL )
+				boostOutput = BOOST_MANUAL_RACE;
+		}
 	}
 }
 

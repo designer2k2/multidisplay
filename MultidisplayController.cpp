@@ -867,7 +867,9 @@ void MultidisplayController::mainLoop() {
 	//Check for Limits:
 	//if(DoCheck == 1)
 	// {
-	CheckLimits();
+
+//	CheckLimits();
+
 	// }
 
 	// ui knows what screen is active and draws it!
