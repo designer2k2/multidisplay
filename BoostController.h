@@ -37,6 +37,7 @@ public:
 	double boostSetPointSave;
 	uint8_t idleSetPointActive;
 	double boostOutput;
+	double boostOutputSave;
 	uint8_t mode;
 };
 

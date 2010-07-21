@@ -560,6 +560,18 @@ void MultidisplayController::serialSend() {
 		Serial.print(data.calAgt[1]);
 		Serial.print(";");
 		Serial.print(data.batVolt);
+		Serial.print(";");
+		Serial.print(data.VDOPres1);
+		Serial.print(";");
+		Serial.print(data.VDOPres2);
+		Serial.print(";");
+		Serial.print(data.VDOPres3);
+		Serial.print(";");
+		Serial.print(data.VDOTemp1);
+		Serial.print(";");
+		Serial.print(data.VDOTemp2);
+		Serial.print(";");
+		Serial.print(data.VDOTemp3);
 		break;
 	default:
 		SerOut = SERIALOUT_DISABLED;

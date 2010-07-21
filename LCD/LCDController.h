@@ -27,7 +27,7 @@
 
 class LCDScreen;
 
-#define SCREENCOUNT 4
+#define SCREENCOUNT 3
 
 /**
  *  controlls the LCD screen

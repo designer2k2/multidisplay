@@ -35,8 +35,11 @@ void BoostController::myconstructor() {
 	boostPid = new PID ( (double*) &data.calBoost, &boostOutput, &boostSetPoint,10,5,1 );
 	boostPid->SetOutputLimits(0,255);
 	boostPid->SetInputLimits(-1.0, 2.0);
-	boostPid->SetMode(AUTO);
+//	boostPid->SetMode(AUTO);
+	boostPid->SetMode(MANUAL);
+	boostOutput = 250;
 	boostPid->SetSampleTime(20);
+	boostOutputSave = 0.0;
 }
 
 
@@ -52,13 +55,25 @@ void BoostController::toggleMode (uint8_t nmode) {
 }
 
 void BoostController::compute () {
-	if ((data.calThrottle == 0) && !idleSetPointActive) {
-		idleSetPointActive = 1;
-		boostSetPointSave = boostSetPoint;
-		boostSetPoint = 0.0;
-	} else if ((data.calThrottle >= 0) && idleSetPointActive) {
-		idleSetPointActive = 0;
-		boostSetPoint = boostSetPointSave;
+	if ( boostPid->GetMode() == AUTO ) {
+		if ((data.calThrottle == 0) && !idleSetPointActive) {
+			idleSetPointActive = 1;
+			boostSetPointSave = boostSetPoint;
+			boostSetPoint = 0.0;
+		} else if ((data.calThrottle >= 0) && idleSetPointActive) {
+			idleSetPointActive = 0;
+			boostSetPoint = boostSetPointSave;
+		}
+		boostPid->Compute();
+	} else {
+		//MANUAL
+		if ( (data.calThrottle == 0) && boostOutputSave==0.0 ) {
+			boostOutputSave = boostOutput;
+			boostOutput = 0.0;
+		} else if ( (data.calThrottle > 0) && boostOutputSave > 0.0 ) {
+			//restore
+			boostOutput = boostOutputSave;
+			boostOutputSave = 0.0;
+		}
 	}
-	boostPid->Compute();
 }
