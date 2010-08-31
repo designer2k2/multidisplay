@@ -37,7 +37,7 @@ void BoostController::myconstructor() {
 	boostPid->SetInputLimits(-1.0, 2.0);
 //	boostPid->SetMode(AUTO);
 	boostPid->SetMode(MANUAL);
-	boostOutput = 250;
+	boostOutput = BOOST_MANUAL_NORMAL;
 	boostPid->SetSampleTime(20);
 	boostOutputSave = 0.0;
 }
@@ -49,12 +49,20 @@ void BoostController::toggleMode (uint8_t nmode) {
 		mode = nmode;
 		if ( nmode == BOOST_MODE_NORMAL ) {
 			boostSetPoint = BOOST_NORMAL;
-			if ( boostPid->GetMode() == MANUAL )
-				boostOutput = BOOST_MANUAL_NORMAL;
+			if ( boostPid->GetMode() == MANUAL ) {
+				if (boostOutputSave > 0)
+					boostOutputSave = BOOST_MANUAL_NORMAL;
+				else
+					boostOutput = BOOST_MANUAL_NORMAL;
+			}
 		} else {
 			boostSetPoint = BOOST_RACE;
-			if ( boostPid->GetMode() == MANUAL )
-				boostOutput = BOOST_MANUAL_RACE;
+			if ( boostPid->GetMode() == MANUAL ) {
+				if (boostOutputSave > 0)
+					boostOutputSave = BOOST_MANUAL_RACE;
+				else
+					boostOutput = BOOST_MANUAL_RACE;
+			}
 		}
 	}
 }

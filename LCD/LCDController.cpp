@@ -365,27 +365,25 @@ void LCDController::lcdShowIntro(int delayValue) {
 	cgramIntro();
 	cgramIntro2();
 
-	//Show the Intro:
-	lcdp->commandWrite(0x80+2);                  //Line1
-	lcdp->print(1);
-	lcdp->print(2);
-	lcdp->commandWrite(0x80+10);                  //Line1
-	lcdp->print(3);
-	lcdp->print(4);
-
-	lcdp->commandWrite(0xC0+2); 			//Line2
-	lcdp->print(5);
-	lcdp->print(6);
-	lcdp->printIn_P ( PSTR("ulti") );
-	lcdp->commandWrite(0xC0+10); 			//Line2
-	lcdp->print(7);
-	lcdp->print(8);
-//	lcdp->printIn ( "isplay" );
-	lcdp->printIn_P ( PSTR("isplay") );
-
-	lcdp->commandWrite(0xD4+1);                  //Line=4
-	lcdp->printIn_P ( PSTR("www.designer2k2.at") );
-//	lcdp->printIn ( "www.designer2k2.at" );
+//	//Show the Intro:
+//	lcdp->commandWrite(0x80+2);                  //Line1
+//	lcdp->print(1);
+//	lcdp->print(2);
+//	lcdp->commandWrite(0x80+10);                  //Line1
+//	lcdp->print(3);
+//	lcdp->print(4);
+//
+//	lcdp->commandWrite(0xC0+2); 			//Line2
+//	lcdp->print(5);
+//	lcdp->print(6);
+//	lcdp->printIn_P ( PSTR("ulti") );
+//	lcdp->commandWrite(0xC0+10); 			//Line2
+//	lcdp->print(7);
+//	lcdp->print(8);
+//	lcdp->printIn_P ( PSTR("isplay") );
+//
+//	lcdp->commandWrite(0xD4+1);                  //Line=4
+//	lcdp->printIn_P ( PSTR("www.designer2k2.at") );
 
 	//Set the LCD brightness: (This turns on the Light, looks nice)
 	setBrightness(2);

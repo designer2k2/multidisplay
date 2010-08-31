@@ -397,11 +397,12 @@ void MultidisplayController::AnaConversion() {
 	//measured Voltage * 4,09 + 0,7V should give the supply voltage
 	data.batVolt = ((5.0*analogRead(BATTERYPIN)/1023.0)*4.09)+0.7;
 
+#ifdef TYPE_K
 	//Lets do the Typ K Conversion:
 	if(DoTypK==1) 	{
 		FetchTypK();
 	}
-
+#endif
 	//VDO Stuff:
 
 	data.VDOTemp1 = GetVDOTemp(data.anaIn[VDOT1PIN]);
@@ -600,7 +601,7 @@ void MultidisplayController::HeaderPrint() {
 		Serial.println(" ");
 		Serial.print(SERIALOUT_ENABLED);
 		Serial.print(":");
-		Serial.println_P(PSTR("Time;RPM;Boost;Throttle;Lambda;LMM;CaseTemp;TypK1;TypK2;Battery"));
+		Serial.println_P(PSTR("Time;RPM;Boost;Throttle;Lambda;LMM;CaseTemp;TypK1;TypK2;Battery;VDOP1;2;3;VDOT1;2;3"));
 		break;
 	default:
 		break;
@@ -782,6 +783,13 @@ void MultidisplayController::CheckLimits()
   }
 	 */
 
+#ifdef LAMBDA_WIDEBAND
+//	if( data.calLambdaF > 1.1 && data.calThrottle == 100 ) {
+//		FlashTrigger = 1;
+//		//TODO counter 1sec!
+//	}
+#endif
+
 	if(data.calAgt[0]>MaxAGT) {
 		FlashTrigger = 1;    //Enable the LCDFlash
 	}
@@ -912,7 +920,6 @@ void MultidisplayController::mainLoop() {
 	boostController.toggleMode ( digitalRead(NORDSCHLEIFENPIN) );
 
 	boostController.compute();
-//	boostController.boostPid->Compute();
 	analogWrite(N75PIN, (int) boostController.boostOutput);
 //	analogWrite(FREEPWM2, (int) boostController.boostOutput);
 #endif

@@ -41,6 +41,8 @@
 
 #define READFROMEEPROM
 
+#define TYPE_K
+
 //----------------------------------------------------------------------------------------------------
 //Max Values:
 #define MaxAGT 1200            //Maximum AGT
@@ -52,7 +54,7 @@
 #define DEBUG 1
 //#define LCDTEST 1
 //#define RPM_DEBUG 0             //Little Frequency Generator
-#define FREEMEM 0              //Outputs how much free RAM is
+//#define FREEMEM 0              //Outputs how much free RAM is
 
 #define INITTIME 2000          //How long the Init screen will be shown
 //--------------------------------------
