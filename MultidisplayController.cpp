@@ -79,53 +79,53 @@ const unsigned int MultidisplayController::tempTypK[] =
 };
 
 //Lookup Table for the Oilpressure: (12 Values)
-//from 0-10Bar in steps of 1Bar, the list is in 12Bit Digital Reading when supplied with 5V and a 200Ohm Resistor in series
+//from 0-10Bar in steps of 1Bar, the list is in 12Bit Digital Reading when supplied with 5V and a 220Ohm Resistor in series
 //(measuring the Voltage on the Sensor)
 //it has a increasing Resistance with the Pressure.
 const unsigned int MultidisplayController::tempVDOPressure[] =
 {
 		0,
-		195,
-		549,
-		845,
-		1073,
-		1271,
-		1427,
-		1567,
-		1686,
-		1794,
-		1881,
-		1962
+		178,
+		505,
+		783,
+		999,
+		1189,
+		1340,
+		1476,
+		1592,
+		1699,
+		1785,
+		1865
 };
 
 //Lookup Table for the VDOtemperature (22 Values) Its Calibration curve 92-027-006
-//from -30C-180C in steps of 10C, the list is in 12Bit Digital Reading when supplied with 5V and a 200Ohm Resistor in series
+//from -30C-180C in steps of 10C, the list is in 12Bit Digital Reading when supplied with 5V and a 220Ohm Resistor in series
 //(measuring the Voltage on the Sensor)
 //it has a decreasing Resistance with the Temperature
 const unsigned int MultidisplayController::tempVDOTemp[] =
 {
-		4053,
-		4019,
-		3957,
-		3857,
-		3706,
-		3497,
-		3224,
-		2893,
-		2527,
-		2150,
-		1790,
-		1471,
-		1200,
-		968,
-		782,
-		632,
-		515,
-		422,
-		348,
-		287,
-		238,
-		199
+		4049,
+		4012,
+		3944,
+		3835,
+		3672,
+		3447,
+		3157,
+		2811,
+		2433,
+		2053,
+		1694,
+		1382,
+		1121,
+		899,
+		724,
+		582,
+		474,
+		387,
+		319,
+		263,
+		218,
+		182,
 };
 
 MultidisplayController::MultidisplayController() {
