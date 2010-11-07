@@ -79,9 +79,9 @@
 //--------------------------------------
 //Pin Config:
 //arduino
-#define DATAOUT 17              //MOSI
+#define DATAOUT 57              //MOSI  17 on UNO/Duemilanove, 57 on MEGA
 #define DATAIN 12               //MISO
-#define SPICLOCK 13             //Clock
+#define SPICLOCK 23             //Clock  13 on UNO/Duemilanove, 23 on MEGA (13 cant bring the power!) Just bridge 23 and 13 with jumperwire.
 
 #define BATTERYPIN 0           //The Signal from the voltage divider (Analog Pin on the Arduino!)
 #define LCDBRIGHTPIN 5		     //The Pin for the Brightness of the LCD, it will be PWM.
