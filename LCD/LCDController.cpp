@@ -54,16 +54,20 @@ void  LCDController::myconstructor() {
             scopeInt[i]=0;
 
     //FIXME button modes commented out
-//    myScreens[0] = new LCDScreen1();
-//    myScreens[1] = new LCDScreen2();
-//    myScreens[0] = new LCDScreen3();
-//    myScreens[3] = new LCDScreen4();
-//    myScreens[4] = new LCDScreen5();
-//    myScreens[5] = new LCDScreen6();
-//    myScreens[1] = new LCDScreen7();
-//    myScreens[7] = new LCDScreen8();
-//    myScreens[8] = new LCDScreen9();
+#ifdef MULTIDISPLAY_V2
+    myScreens[0] = new LCDScreen1();
+    myScreens[1] = new LCDScreen2();
+    myScreens[0] = new LCDScreen3();
+    myScreens[3] = new LCDScreen4();
+    myScreens[4] = new LCDScreen5();
+    myScreens[5] = new LCDScreen6();
+    myScreens[1] = new LCDScreen7();
+    myScreens[7] = new LCDScreen8();
+    myScreens[8] = new LCDScreen9();
+    myScreens[9] = new LCDScreen10();
+#else
     myScreens[0] = new LCDScreen10();
+#endif
 }
 
 void LCDController::init() {

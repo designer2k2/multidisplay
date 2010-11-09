@@ -20,6 +20,12 @@
 #ifndef MULTIDISPLAY_DEFINES_H_
 #define MULTIDISPLAY_DEFINES_H_
 
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+#define MULTIDISPLAY_V2
+#else
+#define MULTIDISPLAY_V1
+#endif
+
 
 //choose your engines ecu
 //only one of them should be defined!
@@ -79,9 +85,18 @@
 //--------------------------------------
 //Pin Config:
 //arduino
+#ifdef MULTIDISPLAY_V2
 #define DATAOUT 57              //MOSI  17 on UNO/Duemilanove, 57 on MEGA
 #define DATAIN 12               //MISO
 #define SPICLOCK 23             //Clock  13 on UNO/Duemilanove, 23 on MEGA (13 cant bring the power!) Just bridge 23 and 13 with jumperwire.
+#endif
+
+#ifdef MULTIDISPLAY_V1
+#define DATAOUT 17              //MOSI  17 on UNO/Duemilanove, 57 on MEGA
+#define DATAIN 12               //MISO
+#define SPICLOCK 13             //Clock  13 on UNO/Duemilanove, 23 on MEGA (13 cant bring the power!) Just bridge 23 and 13 with jumperwire.
+#endif
+
 
 #define BATTERYPIN 0           //The Signal from the voltage divider (Analog Pin on the Arduino!)
 #define LCDBRIGHTPIN 5		     //The Pin for the Brightness of the LCD, it will be PWM.
