@@ -862,14 +862,12 @@ void MultidisplayController::mainLoop() {
 	}
 
 	AnaConversion();
-	//Calibrate them:
-	if(DoCal == 1) {
-		AnaConversion();
+
 
 #ifdef RPM_SHIFT_LIGHT
 		Shiftlight();
 #endif //RPM_SHIFT_LIGHT
-	}
+
 
 
 	//Check for Limits:
