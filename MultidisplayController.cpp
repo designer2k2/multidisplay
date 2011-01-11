@@ -501,26 +501,29 @@ void MultidisplayController::serialReceive() {
 
 void MultidisplayController::serialSend() {
 #ifdef BOOSTN75
-	  Serial.print("\2");
-	  Serial.print("PID ");
-	  Serial.print(boostController.boostSetPoint);
-	  Serial.print(" ");
-	  Serial.print(data.calBoost);
-	  Serial.print(" ");
-	  Serial.print(boostController.boostOutput);
-	  Serial.print(" ");
-	  Serial.print(boostController.boostPid->GetP_Param());
-	  Serial.print(" ");
-	  Serial.print(boostController.boostPid->GetI_Param());
-	  Serial.print(" ");
-	  Serial.print(boostController.boostPid->GetD_Param());
-	  Serial.print(" ");
-	  if (boostController.boostPid->GetMode()==AUTO)
-		  Serial.print("Automatic");
-	  else
-		  Serial.print("Manual");
-	  Serial.print("\3");
-	  Serial.println();
+
+	if ( SerOut != SERIALOUT_TUNERPRO_ADX ) {
+		Serial.print("\2");
+		Serial.print("PID ");
+		Serial.print(boostController.boostSetPoint);
+		Serial.print(" ");
+		Serial.print(data.calBoost);
+		Serial.print(" ");
+		Serial.print(boostController.boostOutput);
+		Serial.print(" ");
+		Serial.print(boostController.boostPid->GetP_Param());
+		Serial.print(" ");
+		Serial.print(boostController.boostPid->GetI_Param());
+		Serial.print(" ");
+		Serial.print(boostController.boostPid->GetD_Param());
+		Serial.print(" ");
+		if (boostController.boostPid->GetMode()==AUTO)
+			Serial.print("Automatic");
+		else
+			Serial.print("Manual");
+		Serial.print("\3");
+		Serial.println();
+	}
 #endif /* BOOSTN75 */
 
 	Serial.print("\2");
@@ -573,6 +576,10 @@ void MultidisplayController::serialSend() {
 		Serial.print(data.VDOTemp2);
 		Serial.print(";");
 		Serial.print(data.VDOTemp3);
+		break;
+	case SERIALOUT_TUNERPRO_ADX:
+		//TODO output float vals
+		Serial.write ( (uint8_t*) &(data.calRPM), sizeof(int) );
 		break;
 	default:
 		SerOut = SERIALOUT_DISABLED;

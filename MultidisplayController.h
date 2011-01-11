@@ -79,6 +79,9 @@ private:
      *  multidisplay command (from pc to arduino)
      *  1: buttons: 1=a pressed, 2=a hold, 3=b pressed, 4=b hold
      *
+     *  2: activate tunerpro adx binary output mode
+     *  3: tunerpro adx request data
+     *
      *  attention, you have to send ints, not chars over the serial line!
      *
      *  ============ arduino -> pc ==================

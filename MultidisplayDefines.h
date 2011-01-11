@@ -170,6 +170,7 @@ typedef unsigned char byte;
 #define SERIALOUT_DISABLED 0
 #define SERIALOUT_RAW 1
 #define SERIALOUT_ENABLED 2
+#define SERIALOUT_TUNERPRO_ADX 3
 //send and receive each SERIALFREQ millisecs!
 #define SERIALFREQ 20
 
