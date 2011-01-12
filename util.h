@@ -29,4 +29,7 @@ uint16_t freeMem(void);
 void EEPROMWriteDouble(int p_address, long p_value);
 long EEPROMReadDouble(int p_address);
 
+int float2fixedintb100 (float in);
+float fixedintb1002float (int in);
+
 #endif /* UTIL_H_ */

@@ -70,5 +70,12 @@ long EEPROMReadDouble(int p_address) {
 	return (firstTwoBytes + secondTwoBytes);
 }
 
+int float2fixedintb100 (float in) {
+	return (int) (in * 100.0);
+}
+float fixedintb1002float (int in) {
+	return (float) (in / 100.0);
+}
+
 
 

@@ -145,6 +145,7 @@ void  MultidisplayController::myconstructor() {
 	data.maxLdt=0;             //max LD for the screen
 
 	DoCheck = 1;
+	adx_request_data = 0;
 	SerOut = SERIALOUT_RAW;
 
 	buttonTime = 0;
@@ -444,12 +445,6 @@ void MultidisplayController::serialReceive() {
 		index++;
 	}
 
-//	if ( index > 0 ) {
-//		Serial.print ("DEBUG rcv");
-//		Serial.print (index);
-//		Serial.println();
-//	}
-
 	// if the information we got was in the correct format,
 	// read it into the system
 	// case 1: command for pid lib
@@ -476,21 +471,34 @@ void MultidisplayController::serialReceive() {
 		else
 			boostController.boostPid->SetMode(AUTO);
 #endif
-	} else 	if (Auto_Man==2 && index >= 2) {
-		//case 2: command for multidisplay
-
-		switch ( srData.asBytes[0] ) {
-			case 1:
-				buttonAPressed();
-				break;
+	} else 	{
+		switch (Auto_Man) {
 			case 2:
-				buttonAHold();
+				if (index >= 2) {
+				//command for multidisplay
+
+					switch ( srData.asBytes[0] ) {
+					case 1:
+						buttonAPressed();
+						break;
+					case 2:
+						buttonAHold();
+						break;
+					case 3:
+						buttonBPressed();
+						break;
+					case 4:
+						buttonBHold();
+						break;
+					}
+				}
 				break;
+
 			case 3:
-				buttonBPressed();
+				SerOut = SERIALOUT_TUNERPRO_ADX;
 				break;
 			case 4:
-				buttonBHold();
+				adx_request_data = 1;
 				break;
 		}
 	}
@@ -578,8 +586,19 @@ void MultidisplayController::serialSend() {
 		Serial.print(data.VDOTemp3);
 		break;
 	case SERIALOUT_TUNERPRO_ADX:
-		//TODO output float vals
+		int outbuf;
+
 		Serial.write ( (uint8_t*) &(data.calRPM), sizeof(int) );
+		Serial.write ( (uint8_t*) &(data.calThrottle), sizeof(int) );
+
+		outbuf = float2fixedintb100(data.calLambdaF);
+		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
+
+		outbuf = float2fixedintb100(data.calBoost);
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
+
+		Serial.write ( (uint8_t*) &(data.calAgt[0]), sizeof(int) );
+		Serial.write ( (uint8_t*) &(data.calAgt[1]), sizeof(int) );
 		break;
 	default:
 		SerOut = SERIALOUT_DISABLED;
@@ -932,7 +951,8 @@ void MultidisplayController::mainLoop() {
 	if ( millis() > serialTime ) {
 		serialReceive();
 		//Print it:
-		serialSend();
+		if ( SerOut!=SERIALOUT_TUNERPRO_ADX || ( SerOut==SERIALOUT_TUNERPRO_ADX && adx_request_data==1 ) )
+			serialSend();
 		serialTime += SERIALFREQ;
 	}
 }

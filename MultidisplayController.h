@@ -38,6 +38,7 @@ public:
 	//dont use the constructor because I want to control when the global objects get initialized
 	void myconstructor();
 
+	uint8_t adx_request_data;
 	uint8_t SerOut;
     uint8_t DoCal;
     uint8_t DoTypK;
