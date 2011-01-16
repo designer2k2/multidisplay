@@ -81,7 +81,7 @@ private:
      *  1: buttons: 1=a pressed, 2=a hold, 3=b pressed, 4=b hold
      *
      *  2: activate tunerpro adx binary output mode
-     *  3: tunerpro adx request data
+     *  3: change serial mode: 2=enabled(string), 3=tunerpro adx request data
      *
      *  attention, you have to send ints, not chars over the serial line!
      *

@@ -67,6 +67,21 @@ public:
 	int maxOilE[4];             //maximum Oilpressure
 
 
+#ifdef MULTIDISPLAY_V2
+	/*
+	 * 4 x knock (8bit)
+	 * 4 x ignition advance (8bit)
+	 * rpm (8bit)
+	 * boost (8bit)
+	 * iat (8bit)
+	 * flags (wot, idle) (8bit)
+	 * fuel (16bit)
+	 *
+	 * TODO what else?
+	 */
+	uint8_t digifant_data[14];
+#endif
+
 	SensorData();
 
 	//dont use the constructor because I want to control when the global objects get initialized

@@ -464,12 +464,15 @@ void MultidisplayController::serialReceive() {
 		p = double(srData.asFixedInt32[3] / 1000.0);
 		i = double(srData.asFixedInt32[4] / 1000.0);
 		d = double(srData.asFixedInt32[5] / 1000.0);
-		boostController.boostPid->SetTunings(p, i, d);
 
-		if(Auto_Man==0)
-			boostController.boostPid->SetMode(MANUAL);// * set the controller mode
-		else
-			boostController.boostPid->SetMode(AUTO);
+		if ( boostController.boostPid != NULL ) {
+			boostController.boostPid->SetTunings(p, i, d);
+
+			if(Auto_Man==0)
+				boostController.boostPid->SetMode(MANUAL);// * set the controller mode
+			else
+				boostController.boostPid->SetMode(AUTO);
+		}
 #endif
 	} else 	{
 		switch (Auto_Man) {
@@ -495,7 +498,16 @@ void MultidisplayController::serialReceive() {
 				break;
 
 			case 3:
-				SerOut = SERIALOUT_TUNERPRO_ADX;
+				if (index >= 2) {
+					switch ( srData.asBytes[0] ) {
+						case 3:
+							SerOut = SERIALOUT_TUNERPRO_ADX;
+							break;
+						case 2:
+							SerOut = SERIALOUT_ENABLED;
+							break;
+					}
+				}
 				break;
 			case 4:
 				adx_request_data = 1;
@@ -519,16 +531,21 @@ void MultidisplayController::serialSend() {
 		Serial.print(" ");
 		Serial.print(boostController.boostOutput);
 		Serial.print(" ");
-		Serial.print(boostController.boostPid->GetP_Param());
-		Serial.print(" ");
-		Serial.print(boostController.boostPid->GetI_Param());
-		Serial.print(" ");
-		Serial.print(boostController.boostPid->GetD_Param());
-		Serial.print(" ");
-		if (boostController.boostPid->GetMode()==AUTO)
-			Serial.print("Automatic");
-		else
-			Serial.print("Manual");
+		if ( boostController.boostPid != NULL ) {
+			Serial.print(boostController.boostPid->GetP_Param());
+			Serial.print(" ");
+			Serial.print(boostController.boostPid->GetI_Param());
+			Serial.print(" ");
+			Serial.print(boostController.boostPid->GetD_Param());
+			Serial.print(" ");
+			if (boostController.boostPid->GetMode()==AUTO)
+				Serial.print("Automatic");
+			else
+				Serial.print("Manual");
+		} else {
+			Serial.print (" 0 0 0 M");
+		}
+
 		Serial.print("\3");
 		Serial.println();
 	}
@@ -591,10 +608,12 @@ void MultidisplayController::serialSend() {
 		Serial.write ( (uint8_t*) &(data.calRPM), sizeof(int) );
 		Serial.write ( (uint8_t*) &(data.calThrottle), sizeof(int) );
 
-		outbuf = float2fixedintb100(data.calLambdaF);
+//		outbuf = float2fixedintb100(data.calLambdaF);
+		outbuf = float2fixedintb100(0.8);
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
 
-		outbuf = float2fixedintb100(data.calBoost);
+//		outbuf = float2fixedintb100(data.calBoost);
+		outbuf = float2fixedintb100(1.5);
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
 
 		Serial.write ( (uint8_t*) &(data.calAgt[0]), sizeof(int) );
@@ -621,13 +640,13 @@ void MultidisplayController::HeaderPrint() {
 		break;
 	case SERIALOUT_RAW:
 		Serial.println(" ");
-		Serial.println_P(PSTR("Time;data.anaIn0;data.anaIn1;data.anaIn2;data.anaIn3;data.anaIn4;data.anaIn5;data.anaIn6;data.anaIn7"));
+//		Serial.println_P(PSTR("Time;data.anaIn0;data.anaIn1;data.anaIn2;data.anaIn3;data.anaIn4;data.anaIn5;data.anaIn6;data.anaIn7"));
 		break;
 	case SERIALOUT_ENABLED:
 		Serial.println(" ");
 		Serial.print(SERIALOUT_ENABLED);
 		Serial.print(":");
-		Serial.println_P(PSTR("Time;RPM;Boost;Throttle;Lambda;LMM;CaseTemp;TypK1;TypK2;Battery;VDOP1;2;3;VDOT1;2;3"));
+//		Serial.println_P(PSTR("Time;RPM;Boost;Throttle;Lambda;LMM;CaseTemp;TypK1;TypK2;Battery;VDOP1;2;3;VDOT1;2;3"));
 		break;
 	default:
 		break;
@@ -951,8 +970,9 @@ void MultidisplayController::mainLoop() {
 	if ( millis() > serialTime ) {
 		serialReceive();
 		//Print it:
-		if ( SerOut!=SERIALOUT_TUNERPRO_ADX || ( SerOut==SERIALOUT_TUNERPRO_ADX && adx_request_data==1 ) )
-			serialSend();
+//		if ( SerOut!=SERIALOUT_TUNERPRO_ADX || ( SerOut==SERIALOUT_TUNERPRO_ADX && adx_request_data==1 ) )
+//			serialSend();
+		serialSend();
 		serialTime += SERIALFREQ;
 	}
 }

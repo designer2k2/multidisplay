@@ -16,7 +16,8 @@
 LCDScreen10::LCDScreen10() {
 	flags.f.doCal=1;
 	flags.f.doTypK = 1;
-	flags.f.serial = SERIALOUT_ENABLED;
+//	flags.f.serial = SERIALOUT_ENABLED;
+	flags.f.serial = SERIALOUT_TUNERPRO_ADX;
 	flags.f.refreshRate = 10;
 	flags.f.loadBar = 0;
 	flags.f.loadDot = 0;
@@ -49,11 +50,14 @@ void LCDScreen10::customDraw() {
     lcdController.printInt(lcdController.ystart[2] + 5, data.calRPM, 4);
     lcdController.printFloat2DP(lcdController.ystart[2] + 14, data.calBoost);
     lcdController.printInt(lcdController.ystart[3] + 4, digitalRead(NORDSCHLEIFENPIN), 1);
-#ifdef BOOSTN75
+
+#ifdef BOOSTPID
     if ( boostController.boostPid->GetMode() == MANUAL )
     	lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[3]+5, PSTR("M"));
     else
     	lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[3]+5, PSTR("A"));
+#endif
+#ifdef BOOSTN75
     lcdController.printFloat2DP(lcdController.ystart[3] + 7, boostController.boostSetPoint);
     lcdController.printFloat2DP(lcdController.ystart[3] + 13, boostController.boostOutput);
 #endif
