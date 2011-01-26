@@ -326,7 +326,11 @@ void MultidisplayController::AnaConversion() {
 	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
 #endif
 #ifdef BOOST_BOSCH_200KPA
-
+	data.calAbsoluteBoost = 5.0* ((float) data.anaIn[BOOST2PIN])/4096.0;             //only gets 0-5V
+	data.calAbsoluteBoost = (data.calAbsoluteBoost + 0.25)/0.0252778;     	//makes 0-200kPa out of it
+	data.calAbsoluteBoost = data.calAbsoluteBoost / 100.0; //bar
+//	data.calBoostPSI = data.calBoostBar * BAR2PSI;
+	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
 #endif
 
     //Calibration for RPM (its 2.34!)

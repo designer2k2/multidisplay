@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <avr/common.h>
+#include <avr/io.h>
 #include "util.h"
 #include "EEPROM.h"
 
