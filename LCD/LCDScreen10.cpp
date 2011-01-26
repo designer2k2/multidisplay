@@ -36,7 +36,7 @@ void LCDScreen10::customInit() {
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[1], PSTR("LAMBDA:"));
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[2], PSTR("RPM:"));
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[2]+10, PSTR("BST:"));
-    lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[3], PSTR("N75:"));
+//    lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[3], PSTR("N75:"));
 }
 
 
@@ -49,18 +49,21 @@ void LCDScreen10::customDraw() {
     lcdController.printInt (lcdController.ystart[1]+ 14, data.anaIn[LAMBDAPIN], 4);
     lcdController.printInt(lcdController.ystart[2] + 5, data.calRPM, 4);
     lcdController.printFloat2DP(lcdController.ystart[2] + 14, data.calBoost);
-    lcdController.printInt(lcdController.ystart[3] + 4, digitalRead(NORDSCHLEIFENPIN), 1);
+//    lcdController.printInt(lcdController.ystart[3] + 4, digitalRead(NORDSCHLEIFENPIN), 1);
 
-#ifdef BOOSTPID
-    if ( boostController.boostPid->GetMode() == MANUAL )
-    	lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[3]+5, PSTR("M"));
-    else
-    	lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[3]+5, PSTR("A"));
-#endif
-#ifdef BOOSTN75
-    lcdController.printFloat2DP(lcdController.ystart[3] + 7, boostController.boostSetPoint);
-    lcdController.printFloat2DP(lcdController.ystart[3] + 13, boostController.boostOutput);
-#endif
+    lcdController.printInt(lcdController.ystart[3], data.anaIn[BOOSTPIN]);
+    lcdController.printInt(lcdController.ystart[3]+10, data.anaIn[BOOST2PIN]);
+
+//#ifdef BOOSTPID
+//    if ( boostController.boostPid->GetMode() == MANUAL )
+//    	lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[3]+5, PSTR("M"));
+//    else
+//    	lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[3]+5, PSTR("A"));
+//#endif
+//#ifdef BOOSTN75
+//    lcdController.printFloat2DP(lcdController.ystart[3] + 7, boostController.boostSetPoint);
+//    lcdController.printFloat2DP(lcdController.ystart[3] + 13, boostController.boostOutput);
+//#endif
 
 
 //    lcdController.printInt(lcdController.ystart[3] + 13, digitalRead(FREEANALOG2), 4);

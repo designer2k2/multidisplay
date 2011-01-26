@@ -37,7 +37,7 @@
 //define this if you measure the boost with SM-VAC/Boost instead of Motorola MPX4250AP
 #define BOOST_PLX_SMVACBOOST
 
-#define BOOSTN75
+//#define BOOSTN75
 //#define BOOSTPID
 #define BOOST_NORMAL 1.0
 #define BOOST_RACE 1.5

@@ -548,6 +548,7 @@ void MultidisplayController::serialSend() {
 
 		Serial.print("\3");
 		Serial.println();
+
 	}
 #endif /* BOOSTN75 */
 
@@ -625,6 +626,8 @@ void MultidisplayController::serialSend() {
 	}
 	Serial.print("\3");
 	Serial.println();
+
+	Serial.println (freeMem());
 }
 
 void MultidisplayController::HeaderPrint() {
