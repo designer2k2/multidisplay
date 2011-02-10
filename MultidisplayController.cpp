@@ -363,12 +363,12 @@ void MultidisplayController::AnaConversion() {
 
 #ifdef DIGIFANT
     //digifant idle switch (LL-Schalter) gets 0V for closed throttle valve; ~5V if open
-    // assumption: if > 4 V: open
-    if ( data.anaIn[LMMPIN] < 3276 )
+    // assumption: if > 3 V: open
+    if ( data.anaIn[LMMPIN] < 2457 )
             data.calThrottle = 0;
     else {
             //full throttle ?
-            if ( data.anaIn[THROTTLEPIN] > 3276 )
+            if ( data.anaIn[THROTTLEPIN] > 2457 )
                     data.calThrottle = 50;
             else
                     data.calThrottle = 100;
@@ -618,12 +618,10 @@ void MultidisplayController::serialSend() {
 		Serial.write ( (uint8_t*) &(data.calRPM), sizeof(int) );
 		Serial.write ( (uint8_t*) &(data.calThrottle), sizeof(int) );
 
-//		outbuf = float2fixedintb100(data.calLambdaF);
-		outbuf = float2fixedintb100(0.8);
+		outbuf = float2fixedintb100(data.calLambdaF);
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
 
-//		outbuf = float2fixedintb100(data.calBoost);
-		outbuf = float2fixedintb100(1.5);
+		outbuf = float2fixedintb100(data.calBoost);
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
 
 		Serial.write ( (uint8_t*) &(data.calAgt[0]), sizeof(int) );
