@@ -198,4 +198,22 @@ typedef unsigned char byte;
 
 #define BAR2PSI 14.50377
 
+/**
+ * EEPROM Layout:
+ *
+ * Start Byte | type | name
+ * 0   | byte | n75 manual normal
+ * 1   | byte | n75 manual race
+ * 100 | byte | activeScreen
+ * 105 | byte | brightness
+ * 200 | double | calLD
+ * 205 | byte | ldCalPoint
+ */
+#define EEPROM_N75_MANUAL_NORMAL 0
+#define EEPROM_N75_MANUAL_RACE 1
+#define EEPROM_ACTIVESCREEN 100
+#define EEPROM_BRIGHTNESS 105
+#define EEPROM_AMBIENTPRESSURE 200
+#define EEPROM_LDCALPOINT 205
+
 #endif /* MULTIDISPLAY_DEFINES_H_ */

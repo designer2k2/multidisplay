@@ -39,6 +39,9 @@ public:
 	double boostOutput;
 	double boostOutputSave;
 	uint8_t mode;
+
+	uint8_t n75_manual_normal;
+	uint8_t n75_manual_race;
 };
 
 extern BoostController boostController;

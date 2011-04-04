@@ -49,10 +49,10 @@ int main(void) {
 
     data.myconstructor();
     lcdController.myconstructor();
-	mController.myconstructor();
 #ifdef BOOSTN75
 	boostController.myconstructor();
 #endif
+	mController.myconstructor();
 
 	for (;;)
 		mController.mainLoop();

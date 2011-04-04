@@ -26,6 +26,8 @@ BoostController::BoostController() {
 
 void BoostController::myconstructor() {
 	boostOutput = 0;
+	n75_manual_normal = BOOST_MANUAL_NORMAL;
+	n75_manual_race = BOOST_MANUAL_RACE;
 	boostSetPoint = BOOST_NORMAL;
 	mode = BOOST_MODE_NORMAL;
 	boostSetPointSave = 0.0;
@@ -39,7 +41,7 @@ void BoostController::myconstructor() {
 #else
 	boostPid = 0;
 #endif
-	boostOutput = BOOST_MANUAL_NORMAL;
+	boostOutput = n75_manual_normal;
 	boostOutputSave = 0.0;
 }
 
@@ -53,9 +55,9 @@ void BoostController::toggleMode (uint8_t nmode) {
 			if ( boostPid->GetMode() == MANUAL ) {
 #endif
 				if (boostOutputSave > 0)
-					boostOutputSave = BOOST_MANUAL_NORMAL;
+					boostOutputSave = n75_manual_normal;
 				else
-					boostOutput = BOOST_MANUAL_NORMAL;
+					boostOutput = n75_manual_normal;
 #ifdef BOOSTPID
 			}
 #endif
@@ -65,9 +67,9 @@ void BoostController::toggleMode (uint8_t nmode) {
 			if ( boostPid->GetMode() == MANUAL ) {
 #endif
 				if (boostOutputSave > 0)
-					boostOutputSave = BOOST_MANUAL_RACE;
+					boostOutputSave = n75_manual_race;
 				else
-					boostOutput = BOOST_MANUAL_RACE;
+					boostOutput = n75_manual_race;
 #ifdef BOOSTPID
 			}
 #endif

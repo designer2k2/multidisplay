@@ -38,7 +38,6 @@ public:
 	//dont use the constructor because I want to control when the global objects get initialized
 	void myconstructor();
 
-	uint8_t adx_request_data;
 	uint8_t SerOut;
     uint8_t DoCal;
     uint8_t DoTypK;
@@ -78,10 +77,11 @@ private:
      *  21-24: fixed point value (scale factor 1000) D_Param
      *
      *  multidisplay command (from pc to arduino)
-     *  1: buttons: 1=a pressed, 2=a hold, 3=b pressed, 4=b hold
+     *  2: buttons: 1=a pressed, 2=a hold, 3=b pressed, 4=b hold
      *
-     *  2: activate tunerpro adx binary output mode
      *  3: change serial mode: 2=enabled(string), 3=tunerpro adx request data
+     *
+     *  4: eeprom: 1=save settings, 2 calibrate boost (measure and store ambient pressure)
      *
      *  attention, you have to send ints, not chars over the serial line!
      *
@@ -121,6 +121,9 @@ private:
 	void buttonAPressed();
 	void buttonBHold();
 	void buttonBPressed();
+
+	void readSettingsFromEeprom();
+	void saveSettings2Eeprom();
 };
 
 

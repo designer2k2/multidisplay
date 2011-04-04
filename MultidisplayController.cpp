@@ -34,15 +34,7 @@
 
 #include <PID_Beta6.h>
 
-/**
- * EEPROM Layout:
- *
- * Start Byte | type | name
- * 100 | byte | activeScreen
- * 105 | byte | brightness
- * 200 | double | calLD
- * 205 | byte | ldCalPoint
- */
+
 
 //Lookup Table for the TypK:
 //from 0-1350°C in steps of 50°C, the list is in microV according to that Temp.
@@ -145,7 +137,6 @@ void  MultidisplayController::myconstructor() {
 	data.maxLdt=0;             //max LD for the screen
 
 	DoCheck = 1;
-	adx_request_data = 0;
 	SerOut = SERIALOUT_RAW;
 
 	buttonTime = 0;
@@ -186,19 +177,7 @@ void  MultidisplayController::myconstructor() {
 
 
 #ifdef READFROMEEPROM
-	//Read the Values from the EEPROM back
-
-	//what screen was last shown?
-	//FIXME
-//	lcdController.setActiveScreen (EEPROM.read(100));
-
-	lcdController.setBrightness (EEPROM.read(105));    //The Brightness from the LCD
-	uint8_t ldp = EEPROM.read(205);
-	if ( ldp >= 0 && ldp <= 20 )
-		data.ldCalPoint = ldp;
-	float ldt = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
-	if ( ldt > 0.0 && ldt < 1.2 )
-		data.boostAmbientPressureBar = ldt;
+	readSettingsFromEeprom();
 #endif
 
 	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
@@ -523,12 +502,41 @@ void MultidisplayController::serialReceive() {
 				}
 				break;
 			case 4:
-				adx_request_data = 1;
+				if (index >= 2){
+					switch ( srData.asBytes[0] ) {
+					case 1:
+						saveSettings2Eeprom();
+						break;
+					case 2:
+						CalibrateLD();
+						break;
+					}
+				}
 				break;
 		}
 	}
 
 	Serial.flush();                         // * clear any random data from the serial buffer
+}
+
+void MultidisplayController::saveSettings2Eeprom() {
+
+	EEPROM.write(100, lcdController.activeScreen );
+}
+
+void MultidisplayController::readSettingsFromEeprom() {
+	//what screen was last shown?
+	//FIXME
+	//	lcdController.setActiveScreen (EEPROM.read(100));
+
+	lcdController.setBrightness (EEPROM.read(105));    //The Brightness from the LCD
+	uint8_t ldp = EEPROM.read(205);
+	if ( ldp >= 0 && ldp <= 20 )
+		data.ldCalPoint = ldp;
+	float ldt = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
+	if ( ldt > 0.0 && ldt < 1.2 )
+		data.boostAmbientPressureBar = ldt;
+
 }
 
 
