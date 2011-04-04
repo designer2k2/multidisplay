@@ -22,8 +22,6 @@
 #include "MultidisplayDefines.h"
 
 BoostController::BoostController() {
-	// TODO Auto-generated constructor stub
-
 }
 
 void BoostController::myconstructor() {
@@ -48,7 +46,6 @@ void BoostController::myconstructor() {
 
 void BoostController::toggleMode (uint8_t nmode) {
 	if (mode != nmode) {
-//		if ( nmode == BOOST_MODE_NORMAL || nmode == BOOST_MODE_RACE )
 		mode = nmode;
 		if ( nmode == BOOST_MODE_NORMAL ) {
 			boostSetPoint = BOOST_NORMAL;

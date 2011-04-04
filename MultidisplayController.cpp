@@ -316,7 +316,8 @@ void MultidisplayController::AnaConversion() {
 	data.calAbsoluteBoost = 5.0* ( (float) data.anaIn[BOOSTPIN])/4096.0;
 	data.calAbsoluteBoost = data.calAbsoluteBoost * 9.0 - 15; //psi
 	data.calAbsoluteBoost = data.calAbsoluteBoost / BAR2PSI; //bar
-	data.calBoost = data.calAbsoluteBoost; //sm vac/boost gets relative boost
+	data.calBoost = data.calAbsoluteBoost; //formula above gets relative boost
+	data.calAbsoluteBoost += data.boostAmbientPressureBar;
 #endif
 #ifdef BOOST_MOTOROLA_MPX4250
 	//or Motorola MPX 4250 datasheet
@@ -474,6 +475,7 @@ void MultidisplayController::serialReceive() {
 		i = double(srData.asFixedInt32[4] / 1000.0);
 		d = double(srData.asFixedInt32[5] / 1000.0);
 
+#ifdef BOOSTPID
 		if ( boostController.boostPid != NULL ) {
 			boostController.boostPid->SetTunings(p, i, d);
 
@@ -482,6 +484,8 @@ void MultidisplayController::serialReceive() {
 			else
 				boostController.boostPid->SetMode(AUTO);
 		}
+#endif
+
 #endif
 	} else 	{
 		switch (Auto_Man) {
@@ -541,6 +545,7 @@ void MultidisplayController::serialSend() {
 		Serial.print(boostController.boostOutput);
 		Serial.print(" ");
 		if ( boostController.boostPid != NULL ) {
+#ifdef BOOSTPID
 			Serial.print(boostController.boostPid->GetP_Param());
 			Serial.print(" ");
 			Serial.print(boostController.boostPid->GetI_Param());
@@ -551,6 +556,7 @@ void MultidisplayController::serialSend() {
 				Serial.print("Automatic");
 			else
 				Serial.print("Manual");
+#endif
 		} else {
 			Serial.print (" 0 0 0 M");
 		}
@@ -621,7 +627,8 @@ void MultidisplayController::serialSend() {
 		outbuf = float2fixedintb100(data.calLambdaF);
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
 
-		outbuf = float2fixedintb100(data.calBoost);
+//		outbuf = float2fixedintb100(data.calBoost);
+		outbuf = float2fixedintb100(data.calAbsoluteBoost);
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
 
 		Serial.write ( (uint8_t*) &(data.calAgt[0]), sizeof(int) );
