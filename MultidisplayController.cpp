@@ -510,6 +510,16 @@ void MultidisplayController::serialReceive() {
 					case 2:
 						CalibrateLD();
 						break;
+					case 3:
+						readSettingsFromEeprom();
+						break;
+					case 4:
+						//set new manual n75 boost dutycycles
+						if (index >= 4) {
+							boostController.n75_manual_normal = srData.asBytes[1];
+							boostController.n75_manual_race = srData.asBytes[2];
+						}
+						break;
 					}
 				}
 				break;
@@ -522,6 +532,11 @@ void MultidisplayController::serialReceive() {
 void MultidisplayController::saveSettings2Eeprom() {
 
 	EEPROM.write(100, lcdController.activeScreen );
+
+#ifdef BOOSTN75
+	EEPROM.write (EEPROM_N75_MANUALDUTY_NORMAL, boostController.n75_manual_normal);
+	EEPROM.write (EEPROM_N75_MANUALDUTY_RACE, boostController.n75_manual_race);
+#endif
 }
 
 void MultidisplayController::readSettingsFromEeprom() {
@@ -537,6 +552,10 @@ void MultidisplayController::readSettingsFromEeprom() {
 	if ( ldt > 0.0 && ldt < 1.2 )
 		data.boostAmbientPressureBar = ldt;
 
+//#ifdef BOOSTN75
+//	boostController.n75_manual_normal = EEPROM.read (EEPROM_N75_MANUALDUTY_NORMAL);
+//	boostController.n75_manual_race = EEPROM.read (EEPROM_N75_MANUALDUTY_RACE);
+//#endif
 }
 
 

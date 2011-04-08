@@ -26,8 +26,8 @@ BoostController::BoostController() {
 
 void BoostController::myconstructor() {
 	boostOutput = 0;
-	n75_manual_normal = BOOST_MANUAL_NORMAL;
-	n75_manual_race = BOOST_MANUAL_RACE;
+	n75_manual_normal = N75_MANUALDUTY_NORMAL;
+	n75_manual_race = N75_MANUALDUTY_RACE;
 	boostSetPoint = BOOST_NORMAL;
 	mode = BOOST_MODE_NORMAL;
 	boostSetPointSave = 0.0;
