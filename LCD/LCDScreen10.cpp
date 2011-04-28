@@ -46,7 +46,7 @@ void LCDScreen10::customDraw() {
     lcdController.printInt(0x80 + 5, data.calThrottle, 3 );
     lcdController.printFloat2DP(0x80 + 14, data.calCaseTemp);
     lcdController.printFloat2DP(lcdController.ystart[1] + 8, data.calLambdaF);
-    lcdController.printInt (lcdController.ystart[1]+ 14, data.anaIn[LAMBDAPIN], 4);
+//    lcdController.printInt (lcdController.ystart[1]+ 14, data.anaIn[LAMBDAPIN], 4);
     lcdController.printInt(lcdController.ystart[2] + 5, data.calRPM, 4);
     lcdController.printFloat2DP(lcdController.ystart[2] + 14, data.calBoost);
 
@@ -63,7 +63,7 @@ void LCDScreen10::customDraw() {
 //#endif
 #ifdef BOOSTN75
     lcdController.printInt(lcdController.ystart[3], digitalRead(NORDSCHLEIFENPIN), 1);
-    lcdController.printInt(lcdController.ystart[3] + 1, digitalRead(FREEANALOG2), 1);
+//    lcdController.printInt(lcdController.ystart[3] + 1, digitalRead(FREEANALOG2), 1);
     lcdController.printFloat2DP(lcdController.ystart[3] + 5, boostController.n75_manual_normal);
     lcdController.printFloat2DP(lcdController.ystart[3] + 9, boostController.n75_manual_race);
     lcdController.printFloat2DP(lcdController.ystart[3] + 13, boostController.boostOutput);

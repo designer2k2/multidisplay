@@ -61,7 +61,7 @@
 
 //Options:
 
-#define DEBUG 1
+//#define DEBUG 1
 //#define LCDTEST 1
 //#define RPM_DEBUG 0             //Little Frequency Generator
 //#define FREEMEM 0              //Outputs how much free RAM is

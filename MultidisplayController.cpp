@@ -449,12 +449,12 @@ void MultidisplayController::serialReceive() {
 			boostController.boostOutput = double(srData.asFixedInt32[2] / 1000.0);
 		}
 
+#ifdef BOOSTPID
 		double p, i, d;  // * read in and set the controller tunings
 		p = double(srData.asFixedInt32[3] / 1000.0);
 		i = double(srData.asFixedInt32[4] / 1000.0);
 		d = double(srData.asFixedInt32[5] / 1000.0);
 
-#ifdef BOOSTPID
 		if ( boostController.boostPid != NULL ) {
 			boostController.boostPid->SetTunings(p, i, d);
 
@@ -504,15 +504,15 @@ void MultidisplayController::serialReceive() {
 			case 4:
 				if (index >= 2){
 					switch ( srData.asBytes[0] ) {
-					case 1:
-						saveSettings2Eeprom();
-						break;
-					case 2:
-						CalibrateLD();
-						break;
-					case 3:
-						readSettingsFromEeprom();
-						break;
+//					case 1:
+//						saveSettings2Eeprom();
+//						break;
+//					case 2:
+//						CalibrateLD();
+//						break;
+//					case 3:
+//						readSettingsFromEeprom();
+//						break;
 					case 4:
 						//set new manual n75 boost dutycycles
 						if (index >= 4) {
@@ -529,15 +529,15 @@ void MultidisplayController::serialReceive() {
 	Serial.flush();                         // * clear any random data from the serial buffer
 }
 
-void MultidisplayController::saveSettings2Eeprom() {
-
-	EEPROM.write(100, lcdController.activeScreen );
-
-#ifdef BOOSTN75
-	EEPROM.write (EEPROM_N75_MANUALDUTY_NORMAL, boostController.n75_manual_normal);
-	EEPROM.write (EEPROM_N75_MANUALDUTY_RACE, boostController.n75_manual_race);
-#endif
-}
+//void MultidisplayController::saveSettings2Eeprom() {
+//
+//	EEPROM.write(100, lcdController.activeScreen );
+//
+//#ifdef BOOSTN75
+//	EEPROM.write (EEPROM_N75_MANUALDUTY_NORMAL, boostController.n75_manual_normal);
+//	EEPROM.write (EEPROM_N75_MANUALDUTY_RACE, boostController.n75_manual_race);
+//#endif
+//}
 
 void MultidisplayController::readSettingsFromEeprom() {
 	//what screen was last shown?

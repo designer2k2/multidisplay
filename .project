@@ -4,7 +4,6 @@
 	<comment></comment>
 	<projects>
 		<project>arduinoDuemilanoveCore</project>
-		<project>arduinoDuemilanoveCoreLib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
