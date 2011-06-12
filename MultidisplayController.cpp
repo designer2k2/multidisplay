@@ -167,14 +167,27 @@ void  MultidisplayController::myconstructor() {
 
 	Serial.begin(57600);
 
+#if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
+	Serial1.begin(9600);
+
+	DF_KlineSerialTime = 0;
+	df_kline_status = DF_KLINE_STATUS_FRAME_COMPLETE;
+	df_kline_active_frame = 0;
+	df_kline_index = 0;
+	df_kline_discarded_frames = 0;
+	df_kline_last_frame_completely_received = 255;
+#endif
+
 	wire.begin();                  //Start the Wire Libary for the PCF8574
 
 	expanderWrite2(IOport2); //Switch off all Devices
 
 	//Print the Info:
-//	Serial.println(" ");
+#ifdef MULTIDISPLAY_V2
+	Serial.println("MultiDisplay 2.0 pre!");
+#else
 	Serial.println("MultiDisplay 1.1!");
-
+#endif
 
 #ifdef READFROMEEPROM
 	readSettingsFromEeprom();
@@ -504,15 +517,17 @@ void MultidisplayController::serialReceive() {
 			case 4:
 				if (index >= 2){
 					switch ( srData.asBytes[0] ) {
-//					case 1:
-//						saveSettings2Eeprom();
-//						break;
-//					case 2:
-//						CalibrateLD();
-//						break;
-//					case 3:
-//						readSettingsFromEeprom();
-//						break;
+#ifdef MULTIDISPLAY_V2
+					case 1:
+						saveSettings2Eeprom();
+						break;
+					case 2:
+						CalibrateLD();
+						break;
+					case 3:
+						readSettingsFromEeprom();
+						break;
+#endif
 					case 4:
 						//set new manual n75 boost dutycycles
 						if (index >= 4) {
@@ -529,15 +544,15 @@ void MultidisplayController::serialReceive() {
 	Serial.flush();                         // * clear any random data from the serial buffer
 }
 
-//void MultidisplayController::saveSettings2Eeprom() {
-//
-//	EEPROM.write(100, lcdController.activeScreen );
-//
-//#ifdef BOOSTN75
-//	EEPROM.write (EEPROM_N75_MANUALDUTY_NORMAL, boostController.n75_manual_normal);
-//	EEPROM.write (EEPROM_N75_MANUALDUTY_RACE, boostController.n75_manual_race);
-//#endif
-//}
+void MultidisplayController::saveSettings2Eeprom() {
+
+	EEPROM.write(100, lcdController.activeScreen );
+
+#ifdef BOOSTN75
+	EEPROM.write (EEPROM_N75_MANUALDUTY_NORMAL, boostController.n75_manual_normal);
+	EEPROM.write (EEPROM_N75_MANUALDUTY_RACE, boostController.n75_manual_race);
+#endif
+}
 
 void MultidisplayController::readSettingsFromEeprom() {
 	//what screen was last shown?
@@ -654,12 +669,54 @@ void MultidisplayController::serialSend() {
 		outbuf = float2fixedintb100(data.calLambdaF);
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
 
-//		outbuf = float2fixedintb100(data.calBoost);
 		outbuf = float2fixedintb100(data.calAbsoluteBoost);
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
 
 		Serial.write ( (uint8_t*) &(data.calAgt[0]), sizeof(int) );
 		Serial.write ( (uint8_t*) &(data.calAgt[1]), sizeof(int) );
+
+#if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
+
+		if ( df_kline_last_frame_completely_received < 255 ) {
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[1]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[2]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[3]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[4]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[5]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[6]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[7]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[8]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[9]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[10]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[11]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[12]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[13]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[14]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[15]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[16]), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[17]), sizeof(uint8_t) );
+		} else {
+			uint8_t tmp = 0;
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+		}
+#endif
+
 		break;
 	default:
 		SerOut = SERIALOUT_DISABLED;
@@ -1019,6 +1076,14 @@ void MultidisplayController::mainLoop() {
 		serialSend();
 		serialTime += SERIALFREQ;
 	}
+
+#if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
+	if ( millis() > DF_KlineSerialTime ) {
+		DF_KlineSerialTime += DF_KLINESERIALFREQ;
+		DFKlineSerialReceive();
+	}
+#endif
+
 }
 
 
@@ -1202,4 +1267,56 @@ void MultidisplayController::buttonCheck(int buttonState)  {
 	//Thats it... easy.
 }
 
+#if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
 
+void MultidisplayController::DFKlineSerialReceive() {
+
+	while(Serial1.available()) {
+
+		switch ( df_kline_status ) {
+
+		case DF_KLINE_STATUS_FRAMEERROR:
+		case DF_KLINE_STATUS_FRAME_COMPLETE: {
+			//new frame --> check for start char
+			df_kline_index = 0;
+			for ( int i=0; i < (DF_KLINEFRAMESIZE-1) ; i++ )
+				df_klineData[df_kline_active_frame].asBytes[i]=0xFF;
+
+			uint8_t b = Serial1.read();
+			if ( b != DF_KLINEBEGIN ) {
+				//skip it
+			} else {
+				df_kline_status = DF_KLINE_STATUS_RECEIVING;
+				df_klineData[df_kline_active_frame].asBytes[df_kline_index] = b;
+				df_kline_index++;
+			}
+			break;
+		}
+		case DF_KLINE_STATUS_RECEIVING:
+			if ( df_kline_index == DF_KLINEFRAMESIZE-1 ) {
+				//last char -> check for end char
+				uint8_t b = Serial1.read();
+				if ( b != DF_KLINEEND ) {
+					df_kline_discarded_frames++;
+					df_kline_status = DF_KLINE_STATUS_FRAMEERROR;
+				} else {
+					df_klineData[df_kline_active_frame].asBytes[df_kline_index] = b;
+					//frame complete!
+					df_kline_status = DF_KLINE_STATUS_FRAME_COMPLETE;
+					df_kline_index = 0;
+					//print it!
+					df_kline_last_frame_completely_received = df_kline_active_frame;
+					df_kline_active_frame++;
+					if ( df_kline_active_frame >= DF_KLINE_STORE_FRAME_COUNT )
+						df_kline_active_frame = 0;
+				}
+			} else {
+				df_klineData[df_kline_active_frame].asBytes[df_kline_index] = Serial1.read();
+				df_kline_index++;
+			}
+			break;
+		}
+	}
+}
+
+#endif

@@ -31,12 +31,13 @@
 //only one of them should be defined!
 //#define VR6_MOTRONIC
 #define DIGIFANT
+#define DIGIFANT_KLINE
 
 #define LAMBDA_WIDEBAND
 
 //define this if you measure the boost with SM-VAC/Boost instead of Motorola MPX4250AP / Bosch 200kpa
-#define BOOST_PLX_SMVACBOOST
-//#define BOOST_MOTOROLA_MPX4250
+//#define BOOST_PLX_SMVACBOOST
+#define BOOST_MOTOROLA_MPX4250
 //on boostpin2
 //#define BOOST_BOSCH_200KPA
 
@@ -45,7 +46,7 @@
 #define BOOST_NORMAL 1.0
 #define BOOST_RACE 1.5
 #define N75_MANUALDUTY_NORMAL 96
-#define N75_MANUALDUTY_RACE 255
+#define N75_MANUALDUTY_RACE 230
 #define BOOST_MODE_NORMAL 1
 #define BOOST_MODE_RACE 0
 
@@ -176,7 +177,8 @@ typedef unsigned char byte;
 #define SERIALOUT_ENABLED 2
 #define SERIALOUT_TUNERPRO_ADX 3
 //send and receive each SERIALFREQ millisecs!
-#define SERIALFREQ 20
+//#define SERIALFREQ 20
+#define SERIALFREQ 200
 
 
 #define SCREENA 1
@@ -215,5 +217,16 @@ typedef unsigned char byte;
 #define EEPROM_BRIGHTNESS 105
 #define EEPROM_AMBIENTPRESSURE 200
 #define EEPROM_LDCALPOINT 205
+
+
+#define DF_KLINESERIALFREQ 25
+#define DF_KLINEFRAMESIZE 19
+#define DF_KLINE_STORE_FRAME_COUNT 2
+#define DF_KLINEBEGIN 2
+#define DF_KLINEEND 3
+#define DF_KLINE_STATUS_RECEIVING 1
+#define DF_KLINE_STATUS_FRAME_COMPLETE 2
+#define DF_KLINE_STATUS_FRAMEERROR 3
+
 
 #endif /* MULTIDISPLAY_DEFINES_H_ */

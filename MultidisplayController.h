@@ -124,6 +124,24 @@ private:
 
 	void readSettingsFromEeprom();
 	void saveSettings2Eeprom();
+
+#if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
+
+	void DFKlineSerialReceive();
+
+	union {
+	    	byte asBytes[DF_KLINEFRAMESIZE];
+	    } df_klineData[DF_KLINE_STORE_FRAME_COUNT];
+	unsigned long DF_KlineSerialTime;
+	//! holds the index of the last frame (255 if no frame was received)
+	uint8_t df_kline_last_frame_completely_received;
+	uint8_t df_kline_active_frame;
+	uint8_t df_kline_index;
+	uint8_t df_kline_status;
+	uint16_t df_kline_discarded_frames;
+
+#endif
+
 };
 
 
