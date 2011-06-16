@@ -220,7 +220,7 @@ typedef unsigned char byte;
 
 
 #define DF_KLINESERIALFREQ 25
-#define DF_KLINEFRAMESIZE 19
+#define DF_KLINEFRAMESIZE 21
 #define DF_KLINE_STORE_FRAME_COUNT 2
 #define DF_KLINEBEGIN 2
 #define DF_KLINEEND 3

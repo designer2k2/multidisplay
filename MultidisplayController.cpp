@@ -168,7 +168,8 @@ void  MultidisplayController::myconstructor() {
 	Serial.begin(57600);
 
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
-	Serial1.begin(9600);
+//	Serial1.begin(9600);
+	Serial1.begin(6666);
 
 	DF_KlineSerialTime = 0;
 	df_kline_status = DF_KLINE_STATUS_FRAME_COMPLETE;
@@ -678,42 +679,12 @@ void MultidisplayController::serialSend() {
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
 
 		if ( df_kline_last_frame_completely_received < 255 ) {
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[1]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[2]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[3]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[4]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[5]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[6]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[7]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[8]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[9]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[10]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[11]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[12]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[13]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[14]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[15]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[16]), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[17]), sizeof(uint8_t) );
+			for ( uint8_t i = 1 ; i < (DF_KLINEFRAMESIZE-1) ; i++ )
+				Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[i]), sizeof(uint8_t) );
 		} else {
 			uint8_t tmp = 0;
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-			Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			for ( uint8_t i = 0 ; i < (DF_KLINEFRAMESIZE-2) ; i++ )
+				Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
 		}
 #endif
 
