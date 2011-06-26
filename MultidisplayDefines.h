@@ -177,8 +177,8 @@ typedef unsigned char byte;
 #define SERIALOUT_ENABLED 2
 #define SERIALOUT_TUNERPRO_ADX 3
 //send and receive each SERIALFREQ millisecs!
-//#define SERIALFREQ 20
-#define SERIALFREQ 200
+#define SERIALFREQ 10
+//#define SERIALFREQ 200
 
 
 #define SCREENA 1
@@ -219,7 +219,7 @@ typedef unsigned char byte;
 #define EEPROM_LDCALPOINT 205
 
 
-#define DF_KLINESERIALFREQ 25
+#define DF_KLINESERIALFREQ 1
 #define DF_KLINEFRAMESIZE 21
 #define DF_KLINE_STORE_FRAME_COUNT 2
 #define DF_KLINEBEGIN 2

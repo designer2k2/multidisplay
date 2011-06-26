@@ -165,11 +165,13 @@ void  MultidisplayController::myconstructor() {
 	digitalWrite(DATAOUT,LOW);
 	digitalWrite(SPICLOCK,LOW);
 
-	Serial.begin(57600);
+//	Serial.begin(57600);
+	Serial.begin(115200);
 
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
 //	Serial1.begin(9600);
-	Serial1.begin(6666);
+//	Serial1.begin(6666);
+	Serial1.begin(6667);
 
 	DF_KlineSerialTime = 0;
 	df_kline_status = DF_KLINE_STATUS_FRAME_COMPLETE;
@@ -177,6 +179,9 @@ void  MultidisplayController::myconstructor() {
 	df_kline_index = 0;
 	df_kline_discarded_frames = 0;
 	df_kline_last_frame_completely_received = 255;
+
+	df_kline_freq_milliseconds = 0;
+	df_kline_freq_helper0 = millis();
 #endif
 
 	wire.begin();                  //Start the Wire Libary for the PCF8574
@@ -665,6 +670,9 @@ void MultidisplayController::serialSend() {
 		int outbuf;
 
 		Serial.write ( (uint8_t*) &(data.calRPM), sizeof(int) );
+		//hack for DF data frequency
+//		Serial.write ( (uint8_t*) &( df_kline_freq_milliseconds ), sizeof(int) );
+
 		Serial.write ( (uint8_t*) &(data.calThrottle), sizeof(int) );
 
 		outbuf = float2fixedintb100(data.calLambdaF);
@@ -1275,8 +1283,12 @@ void MultidisplayController::DFKlineSerialReceive() {
 					//frame complete!
 					df_kline_status = DF_KLINE_STATUS_FRAME_COMPLETE;
 					df_kline_index = 0;
-					//print it!
+					//do sth with it!
 					df_kline_last_frame_completely_received = df_kline_active_frame;
+
+					df_kline_freq_milliseconds = (uint16_t) millis() - df_kline_freq_helper0;
+					df_kline_freq_helper0 = millis();
+
 					df_kline_active_frame++;
 					if ( df_kline_active_frame >= DF_KLINE_STORE_FRAME_COUNT )
 						df_kline_active_frame = 0;

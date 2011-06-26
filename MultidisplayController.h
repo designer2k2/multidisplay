@@ -135,6 +135,8 @@ private:
 	unsigned long DF_KlineSerialTime;
 	//! holds the index of the last frame (255 if no frame was received)
 	uint8_t df_kline_last_frame_completely_received;
+	uint16_t df_kline_freq_milliseconds;
+	unsigned long df_kline_freq_helper0;
 	uint8_t df_kline_active_frame;
 	uint8_t df_kline_index;
 	uint8_t df_kline_status;
