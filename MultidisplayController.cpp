@@ -33,11 +33,11 @@
 #include <WProgram.h>
 
 #include <PID_Beta6.h>
-
+#include <digitalWriteFast.h>
 
 
 //Lookup Table for the TypK:
-//from 0-1350°C in steps of 50°C, the list is in microV according to that Temp.
+//from 0-1350Â°C in steps of 50Â°C, the list is in microV according to that Temp.
 const unsigned int MultidisplayController::tempTypK[] =
 {
 		0,
@@ -209,6 +209,76 @@ void  MultidisplayController::myconstructor() {
 }
 
 
+int MultidisplayController::read_adc_fast (uint8_t channel){
+
+	int adcvalue = 0;
+	byte commandbits = B11000000; //command bits - start, mode, chn (3), dont care (3)
+	uint8_t savedChannel = channel;  //Save the channel, to make it possible to deselect the MCP later.
+
+	//choose the right MCP3208, depending on number to read.
+	if(channel>8) 	{
+		//Channels 9-16 on second MCP3208
+		IOport2 = IOport2 & B01111101;     //Clears the Selection Pin for MCP 2 (Bitwise AND) (right is the MCP, left the LED)
+		//to adapt the right Channel selection
+		channel = channel - 8;
+	} else 	{
+		//Channels 1-8 on first MCP3208
+		IOport2 = IOport2 & B01111110;     //Clears the Selection Pin for MCP 1 (Bitwise AND) http://www.programmers-corner.com/article/27
+	}
+
+	//allow channel selection
+	commandbits|=((channel-1)<<3);
+
+	expanderWrite2(IOport2); //Select ADC
+
+	// setup bits to be written
+	for (int i=7 ; i>=3 ; i--){
+
+		//TODO uses still digitalwrite
+//		digitalWriteFast(DATAOUT,commandbits&1<<i);
+
+		//TODO testme
+		uint8_t val = commandbits&1<<i;
+		if ( val ) {
+			//asm(code : output operand list : input operand list [: clobber list]);
+			asm("sbi %0,3" : : "I" (_SFR_IO_ADDR(PORTF)) );
+		} else {
+			asm("cbi %0,3" : : "I" (_SFR_IO_ADDR(PORTF)) );
+		}
+
+		//cycle clock
+		digitalWriteFast(SPICLOCK,HIGH);
+		digitalWriteFast(SPICLOCK,LOW);
+	}
+
+	digitalWriteFast(SPICLOCK,HIGH);    //ignores 2 null bits
+	digitalWriteFast(SPICLOCK,LOW);
+	digitalWriteFast(SPICLOCK,HIGH);
+	digitalWriteFast(SPICLOCK,LOW);
+
+	//read bits from adc
+	for (int i=11 ; i>=0 ; i--){
+		adcvalue+=digitalReadFast(DATAIN)<<i;
+		//cycle clock
+		digitalWriteFast(SPICLOCK,HIGH);
+		digitalWriteFast(SPICLOCK,LOW);
+	}
+
+	//deselct the MCP
+	if(savedChannel > 8) 	{
+		//Channels 9-16 on second MCP3208
+		IOport2 = IOport2 | B10000010;     //Sets the Selection Pin for MCP 2
+	} 	else 	{
+		//Channels 1-8 on first MCP3208
+		IOport2 = IOport2 | B10000001;     //Sets the Selection Pin for MCP 1
+	}
+
+	expanderWrite2(IOport2); //Deselect ADC
+
+	return adcvalue;
+}
+
+
 /**
  * reads the 12bit adc -> analog values between 0 and 2^12
  * \see http://www.arduino.cc/playground/Code/MCP3208
@@ -351,7 +421,7 @@ void MultidisplayController::AnaConversion() {
 	data.calLambda = constrain(data.calLambda, 0, 200);
 
 	//CaseTemp: (damped)
-	data.calCaseTemp = data.calCaseTemp*0.9 + (500.0*data.anaIn[CASETEMPPIN]/4096.0)*0.1;  //thats how to get °C out from a LM35 with 12Bit ADW
+	data.calCaseTemp = data.calCaseTemp*0.9 + (500.0*data.anaIn[CASETEMPPIN]/4096.0)*0.1;  //thats how to get Â°C out from a LM35 with 12Bit ADW
 
 #ifdef VR6_MOTRONIC
 	//Throttle:
@@ -774,7 +844,7 @@ void MultidisplayController::CalibrateLD()
 
 //-------------------------------------------------------------------------------------------------------
 
-//This converts the thermocouple µV reading into some usable °C
+//This converts the thermocouple ÂµV reading into some usable Â°C
 int MultidisplayController::GetTypKTemp(unsigned int microVolts)
 {
 	//TODO dont use linear search!
@@ -791,7 +861,7 @@ int MultidisplayController::GetTypKTemp(unsigned int microVolts)
 	return LookedupValue;
 }
 
-//Converts the ADW Reading into �C
+//Converts the ADW Reading into ï¿œC
 int MultidisplayController::GetVDOTemp(unsigned int ADWreading) {
 	//TODO dont use linear search!
 
@@ -805,8 +875,8 @@ int MultidisplayController::GetVDOTemp(unsigned int ADWreading) {
 		}
 	}
 
-	LookedupValue -= 30;   //must be reduced as the lookup table starts at -30°C.
-	LookedupValue = constrain(LookedupValue,-40,999);    //Limits the Output to 999°C, so an open circuit gets detectet!
+	LookedupValue -= 30;   //must be reduced as the lookup table starts at -30Â°C.
+	LookedupValue = constrain(LookedupValue,-40,999);    //Limits the Output to 999Â°C, so an open circuit gets detectet!
 
 	return LookedupValue;
 }
@@ -832,7 +902,7 @@ int MultidisplayController::GetVDOPressure(unsigned int ADWreading) {
 
 
 void MultidisplayController::FetchTypK()  {
-	//This will read in all the needed Analog values, convert them to �C, and make the calibration with the LM35
+	//This will read in all the needed Analog values, convert them to ï¿œC, and make the calibration with the LM35
 	//so it must be called after the AnaConversion!
 
 	unsigned int Temp = 0;
@@ -864,11 +934,11 @@ void MultidisplayController::FetchTypK()  {
 
 		expanderWrite2(IOport2);    //writes it to the port
 
-		delay(20);   //Due to the 0.1 µF cap this is needed. The Cap should be there to get a stable reading! (from open to RT it takes 15ms, plus 5ms safety)
+		delay(20);   //Due to the 0.1 ÂµF cap this is needed. The Cap should be there to get a stable reading! (from open to RT it takes 15ms, plus 5ms safety)
 		//then read in the value from the ADW
 
-		Temp = ((5.0*read_adc(AGTPIN))/4096.0)*10000;   //gets the Volts and makes �V out of it (100 is already added from the Amp)
-		Temp = GetTypKTemp(Temp);                       //Converts the �V into °C
+		Temp = ((5.0*read_adc(AGTPIN))/4096.0)*10000;   //gets the Volts and makes ï¿œV out of it (100 is already added from the Amp)
+		Temp = GetTypKTemp(Temp);                       //Converts the ï¿œV into Â°C
 
 		//Check if it is open:
 
@@ -1006,11 +1076,15 @@ void MultidisplayController::mainLoop() {
 	// ui knows what screen is active and draws it!
 	lcdController.draw();
 
-	//My own Button Check Function
-	buttonCheck(expanderRead());
+#ifdef MULTIDISPLAY_V1
+	// button check for V1
+	buttonCheck_V1(expanderRead());
+#else
+	//TODO implement buttons for V2
+	__asm__("nop\n\t");
+#endif
 
 	//Saves the Screen when needed:
-
 	if(millis()>= ScreenSave) {
 		//and now save it:
 		EEPROM.write(100, lcdController.activeScreen);
@@ -1199,7 +1273,7 @@ void MultidisplayController::buttonBPressed() {
 
 //-------------------------------------------------------------------------------------------------------
 
-void MultidisplayController::buttonCheck(int buttonState)  {
+void MultidisplayController::buttonCheck_V1(int buttonState)  {
 	/**
 	 * A hold : switch screens
 	 */

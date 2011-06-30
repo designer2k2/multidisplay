@@ -95,6 +95,9 @@ private:
     } srData;
 
 	int read_adc(uint8_t channel);
+
+	int read_adc_fast(uint8_t channel);
+
 	void expanderWrite(byte _data);
 	byte expanderRead();
 	void expanderWrite2(byte _data);
@@ -116,7 +119,7 @@ private:
 	unsigned long buttonTime;   //Button time
 
 	//TODO documentation!
-	void buttonCheck(int buttonState);
+	void buttonCheck_V1(int buttonState);
 	void buttonAHold();
 	void buttonAPressed();
 	void buttonBHold();
