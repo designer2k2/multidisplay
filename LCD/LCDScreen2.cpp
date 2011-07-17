@@ -25,7 +25,7 @@
 LCDScreen2::LCDScreen2() {
 	flags.f.doCal=1;
 	flags.f.doTypK = 1;
-	flags.f.serial = SERIALOUT_RAW;
+	flags.f.serial = SERIALOUT_BINARY;
 	flags.f.refreshRate = 2;
 }
 

@@ -33,7 +33,7 @@ public:
 	int ldCalPoint;             //where to draw the dot from the calibration
 
 
-	int calAgt[NUMTYPK+1];  //All Typ K Values will be stored inside this array
+	int calAgt[NUMBER_OF_ATTACHED_TYPK];  //All Typ K Values will be stored inside this array
 
 	//RPM Smoothing:
 	int rpmReadings[RPMSMOOTH];                // the readings from the analog input
@@ -79,13 +79,18 @@ public:
 	 *
 	 * TODO what else?
 	 */
-	uint8_t digifant_data[14];
+
+	uint16_t speed;
+	uint8_t gear;
+	uint8_t computed_n75;
 #endif
 
 	SensorData();
 
 	//dont use the constructor because I want to control when the global objects get initialized
 	void myconstructor();
+
+	void generate_debugData();
 };
 
 extern SensorData data;

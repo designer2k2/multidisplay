@@ -97,6 +97,7 @@ private:
 	int read_adc(uint8_t channel);
 
 	int read_adc_fast(uint8_t channel);
+	int read_adc_fast_mega(uint8_t channel);
 
 	void expanderWrite(byte _data);
 	byte expanderRead();

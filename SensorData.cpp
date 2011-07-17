@@ -80,9 +80,38 @@ void SensorData::myconstructor () {
 	}
 
 	//TypK Array init:
-	for (uint8_t i = 0; i < NUMTYPK ; i++) 	{
+	for (uint8_t i = 0; i < NUMBER_OF_ATTACHED_TYPK ; i++) 	{
 		calAgt[i] = 0;                      // initialize all the readings to 0
 	}
 
+#ifdef MULTIDISPLAY_V2
+	speed = 0;
+	gear = 0;
+	computed_n75 = 0;
+#endif
+}
 
+void SensorData::generate_debugData () {
+	calRPM=1;
+	calAbsoluteBoost=2;
+	calThrottle=3;
+	calLambdaF=4;
+	calLMM=5;
+	calCaseTemp=6;
+
+#ifdef TYPE_K
+	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++)
+		calAgt[i] = 88;
+#endif
+
+	batVolt=7;
+	VDOPres1=8;
+	VDOPres2=9;
+	VDOPres3=10;
+	VDOTemp1=11;
+	VDOTemp2=12;
+	VDOTemp3=13;
+	speed=14;
+	gear=15;
+	computed_n75=16;
 }

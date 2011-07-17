@@ -52,7 +52,7 @@
 
 #define READFROMEEPROM
 
-#define TYPE_K
+//#define TYPE_K
 
 //----------------------------------------------------------------------------------------------------
 //Max Values:
@@ -160,8 +160,10 @@
 #define RPMMAX 3400                 //its about 8k
 
 #define TEMPTYPKREADINGS 28         //how many entrys are in the Lookup Table
-#define NUMTYPK 1                   //how many TypK`s are attached (enter Number -1)
+#define NUMBER_OF_ATTACHED_TYPK 2                   //how many TypK`s are attached
+#define MAX_ATTACHED_TYPK 8			//max typk which can be attached
 #define MAXTYPK 1170                //over that will be seen as Open.
+
 
 #define EXPANDER B0100001       // Address with 2 address pins grounded. (from the PCF8574)
 #define EXPANDER2 B0100000      // Address with three address pins grounded. (from the PCF8574)
@@ -173,12 +175,16 @@ typedef unsigned char byte;
 
 //serial output
 #define SERIALOUT_DISABLED 0
-#define SERIALOUT_RAW 1
+#define SERIALOUT_BINARY 1
 #define SERIALOUT_ENABLED 2
 #define SERIALOUT_TUNERPRO_ADX 3
+
+//84 bytes
+#define SERIALOUT_BINARY_TAG 84
+
 //send and receive each SERIALFREQ millisecs!
-#define SERIALFREQ 10
-//#define SERIALFREQ 200
+//#define SERIALFREQ 10
+#define SERIALFREQ 800
 
 
 #define SCREENA 1
@@ -220,7 +226,7 @@ typedef unsigned char byte;
 
 
 #define DF_KLINESERIALFREQ 1
-#define DF_KLINEFRAMESIZE 21
+#define DF_KLINEFRAMESIZE 34 //including stx / etx bytes
 #define DF_KLINE_STORE_FRAME_COUNT 2
 #define DF_KLINEBEGIN 2
 #define DF_KLINEEND 3

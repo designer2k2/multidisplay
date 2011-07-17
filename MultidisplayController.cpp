@@ -137,7 +137,7 @@ void  MultidisplayController::myconstructor() {
 	data.maxLdt=0;             //max LD for the screen
 
 	DoCheck = 1;
-	SerOut = SERIALOUT_RAW;
+	SerOut = SERIALOUT_BINARY;
 
 	buttonTime = 0;
 
@@ -208,6 +208,71 @@ void  MultidisplayController::myconstructor() {
 	serialTime = millis();
 }
 
+int MultidisplayController::read_adc_fast_mega (uint8_t channel){
+
+	int adcvalue = 0;
+	byte commandbits = B11000000; //command bits - start, mode, chn (3), dont care (3)
+	uint8_t savedChannel = channel;  //Save the channel, to make it possible to deselect the MCP later.
+
+	//choose the right MCP3208, depending on number to read.
+	if(channel>8) 	{
+		//Channels 9-16 on second MCP3208
+		IOport2 = IOport2 & B01111101;     //Clears the Selection Pin for MCP 2 (Bitwise AND) (right is the MCP, left the LED)
+		//to adapt the right Channel selection
+		channel = channel - 8;
+	} else 	{
+		//Channels 1-8 on first MCP3208
+		IOport2 = IOport2 & B01111110;     //Clears the Selection Pin for MCP 1 (Bitwise AND) http://www.programmers-corner.com/article/27
+	}
+
+	//allow channel selection
+	commandbits|=((channel-1)<<3);
+
+	expanderWrite2(IOport2); //Select ADC
+
+	// setup bits to be written
+	for (int i=7 ; i>=3 ; i--){
+
+		//TODO testme
+		uint8_t val = commandbits&1<<i;
+		if ( val ) {
+			//asm(code : output operand list : input operand list [: clobber list]);
+			asm("sbi %0,3" : : "I" (_SFR_IO_ADDR(PORTF)) );
+		} else {
+			asm("cbi %0,3" : : "I" (_SFR_IO_ADDR(PORTF)) );
+		}
+
+		//cycle clock
+		asm("sbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
+		asm("cbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
+	}
+
+	asm("sbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
+	asm("cbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
+	asm("sbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
+	asm("cbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
+
+	//read bits from adc
+	for (int i=11 ; i>=0 ; i--){
+		adcvalue+=digitalReadFast(DATAIN)<<i;
+		//cycle clock
+		asm("sbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
+		asm("cbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
+	}
+
+	//deselct the MCP
+	if(savedChannel > 8) 	{
+		//Channels 9-16 on second MCP3208
+		IOport2 = IOport2 | B10000010;     //Sets the Selection Pin for MCP 2
+	} 	else 	{
+		//Channels 1-8 on first MCP3208
+		IOport2 = IOport2 | B10000001;     //Sets the Selection Pin for MCP 1
+	}
+
+	expanderWrite2(IOport2); //Deselect ADC
+
+	return adcvalue;
+}
 
 int MultidisplayController::read_adc_fast (uint8_t channel){
 
@@ -482,8 +547,8 @@ void MultidisplayController::AnaConversion() {
 		FetchTypK();
 	}
 #endif
-	//VDO Stuff:
 
+	//VDO Stuff:
 	data.VDOTemp1 = GetVDOTemp(data.anaIn[VDOT1PIN]);
 	data.VDOTemp2 = GetVDOTemp(data.anaIn[VDOT2PIN]);
 	data.VDOTemp3 = GetVDOTemp(data.anaIn[VDOT3PIN]);
@@ -651,53 +716,44 @@ void MultidisplayController::readSettingsFromEeprom() {
 
 
 void MultidisplayController::serialSend() {
-#ifdef BOOSTN75
 
-	if ( SerOut != SERIALOUT_TUNERPRO_ADX ) {
-		Serial.print("\2");
-		Serial.print("PID ");
-		Serial.print(boostController.boostSetPoint);
-		Serial.print(" ");
-		Serial.print(data.calBoost);
-		Serial.print(" ");
-		Serial.print(boostController.boostOutput);
-		Serial.print(" ");
-		if ( boostController.boostPid != NULL ) {
-#ifdef BOOSTPID
-			Serial.print(boostController.boostPid->GetP_Param());
-			Serial.print(" ");
-			Serial.print(boostController.boostPid->GetI_Param());
-			Serial.print(" ");
-			Serial.print(boostController.boostPid->GetD_Param());
-			Serial.print(" ");
-			if (boostController.boostPid->GetMode()==AUTO)
-				Serial.print("Automatic");
-			else
-				Serial.print("Manual");
-#endif
-		} else {
-			Serial.print (" 0 0 0 M");
-		}
-
-		Serial.print("\3");
-		Serial.println();
-
-	}
-#endif /* BOOSTN75 */
+//#ifdef BOOSTN75
+//
+//	if ( SerOut != SERIALOUT_TUNERPRO_ADX || SerOut != SERIALOUT_BINARY ) {
+//		Serial.print("\2");
+//		Serial.print("PID ");
+//		Serial.print(boostController.boostSetPoint);
+//		Serial.print(" ");
+//		Serial.print(data.calBoost);
+//		Serial.print(" ");
+//		Serial.print(boostController.boostOutput);
+//		Serial.print(" ");
+//		if ( boostController.boostPid != NULL ) {
+//#ifdef BOOSTPID
+//			Serial.print(boostController.boostPid->GetP_Param());
+//			Serial.print(" ");
+//			Serial.print(boostController.boostPid->GetI_Param());
+//			Serial.print(" ");
+//			Serial.print(boostController.boostPid->GetD_Param());
+//			Serial.print(" ");
+//			if (boostController.boostPid->GetMode()==AUTO)
+//				Serial.print("Automatic");
+//			else
+//				Serial.print("Manual");
+//#endif
+//		} else {
+//			Serial.print (" 0 0 0 M");
+//		}
+//
+//		Serial.print("\3");
+//		Serial.println();
+//
+//	}
+//#endif /* BOOSTN75 */
 
 	Serial.print("\2");
 	switch(SerOut){
 	case SERIALOUT_DISABLED:
-		break;
-	case SERIALOUT_RAW:
-		//RAW Output:
-		Serial.print(time);
-		Serial.print(";");
-		for(int I = 1; I <=15;I++){
-			Serial.print(data.anaIn[I]);
-			Serial.print(";");
-		}
-		Serial.print(data.anaIn[16]);
 		break;
 	case SERIALOUT_ENABLED:
 		//Convertet Output:
@@ -767,14 +823,99 @@ void MultidisplayController::serialSend() {
 #endif
 
 		break;
+
+	case SERIALOUT_BINARY:
+
+		/*
+		 * STX: 1 byte
+		 * SERIALOUT_BINARY_TAG: 1 byte
+		 * MD2 data: 49 bytes
+		 * digifant data: 32 bytes
+		 * ETX: 1 byte
+		 *
+		 * overall 84 bytes per frame!
+		 */
+
+		// 1 byte
+		outbuf = SERIALOUT_BINARY_TAG;
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
+		//32bit / 4 byte
+		Serial.write ( (uint8_t*) &(time), sizeof(unsigned long) );
+		// 2 bytes
+		Serial.write ( (uint8_t*) &(data.calRPM), sizeof(int) );
+
+		// 2 bytes
+		outbuf = float2fixedintb100(data.calAbsoluteBoost);
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
+
+		//8bit are enough / 1 byte
+		Serial.write ( (uint8_t*) &(data.calThrottle), sizeof(uint8_t) );
+
+		// 2 bytes
+		outbuf = float2fixedintb100(data.calLambdaF);
+		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
+
+		// 2 bytes
+		outbuf = float2fixedintb100(data.calLMM);
+		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
+
+		// 2 bytes
+		outbuf = float2fixedintb100(data.calCaseTemp);
+		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
+
+		//8 x 16 bit -> 16 bytes
+#ifdef TYPE_K
+		for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++)
+			Serial.write ( (uint8_t*) &(data.calAgt[i]), sizeof(int) );
+		outbuf = 0;
+		for ( uint8_t i = NUMBER_OF_ATTACHED_TYPK ; i < MAX_ATTACHED_TYPK ; i++)
+			Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
+#else
+		outbuf = 0;
+		for ( uint8_t i = 0 ; i < MAX_ATTACHED_TYPK ; i++)
+			Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
+#endif
+
+		// 2 bytes
+		outbuf = float2fixedintb100(data.batVolt);
+		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
+
+		// 12 bytes
+		Serial.write ( (uint8_t*) &(data.VDOPres1), sizeof(int) );
+		Serial.write ( (uint8_t*) &(data.VDOPres2), sizeof(int) );
+		Serial.write ( (uint8_t*) &(data.VDOPres3), sizeof(int) );
+		Serial.write ( (uint8_t*) &(data.VDOTemp1), sizeof(int) );
+		Serial.write ( (uint8_t*) &(data.VDOTemp2), sizeof(int) );
+		Serial.write ( (uint8_t*) &(data.VDOTemp3), sizeof(int) );
+
+		// 2 bytes
+		Serial.write ( (uint8_t*) &(data.speed), sizeof(uint16_t) );
+		// 1 byte
+		Serial.write ( (uint8_t*) &(data.gear), sizeof(uint8_t) );
+		// 1 byte
+		Serial.write ( (uint8_t*) &(data.computed_n75), sizeof(uint8_t) );
+
+#if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
+		// 32 bytes
+		if ( df_kline_last_frame_completely_received < 255 ) {
+			for ( uint8_t i = 1 ; i < (DF_KLINEFRAMESIZE-1) ; i++ )
+				Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[i]), sizeof(uint8_t) );
+		} else {
+			uint8_t tmp = 0;
+			for ( uint8_t i = 0 ; i < (DF_KLINEFRAMESIZE-2) ; i++ ) {
+				tmp = i;
+				Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
+			}
+		}
+#endif
+
+		break;
+
 	default:
 		SerOut = SERIALOUT_DISABLED;
 		break;
 	}
 	Serial.print("\3");
-	Serial.println();
-
-	Serial.println (freeMem());
 }
 
 void MultidisplayController::HeaderPrint() {
@@ -787,10 +928,6 @@ void MultidisplayController::HeaderPrint() {
    Serial.print("CalBoost: ");
    Serial.println(CalLD);
 		 */
-		break;
-	case SERIALOUT_RAW:
-		Serial.println(" ");
-//		Serial.println_P(PSTR("Time;data.anaIn0;data.anaIn1;data.anaIn2;data.anaIn3;data.anaIn4;data.anaIn5;data.anaIn6;data.anaIn7"));
 		break;
 	case SERIALOUT_ENABLED:
 		Serial.println(" ");
@@ -808,9 +945,9 @@ void MultidisplayController::ChangeSerOut()
 	//Switch from RAW to Cal and vise versa.
 	switch(SerOut){
 	case SERIALOUT_DISABLED:
-		SerOut = SERIALOUT_RAW;
+		SerOut = SERIALOUT_BINARY;
 		break;
-	case SERIALOUT_RAW:
+	case SERIALOUT_BINARY:
 		SerOut = SERIALOUT_ENABLED;
 		break;
 	case SERIALOUT_ENABLED:
@@ -912,7 +1049,7 @@ void MultidisplayController::FetchTypK()  {
 	int row;     // storeing the bin code
 	int  bin [] = {000, 1, 10, 11, 100, 101, 110, 111};//bin = binary, some times it is so easy
 
-	for (int i=0; i <= NUMTYPK; i++) {
+	for (int i=0; i < NUMBER_OF_ATTACHED_TYPK; i++) {
 		//there are 8 connections, so i have to set the 3 pins according to all channels
 
 		//This needs to be modded to fit the new IO Handler
@@ -1053,14 +1190,15 @@ void MultidisplayController::mainLoop() {
 
 	//Read in all Analog values:
 	for(uint8_t i = 1; i <=16;i++) {
-		data.anaIn[i] = read_adc(i);
+		data.anaIn[i] = read_adc_fast (i);
 	}
 
 	AnaConversion();
 
 
+
 #ifdef RPM_SHIFT_LIGHT
-		Shiftlight();
+	Shiftlight();
 #endif //RPM_SHIFT_LIGHT
 
 
@@ -1123,9 +1261,8 @@ void MultidisplayController::mainLoop() {
 
 	if ( millis() > serialTime ) {
 		serialReceive();
-		//Print it:
-//		if ( SerOut!=SERIALOUT_TUNERPRO_ADX || ( SerOut==SERIALOUT_TUNERPRO_ADX && adx_request_data==1 ) )
-//			serialSend();
+
+//		data.generate_debugData();
 		serialSend();
 		serialTime += SERIALFREQ;
 	}
