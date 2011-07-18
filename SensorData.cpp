@@ -88,6 +88,18 @@ void SensorData::myconstructor () {
 	speed = 0;
 	gear = 0;
 	computed_n75 = 0;
+
+	df_cyl1_retard = 0;
+	df_cyl2_retard = 0;
+	df_cyl3_retard = 0;
+	df_cyl4_retard = 0;
+	df_total_retard = 0;
+	df_ignition = 0;
+
+	df_boost = 0;
+	df_ect = 0;
+	df_iat = 0;
+	df_rpm = 0;
 #endif
 }
 
@@ -114,4 +126,7 @@ void SensorData::generate_debugData () {
 	speed=14;
 	gear=15;
 	computed_n75=16;
+
+	df_ignition = 6.0;
+	df_total_retard = 3;
 }

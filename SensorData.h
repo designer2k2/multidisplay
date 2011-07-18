@@ -68,21 +68,28 @@ public:
 
 
 #ifdef MULTIDISPLAY_V2
-	/*
-	 * 4 x knock (8bit)
-	 * 4 x ignition advance (8bit)
-	 * rpm (8bit)
-	 * boost (8bit)
-	 * iat (8bit)
-	 * flags (wot, idle) (8bit)
-	 * fuel (16bit)
-	 *
-	 * TODO what else?
-	 */
-
 	uint16_t speed;
 	uint8_t gear;
 	uint8_t computed_n75;
+
+	/*
+	 * Digifant
+	 * 4 x knock cyl 1-4 retard
+	 * 1 x knock total retard
+	 * 1 x ignition advance
+	 */
+	float df_cyl1_retard;
+	float df_cyl2_retard;
+	float df_cyl3_retard;
+	float df_cyl4_retard;
+	float df_total_retard;
+	float df_ignition;
+
+	float df_boost;
+	float df_ect;
+	float df_iat;
+	int df_rpm;
+
 #endif
 
 	SensorData();

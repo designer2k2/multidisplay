@@ -1496,6 +1496,7 @@ void MultidisplayController::DFKlineSerialReceive() {
 					df_kline_index = 0;
 					//do sth with it!
 					df_kline_last_frame_completely_received = df_kline_active_frame;
+					DFConvertReceivedData();
 
 					df_kline_freq_milliseconds = (uint16_t) millis() - df_kline_freq_helper0;
 					df_kline_freq_helper0 = millis();
@@ -1512,5 +1513,15 @@ void MultidisplayController::DFKlineSerialReceive() {
 		}
 	}
 }
+
+void MultidisplayController::DFConvertReceivedData() {
+	data.df_ignition = ( df_klineData[df_kline_last_frame_completely_received].asBytes[8] * -0.351563 ) + 73.9;
+	data.df_cyl1_retard = ( df_klineData[df_kline_last_frame_completely_received].asBytes[10] * 0.351563 );
+	data.df_cyl2_retard = ( df_klineData[df_kline_last_frame_completely_received].asBytes[12] * 0.351563 );
+	data.df_cyl3_retard = ( df_klineData[df_kline_last_frame_completely_received].asBytes[14] * 0.351563 );
+	data.df_cyl4_retard = ( df_klineData[df_kline_last_frame_completely_received].asBytes[16] * 0.351563 );
+	data.df_total_retard = data.df_cyl1_retard + data.df_cyl2_retard + data.df_cyl3_retard + data.df_cyl4_retard;
+}
+
 
 #endif

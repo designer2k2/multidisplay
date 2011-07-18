@@ -132,6 +132,7 @@ private:
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
 
 	void DFKlineSerialReceive();
+	void DFConvertReceivedData();
 
 	union {
 	    	byte asBytes[DF_KLINEFRAMESIZE];
