@@ -903,7 +903,6 @@ void MultidisplayController::serialSend() {
 		} else {
 			uint8_t tmp = 0;
 			for ( uint8_t i = 0 ; i < (DF_KLINEFRAMESIZE-2) ; i++ ) {
-				tmp = i;
 				Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
 			}
 		}

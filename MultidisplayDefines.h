@@ -93,7 +93,14 @@
 #ifdef MULTIDISPLAY_V2
 #define DATAOUT 57              //MOSI  17 on UNO/Duemilanove, 57 on MEGA
 #define DATAIN 12               //MISO
-#define SPICLOCK 23             //Clock  13 on UNO/Duemilanove, 23 on MEGA (13 cant bring the power!) Just bridge 23 and 13 with jumperwire.
+//#define SPICLOCK 23             //Clock  13 on UNO/Duemilanove, 23 on MEGA (13 cant bring the power!) Just bridge 23 and 13 with jumperwire.
+#define SPICLOCK 26             //Clock  26 on the V2 pcb
+
+//V2 Buttons - pull high
+#define V2_BUTTON1 22
+#define V2_BUTTON2 23
+#define V2_BUTTON3 24
+#define V2_BUTTON4 25
 #endif
 
 #ifdef MULTIDISPLAY_V1
