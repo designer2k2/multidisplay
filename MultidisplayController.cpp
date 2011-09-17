@@ -686,8 +686,16 @@ void MultidisplayController::serialReceive() {
 }
 
 void MultidisplayController::saveSettings2Eeprom() {
-
 	EEPROM.write(100, lcdController.activeScreen );
+
+#ifdef MULTIDISPLAY_V2
+	uint8_t ldp = data.ldCalPoint;
+	if ( ldp >= 0 && ldp <= 20 )
+		EEPROM.write(EEPROM_LDCALPOINT, ldp);
+	float ldt = data.boostAmbientPressureBar;
+	if ( ldt > 0.0 && ldt < 1.2 )
+		EEPROMWriteDouble (EEPROM_AMBIENTPRESSURE, ldt*1000);
+#endif
 
 #ifdef BOOSTN75
 	EEPROM.write (EEPROM_N75_MANUALDUTY_NORMAL, boostController.n75_manual_normal);
@@ -701,17 +709,17 @@ void MultidisplayController::readSettingsFromEeprom() {
 	//	lcdController.setActiveScreen (EEPROM.read(100));
 
 	lcdController.setBrightness (EEPROM.read(105));    //The Brightness from the LCD
-	uint8_t ldp = EEPROM.read(205);
+	uint8_t ldp = EEPROM.read(EEPROM_LDCALPOINT);
 	if ( ldp >= 0 && ldp <= 20 )
 		data.ldCalPoint = ldp;
-	float ldt = EEPROMReadDouble(200)/1000.0;      //gets the float back (thats accurate enough)
+	float ldt = EEPROMReadDouble(EEPROM_AMBIENTPRESSURE)/1000.0;      //gets the float back (thats accurate enough)
 	if ( ldt > 0.0 && ldt < 1.2 )
 		data.boostAmbientPressureBar = ldt;
 
-//#ifdef BOOSTN75
-//	boostController.n75_manual_normal = EEPROM.read (EEPROM_N75_MANUALDUTY_NORMAL);
-//	boostController.n75_manual_race = EEPROM.read (EEPROM_N75_MANUALDUTY_RACE);
-//#endif
+#ifdef BOOSTN75
+	boostController.n75_manual_normal = EEPROM.read (EEPROM_N75_MANUALDUTY_NORMAL);
+	boostController.n75_manual_race = EEPROM.read (EEPROM_N75_MANUALDUTY_RACE);
+#endif
 }
 
 
@@ -966,8 +974,8 @@ void MultidisplayController::CalibrateLD()
 	// changed from global val3 to caluclation of mapped boost
 	data.ldCalPoint = map(data.anaIn[BOOSTPIN], 0, 4096, 0, 200) / 10;
 	//and saved:
-	EEPROM.write(205,data.ldCalPoint);
-	EEPROMWriteDouble(200,data.boostAmbientPressureBar*1000);    //writes the float as long, will do it.
+	EEPROM.write(EEPROM_LDCALPOINT,data.ldCalPoint);
+	EEPROMWriteDouble(EEPROM_AMBIENTPRESSURE,data.boostAmbientPressureBar*1000);    //writes the float as long, will do it.
 
 	//The MaxLD will be reset!
 	data.maxLd = 0.0;
@@ -1217,8 +1225,7 @@ void MultidisplayController::mainLoop() {
 	// button check for V1
 	buttonCheck_V1(expanderRead());
 #else
-	//TODO implement buttons for V2
-	__asm__("nop\n\t");
+	buttonCheck_V2();
 #endif
 
 	//Saves the Screen when needed:
@@ -1280,6 +1287,12 @@ void MultidisplayController::mainLoop() {
 /*==============================================================================
  * BUTTON FUNCTIONS
  *============================================================================*/
+
+
+void MultidisplayController::buttonCheck_V2()  {
+	//TODO implement me!
+}
+
 
 void MultidisplayController::buttonAHold() {
 

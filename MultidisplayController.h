@@ -120,6 +120,7 @@ private:
 	unsigned long buttonTime;   //Button time
 
 	//TODO documentation!
+	void buttonCheck_V2();
 	void buttonCheck_V1(int buttonState);
 	void buttonAHold();
 	void buttonAPressed();

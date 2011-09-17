@@ -29,9 +29,9 @@
 
 //choose your engines ecu
 //only one of them should be defined!
-//#define VR6_MOTRONIC
-#define DIGIFANT
-#define DIGIFANT_KLINE
+#define VR6_MOTRONIC
+//#define DIGIFANT
+//#define DIGIFANT_KLINE
 
 #define LAMBDA_WIDEBAND
 
@@ -93,8 +93,8 @@
 #ifdef MULTIDISPLAY_V2
 #define DATAOUT 57              //MOSI  17 on UNO/Duemilanove, 57 on MEGA
 #define DATAIN 12               //MISO
-//#define SPICLOCK 23             //Clock  13 on UNO/Duemilanove, 23 on MEGA (13 cant bring the power!) Just bridge 23 and 13 with jumperwire.
-#define SPICLOCK 26             //Clock  26 on the V2 pcb
+#define SPICLOCK 23             //Clock  13 on UNO/Duemilanove, 23 on MEGA (13 cant bring the power!) Just bridge 23 and 13 with jumperwire.
+//#define SPICLOCK 26             //Clock  26 on the V2 pcb
 
 //V2 Buttons - pull high
 #define V2_BUTTON1 22
