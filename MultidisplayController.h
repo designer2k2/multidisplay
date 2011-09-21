@@ -112,7 +112,25 @@ private:
 	int GetTypKTemp(unsigned int microVolts);
 	int GetVDOTemp(unsigned int ADWreading);
 	int GetVDOPressure(unsigned int ADWreading);
+
+	//TypK state machine
+#define TYPK_STATE_NEXT_READ_CHANNEL 1
+#define TYPK_STATE_NEXT_SELECT_CHANNEL 2
+	uint8_t typK_state;
+	uint8_t typK_state_cur_channel;
+	unsigned long typK_state_time2read;
+
 	void FetchTypK();
+	void fetchTypK2();
+	void fetchTypK3_fast();
+	void selectTypKchannelForReading ( uint8_t channel );
+	void readTypK ( uint8_t channel );
+	void incTypKChannel () {
+		typK_state_cur_channel++;
+		if ( typK_state_cur_channel == NUMBER_OF_ATTACHED_TYPK )
+			typK_state_cur_channel = 0;
+	}
+
 	void CheckLimits();
 	void SaveMax(uint8_t Num);
 

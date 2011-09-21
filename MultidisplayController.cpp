@@ -206,6 +206,8 @@ void  MultidisplayController::myconstructor() {
 	expanderWrite(0b10000011);        //This may needs to be modified when a third button is attached.
 
 	serialTime = millis();
+	typK_state = TYPK_STATE_NEXT_SELECT_CHANNEL;
+	typK_state_cur_channel = 0;
 }
 
 int MultidisplayController::read_adc_fast_mega (uint8_t channel){
@@ -1045,6 +1047,9 @@ int MultidisplayController::GetVDOPressure(unsigned int ADWreading) {
 //-------------------------------------------------------------------------------------------------------
 
 
+/**
+ * the original typK method
+ */
 void MultidisplayController::FetchTypK()  {
 	//This will read in all the needed Analog values, convert them to ï¿œC, and make the calibration with the LM35
 	//so it must be called after the AnaConversion!
@@ -1103,9 +1108,77 @@ void MultidisplayController::FetchTypK()  {
 	}
 }
 
+/**
+ * still untested!
+ * does not need the 20 msecs delay befor the typK reading
+ * TODO testme!
+ */
+void MultidisplayController::fetchTypK3_fast() {
+	switch ( typK_state ) {
+	case TYPK_STATE_NEXT_SELECT_CHANNEL :
+		incTypKChannel();
+		selectTypKchannelForReading (typK_state_cur_channel);
+		typK_state_time2read = millis() + 20;
+		typK_state = TYPK_STATE_NEXT_READ_CHANNEL;
+		break;
+	case TYPK_STATE_NEXT_READ_CHANNEL :
+		if ( millis() > typK_state_time2read ) {
+			readTypK(typK_state_cur_channel);
+			typK_state = TYPK_STATE_NEXT_SELECT_CHANNEL;
+		}
+		break;
+	}
+}
+
+/**
+ * modularized fetchTypK method
+ * TODO test me!
+ */
+void MultidisplayController::fetchTypK2()  {
+	for (uint8_t i=0; i < NUMBER_OF_ATTACHED_TYPK; i++) {
+		selectTypKchannelForReading (i);
+
+		delay(20);   //Due to the 0.1 ÂµF cap this is needed. The Cap should be there to get a stable reading! (from open to RT it takes 15ms, plus 5ms safety)
+
+		readTypK(i);
+	}
+}
 
 
+void MultidisplayController::selectTypKchannelForReading (uint8_t channel) {
+//	int  bin [] = {000, 1, 10, 11, 100, 101, 110, 111};
+//	row = bin[i];
+//	//r0 = row<<5;   		//Shift them 5 bits so they are 3 MSB (thats where the Selection Pins from the multiplexer are)
+//
+//	r0 = row<<2;   		//Shift them 2 bits becouse the MSB are the CS from the ADWs, and the next 3 are this ones. the 3 LSB are free but can blink :)
+	int r0 = channel << 2;
 
+	byte Mask = B11100011;
+	IOport2 = (IOport2 & Mask) | r0;
+
+	expanderWrite2(IOport2);    //writes it to the port
+}
+
+void MultidisplayController::readTypK ( uint8_t channel ) {
+	unsigned int Temp = 0;
+	Temp = ((5.0*read_adc(AGTPIN))/4096.0)*10000;   //gets the Volts and makes ï¿œV out of it (100 is already added from the Amp)
+	Temp = GetTypKTemp(Temp);                       //Converts the ï¿œV into Â°C
+
+	//Check if it is open:
+
+	if(Temp>=MAXTYPK) {
+		Temp = 0;
+	} else {
+		Temp += int(data.calCaseTemp);                       //apply the Correction
+	}
+
+	data.calAgt[channel] = Temp;              //Save it into the array
+
+	//Check if the Temp is a new Max Temp Event
+	if(Temp>=data.maxAgtValE[3]) {
+		SaveMax(3);
+	}
+}
 
 
 //----------------------------------------------------------------------------------------------------
