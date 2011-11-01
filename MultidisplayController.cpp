@@ -1268,9 +1268,9 @@ void MultidisplayController::mainLoop() {
 
 	//Read in all Analog values:
 	for(uint8_t i = 1; i <=16;i++) {
-//		data.anaIn[i] = read_adc_fast_mega (i);
+		data.anaIn[i] = read_adc_fast_mega (i);
 //		data.anaIn[i] = read_adc_fast (i);
-		data.anaIn[i] = read_adc (i);
+//		data.anaIn[i] = read_adc (i);
 	}
 
 	AnaConversion();
