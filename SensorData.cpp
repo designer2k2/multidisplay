@@ -81,7 +81,7 @@ void SensorData::myconstructor () {
 
 	//TypK Array init:
 	for (uint8_t i = 0; i < NUMBER_OF_ATTACHED_TYPK ; i++) 	{
-		calAgt[i] = 0;                      // initialize all the readings to 0
+		calAgt[i] = 0;
 	}
 
 #ifdef MULTIDISPLAY_V2

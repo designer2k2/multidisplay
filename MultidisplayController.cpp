@@ -210,6 +210,9 @@ void  MultidisplayController::myconstructor() {
 	typK_state_cur_channel = 0;
 }
 
+/*
+ * only for V2 pcb!
+ */
 int MultidisplayController::read_adc_fast_mega (uint8_t channel){
 
 	int adcvalue = 0;
@@ -237,6 +240,7 @@ int MultidisplayController::read_adc_fast_mega (uint8_t channel){
 
 		//TODO testme
 		uint8_t val = commandbits&1<<i;
+		//DATAOUT
 		if ( val ) {
 			//asm(code : output operand list : input operand list [: clobber list]);
 			asm("sbi %0,3" : : "I" (_SFR_IO_ADDR(PORTF)) );
@@ -245,21 +249,24 @@ int MultidisplayController::read_adc_fast_mega (uint8_t channel){
 		}
 
 		//cycle clock
-		asm("sbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
-		asm("cbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
+		//SPICLOCK
+		asm("sbi %0,4" : : "I" (_SFR_IO_ADDR(PORTA)) );
+		asm("cbi %0,4" : : "I" (_SFR_IO_ADDR(PORTA)) );
 	}
 
-	asm("sbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
-	asm("cbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
-	asm("sbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
-	asm("cbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
+	//SPICLOCK
+	asm("sbi %0,4" : : "I" (_SFR_IO_ADDR(PORTA)) );
+	asm("cbi %0,4" : : "I" (_SFR_IO_ADDR(PORTA)) );
+	asm("sbi %0,4" : : "I" (_SFR_IO_ADDR(PORTA)) );
+	asm("cbi %0,4" : : "I" (_SFR_IO_ADDR(PORTA)) );
 
 	//read bits from adc
 	for (int i=11 ; i>=0 ; i--){
 		adcvalue+=digitalReadFast(DATAIN)<<i;
 		//cycle clock
-		asm("sbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
-		asm("cbi %0,1" : : "I" (_SFR_IO_ADDR(PORTA)) );
+		//SPICLOCK
+		asm("sbi %0,4" : : "I" (_SFR_IO_ADDR(PORTA)) );
+		asm("cbi %0,4" : : "I" (_SFR_IO_ADDR(PORTA)) );
 	}
 
 	//deselct the MCP
@@ -874,17 +881,8 @@ void MultidisplayController::serialSend() {
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
 
 		//8 x 16 bit -> 16 bytes
-#ifdef TYPE_K
-		for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++)
-			Serial.write ( (uint8_t*) &(data.calAgt[i]), sizeof(int) );
-		outbuf = 0;
-		for ( uint8_t i = NUMBER_OF_ATTACHED_TYPK ; i < MAX_ATTACHED_TYPK ; i++)
-			Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
-#else
-		outbuf = 0;
 		for ( uint8_t i = 0 ; i < MAX_ATTACHED_TYPK ; i++)
-			Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
-#endif
+			Serial.write ( (uint8_t*) &(data.calAgt[i]), sizeof(int) );
 
 		// 2 bytes
 		outbuf = float2fixedintb100(data.batVolt);
