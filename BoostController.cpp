@@ -25,6 +25,10 @@ BoostController::BoostController() {
 }
 
 void BoostController::myconstructor() {
+
+	//PID doc
+	//http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/
+
 	boostOutput = 0;
 	n75_manual_normal = N75_MANUALDUTY_NORMAL;
 	n75_manual_race = N75_MANUALDUTY_RACE;
