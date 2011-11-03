@@ -53,6 +53,7 @@ void SensorData::myconstructor () {
 	calLambda = 0;
 	calLambdaF = 0;
 	calRPM = 0;
+	rpm_map_idx = 0;
 	calThrottle = 0;
 	calCaseTemp = 0.0;
 	calLMM = 0.0;

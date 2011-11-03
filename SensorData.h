@@ -48,6 +48,7 @@ public:
 	float calLambdaF;
 	int calLambda;
 	int calRPM;
+	uint8_t rpm_map_idx;
 	int calThrottle;
 	float calCaseTemp;
 	float calLMM;

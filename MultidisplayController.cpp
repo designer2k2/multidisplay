@@ -544,7 +544,7 @@ void MultidisplayController::AnaConversion() {
 	if ( data.calRPM >= data.maxRpmE[2] ) {
 		SaveMax(2);
 	}
-
+	data.rpm_map_idx = (uint8_t) map ( data.calRPM, 0, RPM_MAX_FOR_BOOST_CONTROL, 0, 255);
 
 	//Battery Voltage: (Directly from the Arduino!, so only 1024, not 4096.)
 	//measured Voltage * 4,09 + 0,7V should give the supply voltage

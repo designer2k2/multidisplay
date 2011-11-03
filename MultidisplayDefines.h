@@ -1,4 +1,4 @@
-/*
+/*w
     Copyright 2009-10 Stephan Martin, Dominik Gummel
 
     This file is part of Multidisplay.
@@ -49,6 +49,7 @@
 #define N75_MANUALDUTY_RACE 230
 #define BOOST_MODE_NORMAL 1
 #define BOOST_MODE_RACE 0
+#define RPM_MAX_FOR_BOOST_CONTROL 7000
 
 #define READFROMEEPROM
 
