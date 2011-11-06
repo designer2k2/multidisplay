@@ -234,7 +234,7 @@ void LCD4Bit::init () {
 
 //non-core stuff --------------------------------------
 
-void LCD4Bit::lcdCommandWriteAndPrintIn_P(uint8_t cmd, char *chars) {
+void LCD4Bit::lcdCommandWriteAndPrintIn_P(uint8_t cmd, const char *chars) {
 	commandWrite (cmd);
 	printIn_P(chars);
 }

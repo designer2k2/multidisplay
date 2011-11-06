@@ -36,6 +36,7 @@
 #include "LCDScreen8.h"
 #include "LCDScreen9.h"
 #include "LCDScreen10.h"
+#include "LCDScreen11.h"
 
 const uint8_t	LCDController::ystart[] = { 0x80, 0xC0, 0x94, 0xD4 };
 
@@ -43,7 +44,8 @@ LCDController::LCDController() {
 }
 
 void  LCDController::myconstructor() {
-	activeScreen = SCREENCOUNT-1;
+//	activeScreen = SCREENCOUNT-1;
+	activeScreen = 0;
 	brightness = 2;
 	lcdp = new LCD4Bit(4);
 	cbuf = (char*) malloc (sizeof(char) * LCD_BUFSIZE);
@@ -64,8 +66,16 @@ void  LCDController::myconstructor() {
 //    myScreens[6] = new LCDScreen9();
 //    myScreens[7] = new LCDScreen10();
 
-    myScreens[0] = new LCDScreen10();
-
+    myScreens[0] = new LCDScreen11();
+    myScreens[1] = new LCDScreen10();
+    myScreens[2] = new LCDScreen3();
+    myScreens[3] = new LCDScreen4();
+    myScreens[4] = new LCDScreen5();
+    myScreens[5] = new LCDScreen6();
+    myScreens[6] = new LCDScreen9();
+    myScreens[7] = new LCDScreen1();
+//    myScreens[8] = new LCDScreen2();
+//    myScreens[9] = new LCDScreen11();
 #else
     myScreens[0] = new LCDScreen10();
 #endif
@@ -86,9 +96,15 @@ void LCDController::draw() {
 }
 
 //The LCD brightness, what could be cycled through
+#ifdef MULTIDISPLAY_V2
+const uint8_t LCDController::LCDBrightnessD[]= {
+   255,125,50        //Change this for other settings depending on what you like
+ };
+#else
 const uint8_t LCDController::LCDBrightnessD[]= {
    50,125,255        //Change this for other settings depending on what you like
  };
+#endif
 
 void LCDController::toggleBrightness() {
 	if (brightness == 3)

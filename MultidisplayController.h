@@ -83,6 +83,8 @@ private:
      *
      *  4: eeprom: 1=save settings, 2 calibrate boost (measure and store ambient pressure)
      *
+     *  5: V2 dev debug / testing stuff
+     *
      *  attention, you have to send ints, not chars over the serial line!
      *
      *  ============ arduino -> pc ==================
@@ -166,6 +168,10 @@ private:
 	uint8_t df_kline_status;
 	uint16_t df_kline_discarded_frames;
 
+#endif
+
+#ifdef V2DEVDEBUG
+	uint8_t v2devdebugflag;
 #endif
 
 };

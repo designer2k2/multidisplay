@@ -44,6 +44,6 @@ public:
 	uint8_t n75_manual_race;
 };
 
-extern BoostController boostController;
+//extern BoostController boostController;
 
 #endif /* BOOSTCONTROLLER_H_ */

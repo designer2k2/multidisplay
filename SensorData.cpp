@@ -87,7 +87,8 @@ void SensorData::myconstructor () {
 
 #ifdef MULTIDISPLAY_V2
 	speed = 0;
-	gear = 0;
+	//FIXME implement gear detection!
+	gear = 5;
 	computed_n75 = 0;
 
 	df_cyl1_retard = 0;

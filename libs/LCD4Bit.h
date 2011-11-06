@@ -24,7 +24,7 @@ public:
   void cursorTo(int line_num, int x);
   void leftScroll(int chars, int delay_time);
 
-  void lcdCommandWriteAndPrintIn_P(uint8_t cmd, char *chars);
+  void lcdCommandWriteAndPrintIn_P(uint8_t cmd, const char *chars);
   //end of non-core--------
 
   //4bit only, therefore ideally private but may be needed by user

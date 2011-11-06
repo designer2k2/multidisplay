@@ -41,6 +41,8 @@
 //on boostpin2
 //#define BOOST_BOSCH_200KPA
 
+#define GEARS 6
+
 #define BOOSTN75
 //#define BOOSTPID
 #define BOOST_NORMAL 1.0
@@ -62,6 +64,8 @@
 //----------------------------------------------------------------------------------------------------
 
 //Options:
+
+#define V2DEVDEBUG 1
 
 //#define DEBUG 1
 //#define LCDTEST 1

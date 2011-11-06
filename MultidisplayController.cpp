@@ -23,6 +23,7 @@
 #include "LCDScreen8.h"
 #include "LCDScreen7.h"
 #include "BoostController.h"
+#include "RPMBoostController.h"
 
 #include <stdlib.h>
 #include <inttypes.h>
@@ -208,6 +209,10 @@ void  MultidisplayController::myconstructor() {
 	serialTime = millis();
 	typK_state = TYPK_STATE_NEXT_SELECT_CHANNEL;
 	typK_state_cur_channel = 0;
+
+#ifdef V2DEVDEBUG
+	v2devdebugflag = 0;
+#endif
 }
 
 /*
@@ -523,6 +528,9 @@ void MultidisplayController::AnaConversion() {
 	data.calLMM = 5.0*data.anaIn[LMMPIN]/4096.0;		   //makes 0.0 to 5.0 Volt out of it, with VagCom this could be maped to gr Air i think
 #endif
 
+#ifdef V2DEVDEBUG
+	if ( (v2devdebugflag & 1) == 0 ) {
+#endif
 	//RPM
 	//(from the smoothing example)
 	//TODO more smoothing below 1000 rpm
@@ -544,7 +552,11 @@ void MultidisplayController::AnaConversion() {
 	if ( data.calRPM >= data.maxRpmE[2] ) {
 		SaveMax(2);
 	}
-	data.rpm_map_idx = (uint8_t) map ( data.calRPM, 0, RPM_MAX_FOR_BOOST_CONTROL, 0, 255);
+	data.rpm_map_idx = (uint8_t) map ( constrain (data.calRPM, 0, RPM_MAX_FOR_BOOST_CONTROL),
+			0, RPM_MAX_FOR_BOOST_CONTROL, 0, 255);
+#ifdef V2DEVDEBUG
+	}
+#endif
 
 	//Battery Voltage: (Directly from the Arduino!, so only 1024, not 4096.)
 	//measured Voltage * 4,09 + 0,7V should give the supply voltage
@@ -677,6 +689,9 @@ void MultidisplayController::serialReceive() {
 					case 3:
 						readSettingsFromEeprom();
 						break;
+					case 5:
+						lcdController.setBrightness(srData.asBytes[1]);
+						break;
 #endif
 					case 4:
 						//set new manual n75 boost dutycycles
@@ -688,6 +703,26 @@ void MultidisplayController::serialReceive() {
 					}
 				}
 				break;
+#ifdef V2DEVDEBUG
+			case 5:
+				//V2 debugging stuff
+				if (index >= 2){
+					switch ( srData.asBytes[0] ) {
+					case 0: //disable RPM computation
+						if ( srData.asBytes[1] == 1 )
+							v2devdebugflag = v2devdebugflag  | 1;
+						else
+							v2devdebugflag = v2devdebugflag  & 254;
+						break;
+					case 1: // set RPM
+						int rpm = srData.asBytes[1] << 8 | srData.asBytes[2];
+						data.calRPM = rpm;
+						data.rpm_map_idx = (uint8_t) map ( constrain (data.calRPM, 0, RPM_MAX_FOR_BOOST_CONTROL), 0, RPM_MAX_FOR_BOOST_CONTROL, 0, 255);
+						break;
+					}
+				}
+				break;
+#endif
 		}
 	}
 
@@ -714,10 +749,14 @@ void MultidisplayController::saveSettings2Eeprom() {
 
 void MultidisplayController::readSettingsFromEeprom() {
 	//what screen was last shown?
-	//FIXME
-	//	lcdController.setActiveScreen (EEPROM.read(100));
+	uint8_t t = EEPROM.read(100);
+	if ( t < SCREENCOUNT )
+		lcdController.setActiveScreen (t);
+	else
+		lcdController.setActiveScreen (0);
 
-	lcdController.setBrightness (EEPROM.read(105));    //The Brightness from the LCD
+	lcdController.setBrightness (EEPROM.read(105));
+
 	uint8_t ldp = EEPROM.read(EEPROM_LDCALPOINT);
 	if ( ldp >= 0 && ldp <= 20 )
 		data.ldCalPoint = ldp;

@@ -42,7 +42,7 @@ LCDScreen1::LCDScreen1() {
 
 void LCDScreen1::customInit() {
 	//Line1
-	lcdp->lcdCommandWriteAndPrintIn_P (0x80, PSTR("EGT:"));
+	lcdp->lcdCommandWriteAndPrintIn_P (0x80, PSTR( "EGT:"));
 	//Line=3
 	lcdp->lcdCommandWriteAndPrintIn_P (0x94, PSTR("LD:        Max:"));
 }

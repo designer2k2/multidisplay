@@ -24,6 +24,7 @@
 #include "MultidisplayController.h"
 #include "SensorData.h"
 #include "BoostController.h"
+#include "RPMBoostController.h"
 
 /*
 ToDo:
@@ -40,7 +41,7 @@ SensorData data;
 LCDController lcdController;
 MultidisplayController mController;
 #ifdef BOOSTN75
-BoostController boostController;
+RPMBoostController boostController;
 #endif
 
 int main(void) {
