@@ -673,6 +673,9 @@ void MultidisplayController::serialReceive() {
 						case 2:
 							SerOut = SERIALOUT_ENABLED;
 							break;
+						case 0:
+							SerOut = SERIALOUT_DISABLED;
+							break;
 					}
 				}
 				break;
