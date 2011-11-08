@@ -45,7 +45,7 @@ uint16_t freeMem(void) {
 }
 
 //http://www.openobject.org/opensourceurbanism/Storing_Data
-void EEPROMWriteDouble(int p_address, long p_value)
+void EEPROMWriteLong(int p_address, long p_value)
 {
 	byte Byte1 = ((p_value >> 0) & 0xFF);
 	byte Byte2 = ((p_value >> 8) & 0xFF);
@@ -58,7 +58,7 @@ void EEPROMWriteDouble(int p_address, long p_value)
 	EEPROM.write(p_address + 3, Byte4);
 }
 
-long EEPROMReadDouble(int p_address) {
+long EEPROMReadLong(int p_address) {
 	byte Byte1 = EEPROM.read(p_address);
 	byte Byte2 = EEPROM.read(p_address + 1);
 	byte Byte3 = EEPROM.read(p_address + 2);

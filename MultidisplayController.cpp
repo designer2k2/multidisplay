@@ -710,17 +710,27 @@ void MultidisplayController::serialReceive() {
 			case 5:
 				//V2 debugging stuff
 				if (index >= 2){
+					int rpm = 0;
 					switch ( srData.asBytes[0] ) {
-					case 0: //disable RPM computation
+					case 0: //disable RPM computation if 1
 						if ( srData.asBytes[1] == 1 )
 							v2devdebugflag = v2devdebugflag  | 1;
 						else
 							v2devdebugflag = v2devdebugflag  & 254;
 						break;
 					case 1: // set RPM
-						int rpm = srData.asBytes[1] << 8 | srData.asBytes[2];
+						rpm = srData.asBytes[1] << 8 | srData.asBytes[2];
 						data.calRPM = rpm;
 						data.rpm_map_idx = (uint8_t) map ( constrain (data.calRPM, 0, RPM_MAX_FOR_BOOST_CONTROL), 0, RPM_MAX_FOR_BOOST_CONTROL, 0, 255);
+						break;
+					case 2: //disable N75 computation if 1
+						if ( srData.asBytes[1] == 1 )
+							v2devdebugflag = v2devdebugflag  | 2;
+						else
+							v2devdebugflag = v2devdebugflag  & 253;
+						break;
+					case 3: //set manual n75 duty cycle
+						boostController.boostOutput = (double) srData.asBytes[1];
 						break;
 					}
 				}
@@ -741,7 +751,7 @@ void MultidisplayController::saveSettings2Eeprom() {
 		EEPROM.write(EEPROM_LDCALPOINT, ldp);
 	float ldt = data.boostAmbientPressureBar;
 	if ( ldt > 0.0 && ldt < 1.2 )
-		EEPROMWriteDouble (EEPROM_AMBIENTPRESSURE, ldt*1000);
+		EEPROMWriteLong (EEPROM_AMBIENTPRESSURE, ldt*1000);
 #endif
 
 #ifdef BOOSTN75
@@ -763,7 +773,7 @@ void MultidisplayController::readSettingsFromEeprom() {
 	uint8_t ldp = EEPROM.read(EEPROM_LDCALPOINT);
 	if ( ldp >= 0 && ldp <= 20 )
 		data.ldCalPoint = ldp;
-	float ldt = EEPROMReadDouble(EEPROM_AMBIENTPRESSURE)/1000.0;      //gets the float back (thats accurate enough)
+	float ldt = EEPROMReadLong(EEPROM_AMBIENTPRESSURE)/1000.0;      //gets the float back (thats accurate enough)
 	if ( ldt > 0.0 && ldt < 1.2 )
 		data.boostAmbientPressureBar = ldt;
 
@@ -1017,7 +1027,7 @@ void MultidisplayController::CalibrateLD()
 	data.ldCalPoint = map(data.anaIn[BOOSTPIN], 0, 4096, 0, 200) / 10;
 	//and saved:
 	EEPROM.write(EEPROM_LDCALPOINT,data.ldCalPoint);
-	EEPROMWriteDouble(EEPROM_AMBIENTPRESSURE,data.boostAmbientPressureBar*1000);    //writes the float as long, will do it.
+	EEPROMWriteLong(EEPROM_AMBIENTPRESSURE,data.boostAmbientPressureBar*1000);    //writes the float as long, will do it.
 
 	//The MaxLD will be reset!
 	data.maxLd = 0.0;
@@ -1375,7 +1385,13 @@ void MultidisplayController::mainLoop() {
 	//switch connects pin to groud
 	boostController.toggleMode ( digitalRead(NORDSCHLEIFENPIN) );
 
+#ifdef V2DEVDEBUG
+	if ( (v2devdebugflag & 2) == 0 ) {
+#endif
 	boostController.compute();
+#ifdef V2DEVDEBUG
+	}
+#endif
 	analogWrite(N75PIN, (int) boostController.boostOutput);
 //	analogWrite(FREEPWM2, (int) boostController.boostOutput);
 #endif

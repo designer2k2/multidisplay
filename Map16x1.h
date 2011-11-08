@@ -17,6 +17,7 @@ public:
 
 	uint8_t map (uint8_t idx);
 	void loadFromEeprom (int address);
+	void writeToEeprom (int address);
 
 	uint8_t *data;
 };

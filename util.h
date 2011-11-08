@@ -26,8 +26,8 @@ typedef uint8_t byte;
 
 uint16_t freeMem(void);
 
-void EEPROMWriteDouble(int p_address, long p_value);
-long EEPROMReadDouble(int p_address);
+void EEPROMWriteLong(int p_address, long p_value);
+long EEPROMReadLong(int p_address);
 
 int float2fixedintb100 (float in);
 float fixedintb1002float (int in);

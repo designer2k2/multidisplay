@@ -29,3 +29,9 @@ void Map16x1::loadFromEeprom (int address) {
 	for ( uint8_t i = 0 ; i < 16 ; i++ )
 		*(data+i) = EEPROM.read(address + i);
 }
+
+void Map16x1::writeToEeprom (int address) {
+	for ( uint8_t i = 0 ; i < 16 ; i++ )
+		EEPROM.write(address + i, *(data+i));
+}
+
