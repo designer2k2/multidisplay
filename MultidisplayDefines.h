@@ -228,6 +228,10 @@ typedef unsigned char byte;
  * 105 | byte | brightness
  * 200 | double | calLD
  * 205 | byte | ldCalPoint
+ * 3511 | word | 6 n75 boost low setpoint maps for pid (16x1 maps)
+ * 3707 | word | 6 n75 boost high setpoint maps for pid (16x1 maps)
+ * 3903 | byte | 6 n75 low duty cycle maps (16x1 maps)
+ * 3999 | byte | 6 n75 high duty cycle maps (16x1 maps)
  */
 #define EEPROM_N75_MANUALDUTY_NORMAL 0
 #define EEPROM_N75_MANUALDUTY_RACE 1
@@ -235,7 +239,10 @@ typedef unsigned char byte;
 #define EEPROM_BRIGHTNESS 105
 #define EEPROM_AMBIENTPRESSURE 200
 #define EEPROM_LDCALPOINT 205
-
+#define EEPROM_N75_PID_LOW_SETPOINT_MAPS 3511
+#define EEPROM_N75_PID_HIGH_SETPOINT_MAPS 3707
+#define EEPROM_N75_LOW_DUTY_CYCLE_MAPS 3903
+#define EEPROM_N75_HIGH_DUTY_CYCLE_MAPS 3999
 
 #define DF_KLINESERIALFREQ 1
 #define DF_KLINEFRAMESIZE 34 //including stx / etx bytes
@@ -245,6 +252,8 @@ typedef unsigned char byte;
 #define DF_KLINE_STATUS_RECEIVING 1
 #define DF_KLINE_STATUS_FRAME_COMPLETE 2
 #define DF_KLINE_STATUS_FRAMEERROR 3
+
+
 
 
 #endif /* MULTIDISPLAY_DEFINES_H_ */

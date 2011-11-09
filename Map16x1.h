@@ -22,4 +22,16 @@ public:
 	uint8_t *data;
 };
 
+class Map16x1Double {
+public:
+	Map16x1Double();
+	virtual ~Map16x1Double();
+
+	uint8_t map (uint8_t idx);
+	void loadFromEeprom (int address);
+	void writeToEeprom (int address);
+
+	double *data;
+};
+
 #endif /* MAP16X1_H_ */

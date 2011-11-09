@@ -12,6 +12,7 @@
 #include "util.h"
 
 class Map16x1;
+class Map16x1Double;
 
 class RPMBoostController {
 public:
@@ -23,10 +24,10 @@ public:
 
 	uint8_t mode;
 	Map16x1* highboost_duty_cycle[GEARS];
-	Map16x1* highboost_pid_boost[GEARS];
+	Map16x1Double* highboost_pid_boost[GEARS];
 
 	Map16x1* lowboost_duty_cycle[GEARS];
-	Map16x1* lowboost_pid_boost[GEARS];
+	Map16x1Double* lowboost_pid_boost[GEARS];
 
 	double boostOutput;
 
