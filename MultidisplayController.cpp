@@ -598,28 +598,28 @@ void MultidisplayController::Shiftlight()
 
 void MultidisplayController::serialReceive() {
 
-	int index=0;
-	byte Auto_Man = -1;
-	while(Serial.available()&&index<25)
+	int bytes_read=0;
+	byte command = -1;
+	while(Serial.available()&&bytes_read<49)
 	{
-		if(index==0) {
-			Auto_Man = Serial.read();
+		if(bytes_read==0) {
+			command = Serial.read();
 		} else
-			srData.asBytes[index-1] = Serial.read();
-		index++;
+			srData.asBytes[bytes_read-1] = Serial.read();
+		bytes_read++;
 	}
 
 	// if the information we got was in the correct format,
 	// read it into the system
 	// case 1: command for pid lib
-	if(index==25  && (Auto_Man==0 || Auto_Man==1))
+	if(bytes_read==25  && (command==0 || command==1))
 	{
 #ifdef BOOSTN75
 
 		/* we get fixed point values (base 1000) from the pc ! */
 
 		boostController.boostSetPoint = double(srData.asFixedInt32[0] / 1000.0);
-		if(Auto_Man==0) {
+		if(command==0) {
 			// * only change the output if we are in manual mode
 			boostController.boostOutput = double(srData.asFixedInt32[2] / 1000.0);
 		}
@@ -633,7 +633,7 @@ void MultidisplayController::serialReceive() {
 		if ( boostController.boostPid != NULL ) {
 			boostController.boostPid->SetTunings(p, i, d);
 
-			if(Auto_Man==0)
+			if(command==0)
 				boostController.boostPid->SetMode(MANUAL);// * set the controller mode
 			else
 				boostController.boostPid->SetMode(AUTO);
@@ -642,9 +642,9 @@ void MultidisplayController::serialReceive() {
 
 #endif
 	} else 	{
-		switch (Auto_Man) {
+		switch (command) {
 			case 2:
-				if (index >= 2) {
+				if (bytes_read >= 2) {
 				//command for multidisplay
 
 					switch ( srData.asBytes[0] ) {
@@ -665,7 +665,7 @@ void MultidisplayController::serialReceive() {
 				break;
 
 			case 3:
-				if (index >= 2) {
+				if (bytes_read >= 2) {
 					switch ( srData.asBytes[0] ) {
 						case 3:
 							SerOut = SERIALOUT_TUNERPRO_ADX;
@@ -680,7 +680,7 @@ void MultidisplayController::serialReceive() {
 				}
 				break;
 			case 4:
-				if (index >= 2){
+				if (bytes_read >= 2){
 					switch ( srData.asBytes[0] ) {
 #ifdef MULTIDISPLAY_V2
 					case 1:
@@ -698,7 +698,7 @@ void MultidisplayController::serialReceive() {
 #endif
 					case 4:
 						//set new manual n75 boost dutycycles
-						if (index >= 4) {
+						if (bytes_read >= 4) {
 							boostController.n75_manual_normal = srData.asBytes[1];
 							boostController.n75_manual_race = srData.asBytes[2];
 						}
@@ -709,7 +709,7 @@ void MultidisplayController::serialReceive() {
 #ifdef V2DEVDEBUG
 			case 5:
 				//V2 debugging stuff
-				if (index >= 2){
+				if (bytes_read >= 2){
 					int rpm = 0;
 					switch ( srData.asBytes[0] ) {
 					case 0: //disable RPM computation if 1
@@ -736,10 +736,63 @@ void MultidisplayController::serialReceive() {
 				}
 				break;
 #endif
+			case 6:
+				//V2 N75 config
+				if ( bytes_read >= 2 ) {
+					switch ( srData.asBytes[0] ) {
+					case 1: // gearX mode(low=0 high=1) serial : request gearX high/low duty cycle map
+						if ( bytes_read >= 5 ) {
+							boostController.serialSendDutyMap ( srData.asBytes[1], srData.asBytes[2], srData.asBytes[3]);
+						}
+						break;
+					case 2:
+						if ( bytes_read >= 5 ) {
+							boostController.serialSendSetpointMap ( srData.asBytes[1], srData.asBytes[2], srData.asBytes[3]);
+						}
+						break;
+					case 3:
+						//2 gearX mode(low=0 high=1) serial 16 bytes map values: set gearX high/low duty cycle map [size 21]
+						//  		reply: STX tag=24 gearX mode serial 16 bytes map ETX neu geschriebene map zurücksenden!
+						if ( bytes_read >= 21 ) {
+							boostController.setDutyMap ( srData.asBytes[1], srData.asBytes[2], &(srData.asBytes[4]) );
+							boostController.serialSendDutyMap ( srData.asBytes[1], srData.asBytes[2], srData.asBytes[3]);
+						}
+						break;
+					case 4:
+						if ( bytes_read >= 37 ) {
+							boostController.setSetpointMap ( srData.asBytes[1], srData.asBytes[2], (uint16_t*) &(srData.asBytes[4]) );
+							boostController.serialSendSetpointMap ( srData.asBytes[1], srData.asBytes[2], srData.asBytes[3]);
+						}
+						break;
+					case 5:
+						//load
+						if ( bytes_read >= 3 ) {
+							boostController.loadFromEEprom();
+							serialSendAck (srData.asBytes[1]);
+						}
+						break;
+					case 6:
+						//Save
+						if ( bytes_read >= 3 ) {
+							boostController.writeToEEprom();
+							serialSendAck (srData.asBytes[1]);
+						}
+						break;
+					}
+				}
+
 		}
 	}
 
 	Serial.flush();                         // * clear any random data from the serial buffer
+}
+
+void MultidisplayController::serialSendAck (uint8_t serial) {
+	Serial.print("\2");
+	uint8_t outbuf = SERIALOUT_BINARY_TAG_ACK;
+	Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
+	Serial.write ( (uint8_t*) &(serial), sizeof(uint8_t) );
+	Serial.print("\3");
 }
 
 void MultidisplayController::saveSettings2Eeprom() {

@@ -82,18 +82,36 @@ private:
      *  3: change serial mode: 2=enabled(string), 3=tunerpro adx request data
      *
      *  4: eeprom: 1=save settings, 2 calibrate boost (measure and store ambient pressure)
+     *  			3 readSettings, 5 set lcd brightness, 4 set v1 n75 duty cycles
      *
      *  5: V2 dev debug / testing stuff
+     *
+     *  6: n75 v2:
+     *  	1 gearX mode(low=0 high=1) serial : request gearX high/low duty cycle map
+     *  		reply: STX tag=24 gearX mode serial 16 bytes map ETX
+     *  	2 gearX mode(low=0 high=1) serial : request gearX high/low setpoint map
+     *  		reply: STX tag=40 gearX mode serial 32 bytes map ETX fixed point 16 bit values base 100!
+     *  	3 gearX mode(low=0 high=1) serial 16 bytes map values: set gearX high/low duty cycle map [size 21]
+     *  		reply: STX tag=24 gearX mode serial 16 bytes map ETX neu geschriebene map zurücksenden!
+     *  	4 gearX mode(low=0 high=1) serial 32 bytes map values (fixed point base 100): set gearX high/low setpoint map [size 37]
+     *  		reply: STX tag=40 gearX mode serial 32 bytes map ETX fixed point 16 bit values base 100!
+     *  	5 serial load maps from eeprom
+     *  		reply: STX 4 serial ETX	ACK!
+     *  	6 serial save maps to eeprom
+     *  		reply: STX 4 serial ETX	ACK!
      *
      *  attention, you have to send ints, not chars over the serial line!
      *
      *  ============ arduino -> pc ==================
-     *  pid messages from arduino to pc are prefixed with "PID " as chars!
+     *  [old v1, deprecated] pid messages from arduino to pc are prefixed with "PID " as chars!
+     *
+     *  serial data stream:
+     *  STX TAG(=also complete frame length) data ETX
      */
     union {
-      byte asBytes[24];
-      float asFloat[6];
-      int32_t asFixedInt32[6];
+      byte asBytes[48];
+      float asFloat[12];
+      int32_t asFixedInt32[12];
     } srData;
 
 	int read_adc(uint8_t channel);
@@ -109,6 +127,7 @@ private:
 	void Shiftlight();
 
 	void serialSend();
+	void serialSendAck (uint8_t serial);
 	void serialReceive();
 
 	int GetTypKTemp(unsigned int microVolts);

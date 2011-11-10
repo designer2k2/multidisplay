@@ -19,6 +19,15 @@ public:
 	RPMBoostController();
 	void myconstructor ();
 
+	void serialSendDutyMap ( uint8_t gear, uint8_t mode, uint8_t serial );
+	void serialSendSetpointMap ( uint8_t gear, uint8_t mode, uint8_t serial );
+
+	void setDutyMap ( uint8_t gear, uint8_t mode, uint8_t *data );
+	void setSetpointMap ( uint8_t gear, uint8_t mode, uint16_t *data );
+
+	void loadFromEEprom ();
+	void writeToEEprom ();
+
 	void toggleMode (uint8_t nmode);
 	void compute ();
 

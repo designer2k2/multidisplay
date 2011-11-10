@@ -193,6 +193,9 @@ typedef unsigned char byte;
 
 //84 bytes
 #define SERIALOUT_BINARY_TAG 84
+#define SERIALOUT_BINARY_TAG_N75_DUTY_MAP 24
+#define SERIALOUT_BINARY_TAG_N75_SETPOINT_MAP 40
+#define SERIALOUT_BINARY_TAG_ACK 4
 
 //send and receive each SERIALFREQ millisecs!
 #define SERIALFREQ 10
