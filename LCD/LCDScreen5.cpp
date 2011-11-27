@@ -28,7 +28,7 @@
 LCDScreen5::LCDScreen5() {
 	flags.f.doCal=1;
 	flags.f.doTypK = 1;
-	flags.f.serial = SERIALOUT_ENABLED;
+	flags.f.serial = SERIALOUT_BINARY;
 	flags.f.refreshRate = 10;
 	flags.f.loadBar = 0;
 	flags.f.loadDot = 0;

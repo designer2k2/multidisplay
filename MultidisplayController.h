@@ -88,13 +88,13 @@ private:
      *
      *  6: n75 v2:
      *  	1 gearX mode(low=0 high=1) serial : request gearX high/low duty cycle map
-     *  		reply: STX tag=24 gearX mode serial 16 bytes map ETX
+     *  		reply: STX tag=22 gearX mode serial 16 bytes map ETX
      *  	2 gearX mode(low=0 high=1) serial : request gearX high/low setpoint map
-     *  		reply: STX tag=40 gearX mode serial 32 bytes map ETX fixed point 16 bit values base 100!
+     *  		reply: STX tag=38 gearX mode serial 32 bytes map ETX fixed point 16 bit values base 100!
      *  	3 gearX mode(low=0 high=1) serial 16 bytes map values: set gearX high/low duty cycle map [size 21]
-     *  		reply: STX tag=24 gearX mode serial 16 bytes map ETX neu geschriebene map zurücksenden!
+     *  		reply: STX tag=22 gearX mode serial 16 bytes map ETX neu geschriebene map zurücksenden!
      *  	4 gearX mode(low=0 high=1) serial 32 bytes map values (fixed point base 100): set gearX high/low setpoint map [size 37]
-     *  		reply: STX tag=40 gearX mode serial 32 bytes map ETX fixed point 16 bit values base 100!
+     *  		reply: STX tag=38 gearX mode serial 32 bytes map ETX fixed point 16 bit values base 100!
      *  	5 serial load maps from eeprom
      *  		reply: STX 4 serial ETX	ACK!
      *  	6 serial save maps to eeprom
@@ -187,6 +187,17 @@ private:
 	uint8_t df_kline_status;
 	uint16_t df_kline_discarded_frames;
 
+#endif
+
+#if defined(MULTIDISPLAY_V2) && defined(GEAR_RECOGNITION)
+
+#define GEAR_STATE_NEED_RECOGNITION 0
+#define GEAR_STATE_MATCHED 1
+#define GEAR_COMPUTATION_INTERVALL 200
+
+	void gear_computation ();
+	uint8_t gear_state;
+	unsigned long gear_computation_time;
 #endif
 
 #ifdef V2DEVDEBUG

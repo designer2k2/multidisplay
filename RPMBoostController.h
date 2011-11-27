@@ -14,6 +14,9 @@
 class Map16x1;
 class Map16x1Double;
 
+#define BOOSTLIMIT 1.7
+#define PID_ACTIVATION_THRESHOLD 0.2
+
 class RPMBoostController {
 public:
 	RPMBoostController();

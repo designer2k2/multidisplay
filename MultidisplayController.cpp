@@ -213,6 +213,10 @@ void  MultidisplayController::myconstructor() {
 #ifdef V2DEVDEBUG
 	v2devdebugflag = 0;
 #endif
+
+#if defined(MULTIDISPLAY_V2) && defined(GEAR_RECOGNITION)
+	gear_state = GEAR_STATE_NEED_RECOGNITION;
+#endif
 }
 
 /*
@@ -623,7 +627,8 @@ void MultidisplayController::serialReceive() {
 			// * only change the output if we are in manual mode
 			boostController.boostOutput = double(srData.asFixedInt32[2] / 1000.0);
 		}
-
+#endif
+		;
 #ifdef BOOSTPID
 		double p, i, d;  // * read in and set the controller tunings
 		p = double(srData.asFixedInt32[3] / 1000.0);
@@ -640,7 +645,7 @@ void MultidisplayController::serialReceive() {
 		}
 #endif
 
-#endif
+
 	} else 	{
 		switch (command) {
 			case 2:
@@ -675,6 +680,9 @@ void MultidisplayController::serialReceive() {
 							break;
 						case 0:
 							SerOut = SERIALOUT_DISABLED;
+							break;
+						case 4:
+							SerOut = SERIALOUT_BINARY;
 							break;
 					}
 				}
@@ -752,7 +760,7 @@ void MultidisplayController::serialReceive() {
 						break;
 					case 3:
 						//2 gearX mode(low=0 high=1) serial 16 bytes map values: set gearX high/low duty cycle map [size 21]
-						//  		reply: STX tag=24 gearX mode serial 16 bytes map ETX neu geschriebene map zurücksenden!
+						//  		reply: STX tag=22 gearX mode serial 16 bytes map ETX neu geschriebene map zurücksenden!
 						if ( bytes_read >= 21 ) {
 							boostController.setDutyMap ( srData.asBytes[1], srData.asBytes[2], &(srData.asBytes[4]) );
 							boostController.serialSendDutyMap ( srData.asBytes[1], srData.asBytes[2], srData.asBytes[3]);
@@ -771,20 +779,20 @@ void MultidisplayController::serialReceive() {
 							serialSendAck (srData.asBytes[1]);
 						}
 						break;
-					case 6:
-						//Save
-						if ( bytes_read >= 3 ) {
-							boostController.writeToEEprom();
-							serialSendAck (srData.asBytes[1]);
-						}
-						break;
+//					case 6:
+//						//Save
+//						if ( bytes_read >= 3 ) {
+//							boostController.writeToEEprom();
+//							serialSendAck (srData.asBytes[1]);
+//						}
+//						break;
 					}
-				}
 
+				}
+				break;
 		}
 	}
-
-	Serial.flush();                         // * clear any random data from the serial buffer
+//	Serial.flush();
 }
 
 void MultidisplayController::serialSendAck (uint8_t serial) {
@@ -816,10 +824,12 @@ void MultidisplayController::saveSettings2Eeprom() {
 void MultidisplayController::readSettingsFromEeprom() {
 	//what screen was last shown?
 	uint8_t t = EEPROM.read(100);
-	if ( t < SCREENCOUNT )
-		lcdController.setActiveScreen (t);
-	else
-		lcdController.setActiveScreen (0);
+//	if ( t < SCREENCOUNT )
+//		lcdController.setActiveScreen (t);
+//	else
+//		lcdController.setActiveScreen (0);
+	//FIXME hack
+	lcdController.setActiveScreen (0);
 
 	lcdController.setBrightness (EEPROM.read(105));
 
@@ -873,7 +883,9 @@ void MultidisplayController::serialSend() {
 //	}
 //#endif /* BOOSTN75 */
 
-	Serial.print("\2");
+	if ( SerOut != SERIALOUT_DISABLED )
+		Serial.print("\2");
+
 	switch(SerOut){
 	case SERIALOUT_DISABLED:
 		break;
@@ -1027,7 +1039,9 @@ void MultidisplayController::serialSend() {
 		SerOut = SERIALOUT_DISABLED;
 		break;
 	}
-	Serial.print("\3");
+
+	if ( SerOut != SERIALOUT_DISABLED )
+		Serial.print("\3");
 }
 
 void MultidisplayController::HeaderPrint() {
@@ -1464,6 +1478,11 @@ void MultidisplayController::mainLoop() {
 	}
 #endif
 
+#if defined(MULTIDISPLAY_V2) && defined(GEAR_RECOGNITION)
+	if ( millis() > gear_computation_time )
+		gear_computation();
+#endif
+
 }
 
 
@@ -1719,5 +1738,21 @@ void MultidisplayController::DFConvertReceivedData() {
 	data.df_total_retard = data.df_cyl1_retard + data.df_cyl2_retard + data.df_cyl3_retard + data.df_cyl4_retard;
 }
 
+void MultidisplayController::gear_computation () {
+
+	switch (gear_state) {
+	case GEAR_STATE_NEED_RECOGNITION:
+		/*
+#define ABROLLUMFANG 1.764
+		float ratio = ( data.calRPM * 6 * ABROLLUMFANG ) / ( sensor.speed * 100 );
+		*/
+		break;
+	case GEAR_STATE_MATCHED:
+		/*
+		 * need recomputation if clutch pressed
+		 */
+		break;
+	}
+}
 
 #endif
