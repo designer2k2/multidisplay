@@ -146,8 +146,8 @@ void  MultidisplayController::myconstructor() {
 	//test
 	pinMode (NORDSCHLEIFENPIN, INPUT);
 	digitalWrite( NORDSCHLEIFENPIN, HIGH); // turn on pullup resistors
-	pinMode (FREEANALOG2, INPUT);
-	digitalWrite( FREEANALOG2, HIGH); // turn on pullup resistors
+	pinMode (CLUTCHPIN, INPUT);
+	digitalWrite( CLUTCHPIN, HIGH); // turn on pullup resistors
 
 	pinMode (N75PIN, OUTPUT);
 	//http://www.arduino.cc/playground/Main/TimerPWMCheatsheet
@@ -216,6 +216,25 @@ void  MultidisplayController::myconstructor() {
 
 #if defined(MULTIDISPLAY_V2) && defined(GEAR_RECOGNITION)
 	gear_state = GEAR_STATE_NEED_RECOGNITION;
+
+	//TODO move to eeprom
+
+	//Corrado 02A ATB
+//	gear_ratio[0] = 13.0341;
+//	gear_ratio[1] = 7.26225;
+//	gear_ratio[2] = 4.64025;
+//	gear_ratio[3] = 3.34995;
+//	gear_ratio[4] = 2.74275;
+//	gear_ratio[5] = 2.74275;
+
+	//Corrado AYN
+	gear_ratio[0] = 13.918152;
+	gear_ratio[1] = 7.802712;
+	gear_ratio[2] = 4.95498;
+	gear_ratio[3] = 3.577164;
+	gear_ratio[4] = 2.785;
+	gear_ratio[5] = 2.785;
+
 #endif
 }
 
@@ -1479,6 +1498,20 @@ void MultidisplayController::mainLoop() {
 #endif
 
 #if defined(MULTIDISPLAY_V2) && defined(GEAR_RECOGNITION)
+
+	/*
+	 * clutch in -> sw connects through
+	 * clutch separates -> infinity resistance
+	 *
+	 * -> add pulldown
+	 */
+	if ( ! digitalRead(CLUTCHPIN) )
+		gear_state = GEAR_STATE_NEED_RECOGNITION_WAIT_FOR_CLUTCH_IN;
+	else {
+		if ( gear_state == GEAR_STATE_NEED_RECOGNITION_WAIT_FOR_CLUTCH_IN )
+			gear_state = GEAR_STATE_NEED_RECOGNITION;
+	}
+
 	if ( millis() > gear_computation_time )
 		gear_computation();
 #endif
@@ -1740,17 +1773,30 @@ void MultidisplayController::DFConvertReceivedData() {
 
 void MultidisplayController::gear_computation () {
 
+	float ratio = 0;
 	switch (gear_state) {
 	case GEAR_STATE_NEED_RECOGNITION:
-		/*
+
 #define ABROLLUMFANG 1.764
-		float ratio = ( data.calRPM * 6 * ABROLLUMFANG ) / ( sensor.speed * 100 );
-		*/
+		ratio = ( data.calRPM * 6 * ABROLLUMFANG ) / ( data.speed * 100 );
+
+		for ( uint8_t i = 0 ; i < GEARS ; i++ ) {
+			float lower = gear_ratio[i] * 0.9;
+			float upper = gear_ratio[i] * 1.1;
+
+			if ( (lower < ratio) && (ratio < upper) ) {
+				data.gear = i+1;
+				gear_state = GEAR_STATE_MATCHED;
+				return;
+			}
+		}
+
 		break;
 	case GEAR_STATE_MATCHED:
 		/*
 		 * need recomputation if clutch pressed
 		 */
+		data.gear = 0;
 		break;
 	}
 }

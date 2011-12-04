@@ -193,10 +193,13 @@ private:
 
 #define GEAR_STATE_NEED_RECOGNITION 0
 #define GEAR_STATE_MATCHED 1
+#define GEAR_STATE_NEED_RECOGNITION_WAIT_FOR_CLUTCH_IN 2
 #define GEAR_COMPUTATION_INTERVALL 200
 
 	void gear_computation ();
 	uint8_t gear_state;
+	float gear_ratio[GEARS];
+	uint8_t gear_clutchpressed;
 	unsigned long gear_computation_time;
 #endif
 

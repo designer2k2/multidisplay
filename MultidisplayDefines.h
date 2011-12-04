@@ -131,7 +131,7 @@
  * free (lambda relais) (right)
  */
 #define NORDSCHLEIFENPIN 15
-#define FREEANALOG2 16
+#define CLUTCHPIN 16
 //left of lcd pins
 #define FREEPWM2 10
 #define N75PIN 11
