@@ -216,6 +216,7 @@ void  MultidisplayController::myconstructor() {
 
 #if defined(MULTIDISPLAY_V2) && defined(GEAR_RECOGNITION)
 	gear_state = GEAR_STATE_NEED_RECOGNITION;
+	last_gear = 0;
 
 	//TODO move to eeprom
 
@@ -1504,16 +1505,26 @@ void MultidisplayController::mainLoop() {
 	 * clutch separates -> infinity resistance
 	 *
 	 * -> add pulldown
+	 *
+	 * init: after start gear 1
+	 *
 	 */
-	if ( ! digitalRead(CLUTCHPIN) )
+	if ( ! digitalRead(CLUTCHPIN) ) {
+		//clutch pedal pressed
 		gear_state = GEAR_STATE_NEED_RECOGNITION_WAIT_FOR_CLUTCH_IN;
-	else {
-		if ( gear_state == GEAR_STATE_NEED_RECOGNITION_WAIT_FOR_CLUTCH_IN )
+	} else {
+		if ( gear_state == GEAR_STATE_NEED_RECOGNITION_WAIT_FOR_CLUTCH_IN ) {
 			gear_state = GEAR_STATE_NEED_RECOGNITION;
+			last_gear = data.gear;
+			gear_wait_before_idle = millis() + GEAR_WAIT_MSECS_BEFORE_IDLE;
+			gear_computation();
+		}
 	}
 
-	if ( millis() > gear_computation_time )
+	if ( millis() > gear_computation_time ) {
 		gear_computation();
+		gear_computation_time += GEAR_COMPUTATION_INTERVALL;
+	}
 #endif
 
 }
@@ -1774,8 +1785,14 @@ void MultidisplayController::DFConvertReceivedData() {
 void MultidisplayController::gear_computation () {
 
 	float ratio = 0;
+
 	switch (gear_state) {
 	case GEAR_STATE_NEED_RECOGNITION:
+		/*
+		 * need recomputation if clutch pressed
+		 * main loop sets state GEAR_STATE_NEED_RECOGNITION
+		 *
+		 */
 
 #define ABROLLUMFANG 1.764
 		ratio = ( data.calRPM * 6 * ABROLLUMFANG ) / ( data.speed * 100 );
@@ -1788,15 +1805,32 @@ void MultidisplayController::gear_computation () {
 				data.gear = i+1;
 				gear_state = GEAR_STATE_MATCHED;
 				return;
+			} else {
+				// no gear found
+				if ( gear_wait_before_idle < millis() ) {
+					//we waited long enough
+					if ( data.calThrottle == 0 && data.calRPM <= GEAR_IDLE_RPM )
+						// we're idle with no gear
+						data.gear = 0;
+				}
+				/*
+				 * should we save the rpm before the clutch was pressed ?
+				 * this would allow to see quick (new rpm lower or greater)
+				 * if its a down or upshift.
+				 *
+				 * -> TODO test it on the road!
+				 */
 			}
 		}
 
 		break;
 	case GEAR_STATE_MATCHED:
 		/*
-		 * need recomputation if clutch pressed
+		 * we've successfully detected a gear
+		 * TODO should we periodically recompute?
 		 */
-		data.gear = 0;
+		//data.gear = 0;
+
 		break;
 	}
 }

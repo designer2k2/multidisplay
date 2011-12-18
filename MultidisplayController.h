@@ -195,12 +195,16 @@ private:
 #define GEAR_STATE_MATCHED 1
 #define GEAR_STATE_NEED_RECOGNITION_WAIT_FOR_CLUTCH_IN 2
 #define GEAR_COMPUTATION_INTERVALL 200
+#define GEAR_IDLE_RPM 1300
+#define GEAR_WAIT_MSECS_BEFORE_IDLE 500
 
 	void gear_computation ();
 	uint8_t gear_state;
+	uint8_t last_gear;
 	float gear_ratio[GEARS];
 	uint8_t gear_clutchpressed;
 	unsigned long gear_computation_time;
+	unsigned long gear_wait_before_idle;
 #endif
 
 #ifdef V2DEVDEBUG

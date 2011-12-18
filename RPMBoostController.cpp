@@ -34,10 +34,11 @@ void RPMBoostController::toggleMode (uint8_t nmode) {
 
 
 void RPMBoostController::compute () {
+	uint8_t gear_index = constrain (data.gear - 1, 0, GEARS-1);
 	if ( mode == BOOST_RACE )
-		boostOutput = highboost_duty_cycle[data.gear]->map(data.rpm_map_idx);
+		boostOutput = highboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
 	else
-		boostOutput = lowboost_duty_cycle[data.gear]->map(data.rpm_map_idx);
+		boostOutput = lowboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
 }
 
 void RPMBoostController::serialSendDutyMap ( uint8_t gear, uint8_t mode, uint8_t serial ) {
