@@ -7,12 +7,12 @@
  * for which we can't set up reliable defaults, so we need to have the user
  * set them.
  ***************************************************************************/ 
-PID::PID(double *Input, double *Output, double *Setpoint, double Kc, double TauI, double TauD)
+PID_Beta6::PID_Beta6(double *Input, double *Output, double *Setpoint, double Kc, double TauI, double TauD)
 {
 
-  PID::ConstructorCommon(Input, Output, Setpoint, Kc, TauI, TauD);  
+  PID_Beta6::ConstructorCommon(Input, Output, Setpoint, Kc, TauI, TauD);  
   UsingFeedForward = false;
-  PID::Reset();
+  PID_Beta6::Reset();
 
   
 }
@@ -22,13 +22,13 @@ PID::PID(double *Input, double *Output, double *Setpoint, double Kc, double TauI
  * standard constructor, with one addition.  you can link to a Feed Forward bias,
  * which lets you implement... um.. Feed Forward Control.  good stuff.
  ***************************************************************************/
-PID::PID(double *Input, double *Output, double *Setpoint, double *FFBias, double Kc, double TauI, double TauD)
+PID_Beta6::PID_Beta6(double *Input, double *Output, double *Setpoint, double *FFBias, double Kc, double TauI, double TauD)
 {
 
-  PID::ConstructorCommon(Input, Output, Setpoint, Kc, TauI, TauD);  
+  PID_Beta6::ConstructorCommon(Input, Output, Setpoint, Kc, TauI, TauD);  
   UsingFeedForward = true;			  //tell the controller that we'll be using an external
   myBias = FFBias;                              //bias, and where to find it
-  PID::Reset();
+  PID_Beta6::Reset();
 
 }
 
@@ -36,14 +36,14 @@ PID::PID(double *Input, double *Output, double *Setpoint, double *FFBias, double
  *    Most of what is done in the two constructors is the same.  that code
  * was put here for ease of maintenance and (minor) reduction of library size
  ****************************************************************************/
-void PID::ConstructorCommon(double *Input, double *Output, double *Setpoint, double Kc, double TauI, double TauD)
+void PID_Beta6::ConstructorCommon(double *Input, double *Output, double *Setpoint, double Kc, double TauI, double TauD)
 {
-  PID::SetInputLimits(0, 1023);		//default the limits to the 
-  PID::SetOutputLimits(0, 255);		//full ranges of the I/O
+  PID_Beta6::SetInputLimits(0, 1023);		//default the limits to the 
+  PID_Beta6::SetOutputLimits(0, 255);		//full ranges of the I/O
 
   tSample = 1000;			//default Controller Sample Time is 1 second
 
-  PID::SetTunings( Kc, TauI, TauD);
+  PID_Beta6::SetTunings( Kc, TauI, TauD);
 
   nextCompTime = millis();
   inAuto = false;
@@ -60,7 +60,7 @@ void PID::ConstructorCommon(double *Input, double *Output, double *Setpoint, dou
  *  there's an application where the signal being fed to the controller is
  *  outside that range, well, then this function's here for you.
  **************************************************************************/
-void PID::SetInputLimits(double INMin, double INMax)
+void PID_Beta6::SetInputLimits(double INMin, double INMax)
 {
 	//after verifying that mins are smaller than maxes, set the values
 	if(INMin >= INMax) return;
@@ -87,7 +87,7 @@ void PID::SetInputLimits(double INMin, double INMax)
  *  want to clamp it from 0-125.  who knows.  at any rate, that can all be done
  *  here.
  **************************************************************************/
-void PID::SetOutputLimits(double OUTMin, double OUTMax)
+void PID_Beta6::SetOutputLimits(double OUTMin, double OUTMax)
 {
 	//after verifying that mins are smaller than maxes, set the values
 	if(OUTMin >= OUTMax) return;
@@ -109,7 +109,7 @@ void PID::SetOutputLimits(double OUTMin, double OUTMax)
  * it's called automatically from the constructor, but tunings can also
  * be adjusted on the fly during normal operation
  ******************************************************************************/
-void PID::SetTunings(double Kc, double TauI, double TauD)
+void PID_Beta6::SetTunings(double Kc, double TauI, double TauD)
 {
 	//verify that the tunings make sense
 	if (Kc == 0.0 || TauI < 0.0 || TauD < 0.0) return;
@@ -150,7 +150,7 @@ void PID::SetTunings(double Kc, double TauI, double TauD)
  *  outside. In practice though, it is sometimes helpful to start from scratch,
  *  so it was made publicly available
  ******************************************************************************/
-void PID::Reset()
+void PID_Beta6::Reset()
 {
 
 	if(UsingFeedForward)
@@ -171,12 +171,12 @@ void PID::Reset()
  * when the transition from manual to auto occurs, the controller is
  * automatically initialized
  ******************************************************************************/
-void PID::SetMode(int Mode)
+void PID_Beta6::SetMode(int Mode)
 {
 	if (Mode!=0 && !inAuto)
 	{	//we were in manual, and we just got set to auto.
 		//reset the controller internals
-		PID::Reset();
+		PID_Beta6::Reset();
 	}
 	inAuto = (Mode!=0);
 }
@@ -184,7 +184,7 @@ void PID::SetMode(int Mode)
 /* SetSampleTime(...)*******************************************************
  * sets the frequency, in Milliseconds, with which the PID calculation is performed	
  ******************************************************************************/
-void PID::SetSampleTime(int NewSampleTime)
+void PID_Beta6::SetSampleTime(int NewSampleTime)
 {
 	if (NewSampleTime > 0)
 	{ 
@@ -219,7 +219,7 @@ void PID::SetSampleTime(int NewSampleTime)
  *  http://www.controlguru.com .  Dr. Cooper was my controls professor, and is
  *  gifted at concisely and clearly explaining PID control
  *********************************************************************************/
-void PID::Compute()
+void PID_Beta6::Compute()
 {
 	justCalced=false;
 	if (!inAuto) return; //if we're in manual just leave;
@@ -297,46 +297,46 @@ void PID::Compute()
  * These functions allow the outside world to query the status of the PID
  *****************************************************************************/
 
-bool PID::JustCalculated()
+bool PID_Beta6::JustCalculated()
 {
 	return justCalced;
 }
-int PID::GetMode()
+int PID_Beta6::GetMode()
 {
 	if(inAuto)return 1;
 	else return 0;
 }
 
-double PID::GetINMin()
+double PID_Beta6::GetINMin()
 {
 	return inMin;
 }
-double PID::GetINMax()
+double PID_Beta6::GetINMax()
 {
 	return inMin + inSpan;
 }
-double PID::GetOUTMin()
+double PID_Beta6::GetOUTMin()
 {
 	return outMin;
 }
-double PID::GetOUTMax()
+double PID_Beta6::GetOUTMax()
 {
 	return outMin+outSpan;
 }
-int PID::GetSampleTime()
+int PID_Beta6::GetSampleTime()
 {
 	return tSample;
 }
-double PID::GetP_Param()
+double PID_Beta6::GetP_Param()
 {
 	return P_Param;
 }
-double PID::GetI_Param()
+double PID_Beta6::GetI_Param()
 {
 	return I_Param;
 }
 
-double PID::GetD_Param()
+double PID_Beta6::GetD_Param()
 {
 	return D_Param;
 }

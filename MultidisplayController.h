@@ -28,7 +28,7 @@
 #include"SensorData.h"
 #include "LCD/LCDController.h"
 
-class PID;
+class PID_Beta6;
 
 
 

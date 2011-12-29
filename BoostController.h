@@ -31,7 +31,7 @@ public:
 	void toggleMode (uint8_t nmode);
 	void compute ();
 
-	PID *boostPid;
+	PID_Beta6 *boostPid;
 	double boostSetPoint;
 	//used to save the setpoint while throttle is closed
 	double boostSetPointSave;

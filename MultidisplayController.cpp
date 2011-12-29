@@ -639,10 +639,11 @@ void MultidisplayController::serialReceive() {
 	if(bytes_read==25  && (command==0 || command==1))
 	{
 #ifdef BOOSTN75
+		//TODO review for V2
 
 		/* we get fixed point values (base 1000) from the pc ! */
 
-		boostController.boostSetPoint = double(srData.asFixedInt32[0] / 1000.0);
+		boostController.pidBoostSetPoint = double(srData.asFixedInt32[0] / 1000.0);
 		if(command==0) {
 			// * only change the output if we are in manual mode
 			boostController.boostOutput = double(srData.asFixedInt32[2] / 1000.0);

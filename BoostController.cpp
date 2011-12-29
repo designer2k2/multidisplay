@@ -37,7 +37,7 @@ void BoostController::myconstructor() {
 	boostSetPointSave = 0.0;
 	idleSetPointActive = 0;
 #ifdef BOOSTPID
-	boostPid = new PID ( (double*) &data.calBoost, &boostOutput, &boostSetPoint,10,5,1 );
+	boostPid = new PID_Beta6 ( (double*) &data.calBoost, &pidBoostOutput, &pidBoostSetPoint,10,5,1 );
 	boostPid->SetOutputLimits(0,255);
 	boostPid->SetInputLimits(-1.0, 2.0);
 	boostPid->SetMode(MANUAL);
@@ -86,11 +86,11 @@ void BoostController::compute () {
 	if ( boostPid->GetMode() == AUTO ) {
 		if ((data.calThrottle == 0) && !idleSetPointActive) {
 			idleSetPointActive = 1;
-			boostSetPointSave = boostSetPoint;
-			boostSetPoint = 0.0;
+			boostSetPointSave = pidBoostSetPoint;
+			pidBoostSetPoint = 0.0;
 		} else if ((data.calThrottle >= 0) && idleSetPointActive) {
 			idleSetPointActive = 0;
-			boostSetPoint = boostSetPointSave;
+			pidBoostSetPoint = boostSetPointSave;
 		}
 		boostPid->Compute();
 	} else {

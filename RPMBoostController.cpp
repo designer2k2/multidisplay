@@ -24,6 +24,18 @@ void RPMBoostController::myconstructor() {
 	}
 	loadFromEEprom();
 	boostOutput = 0;
+
+//	PID::PID(double* Input, double* Output, double* Setpoint, double Kp, double Ki, double Kd, int ControllerDirection)
+	pid = new PID( (double*) &data.calBoost, &pidBoostOutput, &pidBoostSetPoint, Kp, Ki, Kd, DIRECT);
+	pidBoostSetPoint = 0;
+	pidBoostOutput = 0;
+
+	req_BoostPWM = 0;
+	req_Boost = 0;
+	reqLast_BoostPWM = 0;
+	reqLast_Boost = 0;
+
+	pidActivationThreshold = 0.4;
 }
 
 void RPMBoostController::toggleMode (uint8_t nmode) {
@@ -35,10 +47,29 @@ void RPMBoostController::toggleMode (uint8_t nmode) {
 
 void RPMBoostController::compute () {
 	uint8_t gear_index = constrain (data.gear - 1, 0, GEARS-1);
-	if ( mode == BOOST_RACE )
-		boostOutput = highboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
-	else
-		boostOutput = lowboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
+	if ( mode == BOOST_RACE ) {
+		req_BoostPWM = highboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
+		req_Boost = highboost_pid_boost[gear_index]->map(data.rpm_map_idx);
+//		boostOutput = highboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
+	} else {
+//		boostOutput = lowboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
+		req_BoostPWM = lowboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
+		req_Boost = lowboost_pid_boost[gear_index]->map(data.rpm_map_idx);
+	}
+
+#ifdef BOOSTPID
+	pidBoostSetPoint = req_BoostPWM;
+	pidBoostOutput = req_Boost;
+
+	if ( data.calBoost > pidActivationThreshold ) {
+		pid->compute();
+		boostOutput = pidBoostOutput;
+	} else {
+		boostOutput = reqLast_BoostPWM;
+	}
+#else
+	boostOutput = reqLast_BoostPWM;;
+#endif
 }
 
 void RPMBoostController::serialSendDutyMap ( uint8_t gear, uint8_t mode, uint8_t serial ) {

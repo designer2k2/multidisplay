@@ -1,7 +1,7 @@
 #ifndef PID_Beta6_h
 #define PID_Beta6_h
 
-class PID
+class PID_Beta6
 {
 
 
@@ -12,10 +12,10 @@ class PID
   #define LIBRARY_VERSION	0.6
 
   //commonly used functions **************************************************************************
-    PID(double*, double*, double*,        // * constructor.  links the PID to the Input, Output, and 
+    PID_Beta6(double*, double*, double*,        // * constructor.  links the PID to the Input, Output, and 
         double, double, double);          //   Setpoint.  Initial tuning parameters are also set here
 
-    PID(double*, double*, double*,        // * Overloaded Constructor.  if the user wants to implement
+    PID_Beta6(double*, double*, double*,        // * Overloaded Constructor.  if the user wants to implement
         double*, double, double, double); //   feed-forward
 
     void SetMode(int Mode);               // * sets PID to either Manual (0) or Auto (non-0)
