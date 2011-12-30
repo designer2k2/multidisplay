@@ -639,7 +639,13 @@ void MultidisplayController::serialReceive() {
 	if(bytes_read==25  && (command==0 || command==1))
 	{
 #ifdef BOOSTN75
-		//TODO review for V2
+		/*
+		 * TODO review for V2
+		 * Kp,Ki,Kd
+		 * SampleTime
+		 * On / Of
+		 * ActivationThreshold factor
+		 */
 
 		/* we get fixed point values (base 1000) from the pc ! */
 
@@ -1039,7 +1045,14 @@ void MultidisplayController::serialSend() {
 		// 1 byte
 		Serial.write ( (uint8_t*) &(data.gear), sizeof(uint8_t) );
 		// 1 byte
-		Serial.write ( (uint8_t*) &(data.computed_n75), sizeof(uint8_t) );
+		Serial.write ( (uint8_t*) &(boostController.boostOutput), sizeof(uint8_t) );
+
+		/*
+		 * TODO add
+		 * k,p,d, (?)
+		 * PID active
+		 * requested boost
+		 */
 
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
 		// 32 bytes

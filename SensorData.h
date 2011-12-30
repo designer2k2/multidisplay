@@ -71,7 +71,6 @@ public:
 #ifdef MULTIDISPLAY_V2
 	uint16_t speed;
 	uint8_t gear;
-	uint8_t computed_n75;
 
 	/*
 	 * Digifant

@@ -66,6 +66,7 @@ public:
 	//! output from PID
 	double pidBoostOutput;
 	double Kp, Ki, Kd;
+//	float pidActivationThresholdFactor;
 	double pidActivationThreshold;
 
 //	double pid

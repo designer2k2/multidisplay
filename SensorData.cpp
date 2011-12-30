@@ -88,7 +88,6 @@ void SensorData::myconstructor () {
 #ifdef MULTIDISPLAY_V2
 	speed = 0;
 	gear = 5;
-	computed_n75 = 0;
 
 	df_cyl1_retard = 0;
 	df_cyl2_retard = 0;
@@ -126,7 +125,6 @@ void SensorData::generate_debugData () {
 	VDOTemp3=13;
 	speed=14;
 	gear=15;
-	computed_n75=16;
 
 	df_ignition = 6.0;
 	df_total_retard = 3;

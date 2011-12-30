@@ -27,6 +27,11 @@ void RPMBoostController::myconstructor() {
 
 //	PID::PID(double* Input, double* Output, double* Setpoint, double Kp, double Ki, double Kd, int ControllerDirection)
 	pid = new PID( (double*) &data.calBoost, &pidBoostOutput, &pidBoostSetPoint, Kp, Ki, Kd, DIRECT);
+
+	//default sample time is 100ms
+	//pid->SetSampleTime(50);
+	pid->SetMode(AUTOMATIC);
+
 	pidBoostSetPoint = 0;
 	pidBoostOutput = 0;
 
@@ -35,7 +40,7 @@ void RPMBoostController::myconstructor() {
 	reqLast_BoostPWM = 0;
 	reqLast_Boost = 0;
 
-	pidActivationThreshold = 0.4;
+	pidActivationThreshold = 0;
 }
 
 void RPMBoostController::toggleMode (uint8_t nmode) {
@@ -58,8 +63,13 @@ void RPMBoostController::compute () {
 	}
 
 #ifdef BOOSTPID
-	pidBoostSetPoint = req_BoostPWM;
-	pidBoostOutput = req_Boost;
+	//give the PID the requested boost level
+	pidBoostSetPoint = req_Boost;
+	//activate the PID only if a stable boost is reached
+	pidActivationThreshold = pidBoostSetPoint * 0.5;
+
+	//init PID output with the map value
+	pidBoostOutput = req_BoostPWM;
 
 	if ( data.calBoost > pidActivationThreshold ) {
 		pid->compute();
