@@ -806,13 +806,13 @@ void MultidisplayController::serialReceive() {
 							serialSendAck (srData.asBytes[1]);
 						}
 						break;
-//					case 6:
-//						//Save
-//						if ( bytes_read >= 3 ) {
-//							boostController.writeToEEprom();
-//							serialSendAck (srData.asBytes[1]);
-//						}
-//						break;
+					case 6:
+						//Save
+						if ( bytes_read >= 3 ) {
+							boostController.writeToEEprom();
+							serialSendAck (srData.asBytes[1]);
+						}
+						break;
 					}
 
 				}
@@ -990,11 +990,11 @@ void MultidisplayController::serialSend() {
 		/*
 		 * STX: 1 byte
 		 * SERIALOUT_BINARY_TAG: 1 byte
-		 * MD2 data: 49 bytes
+		 * MD2 data: 52 bytes
 		 * digifant data: 32 bytes
 		 * ETX: 1 byte
 		 *
-		 * overall 84 bytes per frame!
+		 * overall 87 bytes per frame!
 		 */
 
 		// 1 byte
@@ -1044,9 +1044,15 @@ void MultidisplayController::serialSend() {
 		Serial.write ( (uint8_t*) &(data.speed), sizeof(uint16_t) );
 		// 1 byte
 		Serial.write ( (uint8_t*) &(data.gear), sizeof(uint8_t) );
-		// 1 byte
+		// 1 byte N75 dutycycle
 		Serial.write ( (uint8_t*) &(boostController.boostOutput), sizeof(uint8_t) );
+		// 2 bytes
+		outbuf = float2fixedintb100(boostController.req_Boost);
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
 
+		//TODO flags
+		outbuf = 0;
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
 		/*
 		 * TODO add
 		 * k,p,d, (?)
