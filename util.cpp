@@ -71,12 +71,14 @@ long EEPROMReadLong(int p_address) {
 	return (firstTwoBytes + secondTwoBytes);
 }
 
-int float2fixedintb100 (float in) {
-	return (int) (in * 100.0);
+uint16_t float2fixedintb100 (float in) {
+	return (uint16_t) (in * 100.0);
 }
 float fixedintb1002float (int in) {
 	return (float) (in / 100.0);
 }
-
+float fixedintb1002float (uint16_t in) {
+	return (float) (in / 100.0);
+}
 
 

@@ -790,13 +790,15 @@ void MultidisplayController::serialReceive() {
 						//  		reply: STX tag=22 gearX mode serial 16 bytes map ETX neu geschriebene map zurücksenden!
 						if ( bytes_read >= 21 ) {
 							boostController.setDutyMap ( srData.asBytes[1], srData.asBytes[2], &(srData.asBytes[4]) );
-							boostController.serialSendDutyMap ( srData.asBytes[1], srData.asBytes[2], srData.asBytes[3]);
+//							boostController.serialSendDutyMap ( srData.asBytes[1], srData.asBytes[2], srData.asBytes[3]);
+							serialSendAck (srData.asBytes[3]);
 						}
 						break;
 					case 4:
 						if ( bytes_read >= 37 ) {
 							boostController.setSetpointMap ( srData.asBytes[1], srData.asBytes[2], (uint16_t*) &(srData.asBytes[4]) );
-							boostController.serialSendSetpointMap ( srData.asBytes[1], srData.asBytes[2], srData.asBytes[3]);
+//							boostController.serialSendSetpointMap ( srData.asBytes[1], srData.asBytes[2], srData.asBytes[3]);
+							serialSendAck (srData.asBytes[3]);
 						}
 						break;
 					case 5:
@@ -954,7 +956,7 @@ void MultidisplayController::serialSend() {
 		Serial.print(data.VDOTemp3);
 		break;
 	case SERIALOUT_TUNERPRO_ADX:
-		int outbuf;
+		uint16_t outbuf;
 
 		Serial.write ( (uint8_t*) &(data.calRPM), sizeof(int) );
 		//hack for DF data frequency
