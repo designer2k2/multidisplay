@@ -29,6 +29,9 @@ public:
 	void setDutyMap ( uint8_t gear, uint8_t mode, uint8_t *data );
 	void setSetpointMap ( uint8_t gear, uint8_t mode, uint16_t *data );
 
+	void setN75Params (uint16_t *data);
+	void serialSendN75Params (uint8_t serial);
+
 	void loadMapsFromEEprom ();
 	void writeMapsToEEprom ();
 	void loadParamsFromEEprom ();

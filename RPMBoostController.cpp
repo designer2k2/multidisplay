@@ -232,5 +232,61 @@ void RPMBoostController::writeMapsToEEprom () {
 		lowboost_duty_cycle[i]->writeToEeprom( EEPROM_N75_LOW_DUTY_CYCLE_MAPS + i*16 );
 		lowboost_pid_boost[i]->writeToEeprom( EEPROM_N75_PID_LOW_SETPOINT_MAPS + i*32);
 	}
+}
+
+void RPMBoostController::setN75Params (uint16_t *data) {
+	aKp = fixedintb1002float ( *data );
+	++data;
+	aKi = fixedintb1002float ( *data );
+	++data;
+	aKd = fixedintb1002float ( *data );
+	++data;
+	cKp = fixedintb1002float ( *data );
+	++data;
+	cKi = fixedintb1002float ( *data );
+	++data;
+	cKd = fixedintb1002float ( *data );
+	++data;
+	apidActivationThresholdFactor = fixedintb1002float ( *data );
+	++data;
+	cpidActivationThresholdFactor = fixedintb1002float ( *data );
+	++data;
+	if ( ((uint8_t) (*data)) & 1 )
+		usePID = true;
+	else
+		usePID = false;
+}
+
+void RPMBoostController::serialSendN75Params (uint8_t serial) {
+	//STX tag=21 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable) ETX
+
+	Serial.print("\2");
+	uint8_t outbuf = SERIALOUT_BINARY_TAG_N75_PARAMS;
+	Serial.write ( (uint8_t*) &(serial), sizeof(uint8_t) );
+	uint16_t outbuf16 = float2fixedintb100(aKp);
+	Serial.write ( (uint8_t*) &outbuf16, sizeof(uint16_t) );
+	outbuf16 = float2fixedintb100(aKi);
+	Serial.write ( (uint8_t*) &outbuf16, sizeof(uint16_t) );
+	outbuf16 = float2fixedintb100(aKd);
+	Serial.write ( (uint8_t*) &outbuf16, sizeof(uint16_t) );
+
+	outbuf16 = float2fixedintb100(cKp);
+	Serial.write ( (uint8_t*) &outbuf16, sizeof(uint16_t) );
+	outbuf16 = float2fixedintb100(cKi);
+	Serial.write ( (uint8_t*) &outbuf16, sizeof(uint16_t) );
+	outbuf16 = float2fixedintb100(cKd);
+	Serial.write ( (uint8_t*) &outbuf16, sizeof(uint16_t) );
+
+	outbuf16 = float2fixedintb100(apidActivationThresholdFactor);
+	Serial.write ( (uint8_t*) &outbuf16, sizeof(uint16_t) );
+	outbuf16 = float2fixedintb100(cpidActivationThresholdFactor);
+	Serial.write ( (uint8_t*) &outbuf16, sizeof(uint16_t) );
+
+	outbuf = 0;
+	if ( usePID )
+		outbuf |= 1;
+	Serial.write ( (uint8_t*) &outbuf16, sizeof(uint8_t) );
+
+	Serial.print("\3");
 
 }

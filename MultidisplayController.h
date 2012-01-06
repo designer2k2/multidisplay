@@ -99,6 +99,15 @@ private:
      *  		reply: STX 4 serial ETX	ACK!
      *  	6 serial save maps to eeprom
      *  		reply: STX 4 serial ETX	ACK!
+     *  	7 serial load N75 params from eeprom
+     *  		reply: STX 4 serial ETX	ACK!
+     *  	8 serial save N75 params to eeprom
+     *  		reply: STX 4 serial ETX	ACK!
+     *  	9 set N75 params: 9 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable) ETX
+     *  		reply: STX 4 serial ETX	ACK!
+     *  	10 get N75 params: 10 serial ETX
+     *  		reply: STX tag=21 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable) ETX
+     *
      *
      *  attention, you have to send ints, not chars over the serial line!
      *

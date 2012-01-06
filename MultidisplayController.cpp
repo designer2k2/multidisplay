@@ -802,17 +802,45 @@ void MultidisplayController::serialReceive() {
 						}
 						break;
 					case 5:
-						//load
+						//load maps
 						if ( bytes_read >= 3 ) {
 							boostController.loadMapsFromEEprom();
 							serialSendAck (srData.asBytes[1]);
 						}
 						break;
 					case 6:
-						//Save
+						//Save maps
 						if ( bytes_read >= 3 ) {
 							boostController.writeMapsToEEprom();
 							serialSendAck (srData.asBytes[1]);
+						}
+						break;
+					case 7:
+						//load parameters
+						if ( bytes_read >= 3 ) {
+							boostController.loadParamsFromEEprom();
+							serialSendAck (srData.asBytes[1]);
+						}
+						break;
+					case 8:
+						//save parameters
+						if ( bytes_read >= 3 ) {
+							boostController.writeParamsToEEprom();
+							serialSendAck (srData.asBytes[1]);
+						}
+						break;
+					case 9:
+						//set n75 new params
+						// 9 set N75 params: 9 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable)
+						if ( bytes_read >= 20 ) {
+							boostController.setN75Params( (uint16_t*) &srData.asBytes[2]);
+							serialSendAck (srData.asBytes[1]);
+						}
+						break;
+					case 10:
+						//send n75 params
+						if ( bytes_read >= 3 ) {
+							boostController.serialSendN75Params(srData.asBytes[1]);
 						}
 						break;
 					}
