@@ -29,8 +29,10 @@ public:
 	void setDutyMap ( uint8_t gear, uint8_t mode, uint8_t *data );
 	void setSetpointMap ( uint8_t gear, uint8_t mode, uint16_t *data );
 
-	void loadFromEEprom ();
-	void writeToEEprom ();
+	void loadMapsFromEEprom ();
+	void writeMapsToEEprom ();
+	void loadParamsFromEEprom ();
+	void writeParamsToEEprom ();
 
 	void toggleMode (uint8_t nmode);
 	void compute ();
@@ -52,24 +54,28 @@ public:
 	uint8_t n75_manual_normal;
 	uint8_t n75_manual_race;
 
-	double req_BoostPWM;
+	double req_Boost_PWM;
 	double req_Boost;
-	double reqLast_BoostPWM;
-	double reqLast_Boost;
 
 	PID *pid;
 	double pidBoostSetPoint;
-	//used to save the setpoint while throttle is closed
-//	double boostSetPointSave;
-//	uint8_t idleSetPointActive;
+
+	bool usePID;
 
 	//! output from PID
 	double pidBoostOutput;
-	double Kp, Ki, Kd;
-//	float pidActivationThresholdFactor;
-	double pidActivationThreshold;
 
-//	double pid
+	/*
+	 * aggressive PID Settings if the gap to the setpoint is greater
+	 */
+	double aKp, aKi, aKd;
+	double apidActivationThresholdFactor;
+	/*
+	 * conservative PID Settings if we're near to the setpoint setpoint
+	 */
+	double cKp, cKi, cKd;
+	double cpidActivationThresholdFactor;
+
 };
 
 extern RPMBoostController boostController;

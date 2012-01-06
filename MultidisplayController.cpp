@@ -804,14 +804,14 @@ void MultidisplayController::serialReceive() {
 					case 5:
 						//load
 						if ( bytes_read >= 3 ) {
-							boostController.loadFromEEprom();
+							boostController.loadMapsFromEEprom();
 							serialSendAck (srData.asBytes[1]);
 						}
 						break;
 					case 6:
 						//Save
 						if ( bytes_read >= 3 ) {
-							boostController.writeToEEprom();
+							boostController.writeMapsToEEprom();
 							serialSendAck (srData.asBytes[1]);
 						}
 						break;

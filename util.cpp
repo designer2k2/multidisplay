@@ -71,6 +71,21 @@ long EEPROMReadLong(int p_address) {
 	return (firstTwoBytes + secondTwoBytes);
 }
 
+void EEPROMWriteuint16(int p_address, uint16_t p_value) {
+	byte l = ((p_value >> 0) & 0xFF);
+	byte h = ((p_value >> 8) & 0xFF);
+
+	EEPROM.write(p_address, l);
+	EEPROM.write(p_address + 1, h);
+
+}
+uint16_t EEPROMReaduint16(int p_address) {
+	byte l = EEPROM.read(p_address);
+	byte h = EEPROM.read(p_address + 1);
+	uint16_t r = (h << 8) + l;
+	return r;
+}
+
 uint16_t float2fixedintb100 (float in) {
 	return (uint16_t) (in * 100.0);
 }

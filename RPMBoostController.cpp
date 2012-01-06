@@ -10,6 +10,7 @@
 #include "SensorData.h"
 #include <wiring.h>
 #include <HardwareSerial.h>
+#include "EEPROM.h"
 
 RPMBoostController::RPMBoostController() {
 }
@@ -22,11 +23,13 @@ void RPMBoostController::myconstructor() {
 		lowboost_duty_cycle[i] = new Map16x1();
 		lowboost_pid_boost[i] = new Map16x1Double();
 	}
-	loadFromEEprom();
+	loadMapsFromEEprom();
+	loadParamsFromEEprom();
+
 	boostOutput = 0;
 
 //	PID::PID(double* Input, double* Output, double* Setpoint, double Kp, double Ki, double Kd, int ControllerDirection)
-	pid = new PID( (double*) &data.calBoost, &pidBoostOutput, &pidBoostSetPoint, Kp, Ki, Kd, DIRECT);
+	pid = new PID( (double*) &data.calBoost, &pidBoostOutput, &pidBoostSetPoint, aKp, aKi, aKd, DIRECT);
 
 	//default sample time is 100ms
 	//pid->SetSampleTime(50);
@@ -35,12 +38,10 @@ void RPMBoostController::myconstructor() {
 	pidBoostSetPoint = 0;
 	pidBoostOutput = 0;
 
-	req_BoostPWM = 0;
+	req_Boost_PWM = 0;
 	req_Boost = 0;
-	reqLast_BoostPWM = 0;
-	reqLast_Boost = 0;
 
-	pidActivationThreshold = 0;
+//	pidActivationThreshold = 0;
 }
 
 void RPMBoostController::toggleMode (uint8_t nmode) {
@@ -52,34 +53,46 @@ void RPMBoostController::toggleMode (uint8_t nmode) {
 
 void RPMBoostController::compute () {
 	uint8_t gear_index = constrain (data.gear - 1, 0, GEARS-1);
+
 	if ( mode == BOOST_RACE ) {
-		req_BoostPWM = highboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
+		req_Boost_PWM = highboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
 		req_Boost = highboost_pid_boost[gear_index]->map(data.rpm_map_idx);
 //		boostOutput = highboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
 	} else {
 //		boostOutput = lowboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
-		req_BoostPWM = lowboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
+		req_Boost_PWM = lowboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
 		req_Boost = lowboost_pid_boost[gear_index]->map(data.rpm_map_idx);
 	}
 
-#ifdef BOOSTPID
-	//give the PID the requested boost level
-	pidBoostSetPoint = req_Boost;
-	//activate the PID only if a stable boost is reached
-	pidActivationThreshold = pidBoostSetPoint * 0.5;
+	if ( usePID ) {
+		//give the PID the requested boost level
+		pidBoostSetPoint = req_Boost;
+		//activate the PID only if a stable boost is reached
+		double aat = pidBoostSetPoint * apidActivationThresholdFactor;
+		double cat = pidBoostSetPoint * cpidActivationThresholdFactor;
 
-	//init PID output with the map value
-	pidBoostOutput = req_BoostPWM;
-
-	if ( data.calBoost > pidActivationThreshold ) {
-		pid->compute();
-		boostOutput = pidBoostOutput;
+		if ( data.calBoost > aat  ) {
+			if ( data.calBoost > cat  ) {
+				//double Kp, double Ki, double Kd
+				pid->SetTunings(cKp, cKi, cKd);
+			} else {
+				pid->SetTunings(aKp, aKi, aKd);
+			}
+			pid->Compute();
+			boostOutput = pidBoostOutput;
+		} else {
+			//we're under the PID activation thresholds
+			//set the map pwm value as base for the pid controller
+			pidBoostOutput = req_Boost_PWM;
+			//set the map pwm as output pwm
+			boostOutput = req_Boost_PWM;
+		}
 	} else {
-		boostOutput = reqLast_BoostPWM;
+		//no PID
+
+		//FIXME: set output to 0 if throttle is idle!
+		boostOutput = req_Boost_PWM;
 	}
-#else
-	boostOutput = reqLast_BoostPWM;;
-#endif
 }
 
 void RPMBoostController::serialSendDutyMap ( uint8_t gear, uint8_t mode, uint8_t serial ) {
@@ -137,7 +150,7 @@ void RPMBoostController::setSetpointMap ( uint8_t gear, uint8_t mode, uint16_t *
 	}
 }
 
-void RPMBoostController::loadFromEEprom () {
+void RPMBoostController::loadMapsFromEEprom () {
 	for ( uint8_t i = 0; i < GEARS ; i++ ) {
 		highboost_duty_cycle[i]->loadFromEeprom( EEPROM_N75_HIGH_DUTY_CYCLE_MAPS + i*16 );
 		highboost_pid_boost[i]->loadFromEeprom( EEPROM_N75_PID_HIGH_SETPOINT_MAPS + i*32 );
@@ -145,12 +158,79 @@ void RPMBoostController::loadFromEEprom () {
 		lowboost_pid_boost[i]->loadFromEeprom( EEPROM_N75_PID_LOW_SETPOINT_MAPS + i*32);
 	}
 }
+void RPMBoostController::loadParamsFromEEprom () {
+	uint16_t raw = 0;
+	raw = EEPROMReaduint16 (EEPROM_N75_PID_aKp);
+	if ( raw < 0xFFFF )
+		aKp = fixedintb1002float(raw);
+	else
+		aKp = 4;
+	raw = EEPROMReaduint16 (EEPROM_N75_PID_aKd);
+	if ( raw < 0xFFFF )
+		aKd = fixedintb1002float(raw);
+	else
+		aKd = 0.2;
+	raw = EEPROMReaduint16 (EEPROM_N75_PID_aKi);
+	if ( raw < 0xFFFF )
+		aKi = fixedintb1002float(raw);
+	else
+		aKi = 1;
 
-void RPMBoostController::writeToEEprom () {
+	raw = EEPROMReaduint16 (EEPROM_N75_PID_cKp);
+	if ( raw < 0xFFFF )
+		cKp = fixedintb1002float(raw);
+	else
+		cKp = 1;
+	raw = EEPROMReaduint16 (EEPROM_N75_PID_cKd);
+	if ( raw < 0xFFFF )
+		cKd = fixedintb1002float(raw);
+	else
+		cKd = 0.05;
+	raw = EEPROMReaduint16 (EEPROM_N75_PID_cKi);
+	if ( raw < 0xFFFF )
+		cKi = fixedintb1002float(raw);
+	else
+		cKi = 0.25;
+
+	raw = EEPROMReaduint16 (EEPROM_N75_PID_aAT);
+	if ( raw < 0xFFFF )
+		apidActivationThresholdFactor = fixedintb1002float(raw);
+	else
+		apidActivationThresholdFactor = 0.5;
+	raw = EEPROMReaduint16 (EEPROM_N75_PID_cAT);
+	if ( raw < 0xFFFF )
+		cpidActivationThresholdFactor = fixedintb1002float(raw);
+	else
+		cpidActivationThresholdFactor = 0.85;
+
+	uint8_t b = EEPROM.read(EEPROM_N75_ENABLE_PID);
+	if (b==0 || b==255)
+		usePID = false;
+	else
+		usePID = true;
+}
+
+void RPMBoostController::writeParamsToEEprom () {
+	EEPROMWriteuint16 (EEPROM_N75_PID_aKp, float2fixedintb100(aKp) );
+	EEPROMWriteuint16 (EEPROM_N75_PID_aKd, float2fixedintb100(aKd) );
+	EEPROMWriteuint16 (EEPROM_N75_PID_aKi, float2fixedintb100(aKi) );
+	EEPROMWriteuint16 (EEPROM_N75_PID_cKp, float2fixedintb100(cKp) );
+	EEPROMWriteuint16 (EEPROM_N75_PID_cKd, float2fixedintb100(cKd) );
+	EEPROMWriteuint16 (EEPROM_N75_PID_cKi, float2fixedintb100(cKi) );
+	EEPROMWriteuint16 (EEPROM_N75_PID_aAT, float2fixedintb100(apidActivationThresholdFactor) );
+	EEPROMWriteuint16 (EEPROM_N75_PID_cAT, float2fixedintb100(cpidActivationThresholdFactor) );
+	if ( usePID )
+		EEPROM.write(EEPROM_N75_ENABLE_PID, 1);
+	else
+		EEPROM.write(EEPROM_N75_ENABLE_PID, 0);
+}
+
+void RPMBoostController::writeMapsToEEprom () {
 	for ( uint8_t i = 0; i < GEARS ; i++ ) {
 		highboost_duty_cycle[i]->writeToEeprom( EEPROM_N75_HIGH_DUTY_CYCLE_MAPS + i*16 );
 		highboost_pid_boost[i]->writeToEeprom( EEPROM_N75_PID_HIGH_SETPOINT_MAPS + i*32 );
 		lowboost_duty_cycle[i]->writeToEeprom( EEPROM_N75_LOW_DUTY_CYCLE_MAPS + i*16 );
 		lowboost_pid_boost[i]->writeToEeprom( EEPROM_N75_PID_LOW_SETPOINT_MAPS + i*32);
 	}
+
 }
