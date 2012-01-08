@@ -656,21 +656,6 @@ void MultidisplayController::serialReceive() {
 		}
 #endif
 		;
-#ifdef BOOSTPID
-		double p, i, d;  // * read in and set the controller tunings
-		p = double(srData.asFixedInt32[3] / 1000.0);
-		i = double(srData.asFixedInt32[4] / 1000.0);
-		d = double(srData.asFixedInt32[5] / 1000.0);
-
-		if ( boostController.boostPid != NULL ) {
-			boostController.boostPid->SetTunings(p, i, d);
-
-			if(command==0)
-				boostController.boostPid->SetMode(MANUAL);// * set the controller mode
-			else
-				boostController.boostPid->SetMode(AUTO);
-		}
-#endif
 
 
 	} else 	{

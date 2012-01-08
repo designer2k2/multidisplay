@@ -41,10 +41,10 @@ void RPMBoostController::myconstructor() {
 	req_Boost_PWM = 0;
 	req_Boost = 0;
 
-//	pidActivationThreshold = 0;
 }
 
 void RPMBoostController::toggleMode (uint8_t nmode) {
+	//FIXME
 	if (mode != nmode) {
 		mode = nmode;
 	}
@@ -85,13 +85,18 @@ void RPMBoostController::compute () {
 			//set the map pwm value as base for the pid controller
 			pidBoostOutput = req_Boost_PWM;
 			//set the map pwm as output pwm
-			boostOutput = req_Boost_PWM;
+			//we want a silent N75 on idle
+			if ( data.calRPM > 1200 || data.calThrottle > 15 )
+				boostOutput = req_Boost_PWM;
+			else boostOutput = 0;
 		}
 	} else {
 		//no PID
-
-		//FIXME: set output to 0 if throttle is idle!
-		boostOutput = req_Boost_PWM;
+		//we want a silent N75 on idle
+		if ( data.calRPM > 1200 || data.calThrottle > 15 )
+			boostOutput = req_Boost_PWM;
+		else
+			boostOutput = 0;
 	}
 }
 
@@ -262,6 +267,7 @@ void RPMBoostController::serialSendN75Params (uint8_t serial) {
 
 	Serial.print("\2");
 	uint8_t outbuf = SERIALOUT_BINARY_TAG_N75_PARAMS;
+	Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
 	Serial.write ( (uint8_t*) &(serial), sizeof(uint8_t) );
 	uint16_t outbuf16 = float2fixedintb100(aKp);
 	Serial.write ( (uint8_t*) &outbuf16, sizeof(uint16_t) );

@@ -45,7 +45,6 @@
 #define GEAR_RECOGNITION
 
 #define BOOSTN75
-//#define BOOSTPID
 #define BOOST_NORMAL 1.0
 #define BOOST_RACE 1.5
 #define N75_MANUALDUTY_NORMAL 96
