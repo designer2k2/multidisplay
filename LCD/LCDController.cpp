@@ -73,8 +73,8 @@ void  LCDController::myconstructor() {
     myScreens[4] = new LCDScreen5();
     myScreens[5] = new LCDScreen6();
     myScreens[6] = new LCDScreen9();
-    myScreens[7] = new LCDScreen1();
-//    myScreens[8] = new LCDScreen2();
+    myScreens[7] = new LCDScreen8();
+//    myScreens[8] = new LCDScreen8();
 //    myScreens[9] = new LCDScreen11();
 #else
     myScreens[0] = new LCDScreen10();

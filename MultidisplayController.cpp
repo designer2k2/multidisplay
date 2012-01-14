@@ -507,8 +507,8 @@ void MultidisplayController::AnaConversion() {
 
     //Calibration for RPM (its 2.34!)
 	//Check if the Boost is a new Max Boost Event
-	if( data.calBoost >= data.maxLdE[1] ) 	{
-		SaveMax(1);
+	if( data.calBoost >= data.maxValues[MAXVAL_BOOST].boost ) 	{
+		data.saveMax(MAXVAL_BOOST);
 	}
 
 	//Lambda:
@@ -573,14 +573,33 @@ void MultidisplayController::AnaConversion() {
 	data.calRPM = data.rpmAverage*RPMFACTOR;                   // apply the factor for calibration
 
 	//Check if the RPM is a new Max RPM Event
-	if ( data.calRPM >= data.maxRpmE[2] ) {
-		SaveMax(2);
+	if ( data.calRPM >= data.maxValues[MAXVAL_RPM].rpm ) {
+		data.saveMax(MAXVAL_RPM);
 	}
 	data.rpm_map_idx = (uint8_t) map ( constrain (data.calRPM, 0, RPM_MAX_FOR_BOOST_CONTROL),
 			0, RPM_MAX_FOR_BOOST_CONTROL, 0, 255);
 #ifdef V2DEVDEBUG
 	}
 #endif
+
+	//Speed
+	data.speedTotal -= data.speedReadings[data.speedIndex];
+	data.speedReadings[data.speedIndex] = data.anaIn[SPEEDPIN];
+	data.speedTotal += data.speedReadings[data.speedIndex];
+	data.speedIndex = data.speedIndex++;
+
+	if (data.speedIndex >= SPEEDSMOOTH)
+		data.speedIndex = 0;
+
+	data.speedAverage = data.speedTotal / SPEEDSMOOTH;               // calculate the average
+	data.speed = data.speedAverage*SPEEDFACTOR;                   // apply the factor for calibration
+
+	//Check if the speed is a new Max speed Event
+	if ( data.speed >= data.maxValues[MAXVAL_SPEED].speed ) {
+		data.saveMax(MAXVAL_SPEED);
+	}
+
+
 
 	//Battery Voltage: (Directly from the Arduino!, so only 1024, not 4096.)
 	//measured Voltage * 4,09 + 0,7V should give the supply voltage
@@ -707,7 +726,7 @@ void MultidisplayController::serialReceive() {
 						saveSettings2Eeprom();
 						break;
 					case 2:
-						CalibrateLD();
+						calibrateLD();
 						break;
 					case 3:
 						readSettingsFromEeprom();
@@ -818,7 +837,7 @@ void MultidisplayController::serialReceive() {
 						//set n75 new params
 						// 9 set N75 params: 9 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable)
 						if ( bytes_read >= 20 ) {
-							boostController.setN75Params( (uint16_t*) &srData.asBytes[2]);
+							boostController.setN75Params( (uint16_t*) &(srData.asBytes[2]));
 							serialSendAck (srData.asBytes[1]);
 						}
 						break;
@@ -950,9 +969,9 @@ void MultidisplayController::serialSend() {
 		Serial.print(";");
 		Serial.print(data.calCaseTemp);
 		Serial.print(";");
-		Serial.print(data.calAgt[0]);
+		Serial.print(data.calEgt[0]);
 		Serial.print(";");
-		Serial.print(data.calAgt[1]);
+		Serial.print(data.calEgt[1]);
 		Serial.print(";");
 		Serial.print(data.batVolt);
 		Serial.print(";");
@@ -983,8 +1002,8 @@ void MultidisplayController::serialSend() {
 		outbuf = float2fixedintb100(data.calAbsoluteBoost);
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
 
-		Serial.write ( (uint8_t*) &(data.calAgt[0]), sizeof(int) );
-		Serial.write ( (uint8_t*) &(data.calAgt[1]), sizeof(int) );
+		Serial.write ( (uint8_t*) &(data.calEgt[0]), sizeof(int) );
+		Serial.write ( (uint8_t*) &(data.calEgt[1]), sizeof(int) );
 
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
 
@@ -1041,12 +1060,13 @@ void MultidisplayController::serialSend() {
 
 		//8 x 16 bit -> 16 bytes
 		for ( uint8_t i = 0 ; i < MAX_ATTACHED_TYPK ; i++)
-			Serial.write ( (uint8_t*) &(data.calAgt[i]), sizeof(int) );
+			Serial.write ( (uint8_t*) &(data.calEgt[i]), sizeof(int) );
 
 		// 2 bytes
 		outbuf = float2fixedintb100(data.batVolt);
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
 
+		//FIXME send as float
 		// 12 bytes
 		Serial.write ( (uint8_t*) &(data.VDOPres1), sizeof(int) );
 		Serial.write ( (uint8_t*) &(data.VDOPres2), sizeof(int) );
@@ -1064,9 +1084,14 @@ void MultidisplayController::serialSend() {
 		// 2 bytes
 		outbuf = float2fixedintb100(boostController.req_Boost);
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
+		//FIXME do we need the pwm value from the map too ?
 
-		//TODO flags
+		/*
+		 * flags: bit 0 : n75 pid enabled
+		 */
 		outbuf = 0;
+		if ( boostController.usePID )
+			outbuf |= 1;
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
 		/*
 		 * TODO add
@@ -1142,7 +1167,7 @@ void MultidisplayController::ChangeSerOut()
 }
 //-------------------------------------------------------------------------------------------------------
 
-void MultidisplayController::CalibrateLD()
+void MultidisplayController::calibrateLD()
 {
 	data.boostAmbientPressureBar = data.calAbsoluteBoost;
 	// changed from global val3 to caluclation of mapped boost
@@ -1269,15 +1294,11 @@ void MultidisplayController::FetchTypK()  {
 			Temp += int(data.calCaseTemp);                       //apply the Correction
 		}
 
-		data.calAgt[i] = Temp;              //Save it into the array
-
-		//Check if the Temp is a new Max Temp Event
-		if(Temp>=data.maxAgtValE[3]) {
-			SaveMax(3);
-		}
+		data.calEgt[i] = Temp;              //Save it into the array
 
 		//repeat for all NumTypK+1 channels.
 	}
+	data.checkAndSaveMaxEgt();
 }
 
 /**
@@ -1288,7 +1309,7 @@ void MultidisplayController::FetchTypK()  {
 void MultidisplayController::fetchTypK3_fast() {
 	switch ( typK_state ) {
 	case TYPK_STATE_NEXT_SELECT_CHANNEL :
-		incTypKChannel();
+		incTypKChannel(); //checks and saves max EGT
 		selectTypKchannelForReading (typK_state_cur_channel);
 		typK_state_time2read = millis() + 20;
 		typK_state = TYPK_STATE_NEXT_READ_CHANNEL;
@@ -1314,6 +1335,7 @@ void MultidisplayController::fetchTypK2()  {
 
 		readTypK(i);
 	}
+	data.checkAndSaveMaxEgt();
 }
 
 
@@ -1344,12 +1366,7 @@ void MultidisplayController::readTypK ( uint8_t channel ) {
 		Temp += int(data.calCaseTemp);                       //apply the Correction
 	}
 
-	data.calAgt[channel] = Temp;              //Save it into the array
-
-	//Check if the Temp is a new Max Temp Event
-	if(Temp>=data.maxAgtValE[3]) {
-		SaveMax(3);
-	}
+	data.calEgt[channel] = Temp;              //Save it into the array
 }
 
 
@@ -1374,12 +1391,12 @@ void MultidisplayController::CheckLimits()
 //	}
 #endif
 
-	if(data.calAgt[0]>MaxAGT) {
+	if(data.calEgt[0]>MaxAGT) {
 		FlashTrigger = 1;    //Enable the LCDFlash
 	}
 
 
-	if(data.calAgt[1]>MaxAGT) 	{
+	if(data.calEgt[1]>MaxAGT) 	{
 		FlashTrigger = 1;    //Enable the LCDFlash
 	}
 
@@ -1418,21 +1435,6 @@ void MultidisplayController::CheckLimits()
 }
 
 //----------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------
-//Saves all Data to the arrays
-void MultidisplayController::SaveMax(uint8_t Num)
-{
-	data.maxAgtValE[Num] = data.calAgt[0];
-	data.maxLdE[Num] = data.calBoost;
-	data.maxRpmE[Num] = data.calRPM;
-	data.maxLmmE[Num] = data.calLMM;
-	data.maxOilE[Num] = data.VDOPres1;
-}
-
-
-
-
 
 
 
@@ -1642,7 +1644,7 @@ void MultidisplayController::buttonBHold() {
 		break;
 	case 1:
 		//The Calibration from the LD will be done
-		CalibrateLD();
+		calibrateLD();
 		break;
 	default:
 		break;

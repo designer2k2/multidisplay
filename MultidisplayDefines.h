@@ -171,6 +171,10 @@
 #define RPMSMOOTH 5                 //how many readings will be taken for the smoothing (5 is quick and smooth, 10 would be supersmooth but its getting slow)
 #define RPMMAX 3400                 //its about 8k
 
+#define SPEEDFACTOR 0.33332
+#define SPEEDSMOOTH 5
+#define SPEEDPIN 4 //analog 4
+
 #define TEMPTYPKREADINGS 28         //how many entrys are in the Lookup Table
 #define NUMBER_OF_ATTACHED_TYPK 1                   //how many TypK`s are attached
 #define MAX_ATTACHED_TYPK 8			//max typk which can be attached

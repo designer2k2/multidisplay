@@ -23,6 +23,7 @@
 #include "MultidisplayDefines.h"
 #include "MultidisplayController.h"
 #include "LCDController.h"
+#include "SensorData.h"
 
 LCDScreen8::LCDScreen8() {
 	flags.f.doCal=1;
@@ -39,42 +40,36 @@ LCDScreen8::LCDScreen8() {
 
 
 void LCDScreen8::customInit() {
-	lcdp->lcdCommandWriteAndPrintIn_P (0x80, PSTR("Max "));
-	lcdp->lcdCommandWriteAndPrintIn_P (0xC0, PSTR("LD:       RPM:"));
-	lcdp->lcdCommandWriteAndPrintIn_P (0x94, PSTR("LMM:      AGT:"));
+	lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[0], PSTR("Max "));
+	lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[1], PSTR("LD:       RPM:"));
+	lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[2], PSTR("LMM:      EGT:"));
 	//line 4
-	//lcdp->lcdCommandWriteAndPrintIn_P(0xD4, PSTR("T7:       T8:"));
+	//lcdp->lcdCommandWriteAndPrintIn_P(lcdController.ystart[3], PSTR("T7:       T8:"));
 }
 
 
 void LCDScreen8::toggleMax () {
 	//changes the MAX screen through all values
 	maxr++;
-	if ( maxr >= 4 )
+	if ( maxr >= MAXVALUES )
 		maxr = 0;
 }
 
 void LCDScreen8::customDraw()  {
-
 	//Header:
 	lcdController.printInt(0x80+4, maxr);
 
-
-	lcdp->commandWrite(0xC0+3);                  //Max1LD
-
-	if(data.maxLdE[maxr]<0.0)  {
-		lcdp->printIn("-");
-	} else {
-		lcdp->printIn(" ");
-	}
-	lcdController.printFloat2DP(abs(data.maxLdE[maxr]));
+	lcdController.printFloat2DP ( lcdController.ystart[1] + 3, data.maxValues[maxr].boost );
 
 	//Max1RPM
-	lcdController.printInt(0xC0+14, data.maxRpmE[maxr]);
+	lcdController.printInt ( lcdController.ystart[1]+14, data.maxValues[maxr].rpm );
 	//FIXME removed lcdController.print2Blanks(); after each print. if we need it -> custom formatstring!
 
 	//LMM
-	lcdController.printInt(0x94+4, data.maxLmmE[maxr]);
+	lcdController.printInt ( lcdController.ystart[2]+4, data.maxValues[maxr].lmm );
 
-	lcdController.printInt(0x94+14, data.maxAgtValE[maxr]);
+	if ( NUMBER_OF_ATTACHED_TYPK > 0 ) {
+		//FIXME
+		lcdController.printInt(lcdController.ystart[2]+14, data.maxValues[maxr].egt[0]);
+	}
 }

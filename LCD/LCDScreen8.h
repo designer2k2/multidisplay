@@ -25,6 +25,7 @@
 /**
  * Max Value Screen (This shows the Max LD, RPM or AGT or Oil values)
  * screen8: max boost, rpm, lmm, agt
+ * FIXME extend me
  */
 class LCDScreen8: public LCDScreen {
 public:

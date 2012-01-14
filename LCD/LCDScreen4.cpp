@@ -53,19 +53,19 @@ void LCDScreen4::customDraw()  {
 
 	//FIXME removed lcdController.print2Blanks(); after each print. if we need it -> custom formatstring!
 	//T1
-	lcdController.printInt(0x80+4, data.calAgt[0]);
+	lcdController.printInt(0x80+4, data.calEgt[0]);
 	//T2
-	lcdController.printInt(0x80+14, data.calAgt[1]);
+	lcdController.printInt(0x80+14, data.calEgt[1]);
 	//T3
-	lcdController.printInt(0xC0+4, data.calAgt[2]);
+	lcdController.printInt(0xC0+4, data.calEgt[2]);
 	//T4
-	lcdController.printInt(0xC0+14, data.calAgt[3]);
+	lcdController.printInt(0xC0+14, data.calEgt[3]);
 	//T5
-	lcdController.printInt(0x94+4, data.calAgt[4]);
+	lcdController.printInt(0x94+4, data.calEgt[4]);
 	//T6
-	lcdController.printInt(0x94+14, data.calAgt[5]);
+	lcdController.printInt(0x94+14, data.calEgt[5]);
 	//T7
-	lcdController.printInt(0xD4+4, data.calAgt[6]);
+	lcdController.printInt(0xD4+4, data.calEgt[6]);
 	//T8
-	lcdController.printInt(0xD4+14, data.calAgt[7]);
+	lcdController.printInt(0xD4+14, data.calEgt[7]);
 }

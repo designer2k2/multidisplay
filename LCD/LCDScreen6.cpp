@@ -80,13 +80,13 @@ void LCDScreen6::customDraw()  {
 //		snprintf(lcdController.cbuf, LCD_BUFSIZE 21, "%4d", data.calAgt[0]);
 //		lcdController.printBigNum (lcdController.cbuf, LCD_WIDTH-8, 8, 0, LCD_BIGFONT_2);
 
-		lcdController.printBigNum ( (uint16_t) data.calAgt[0], 6, 8, 0, LCD_BIGFONT_2);
+		lcdController.printBigNum ( (uint16_t) data.calEgt[0], 6, 8, 0, LCD_BIGFONT_2);
 //		lcdController.bigNum24(data.calAgt[0],0+8);
 
 		//T2:
 		//bigNum24(CalAGT[1],20);
 //		lcdController.bigNum24(data.calAgt[1],20+8);
 		//sollte ganz rechts ausgegeben werden!
-		lcdController.printBigNum ( (uint16_t) data.calAgt[1], LCD_WIDTH-8, 8, 2, LCD_BIGFONT_2);
+		lcdController.printBigNum ( (uint16_t) data.calEgt[1], LCD_WIDTH-8, 8, 2, LCD_BIGFONT_2);
 	}
 }

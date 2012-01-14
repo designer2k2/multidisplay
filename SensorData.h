@@ -24,6 +24,30 @@
 #include <stdint.h>
 #include "MultidisplayDefines.h"
 
+#define MAXVALUES 8
+#define MAXVAL_BOOST 0
+#define MAXVAL_LMM 1
+#define MAXVAL_LAMBDA 2
+#define MAXVAL_RPM 3
+#define MAXVAL_SPEED 4
+#define MAXVAL_OILPRES 5
+#define MAXVAL_GASPRES 6
+#define MAXVAL_EGT 7
+
+class MaxDataSet {
+public:
+	MaxDataSet () : boost(0), lmm(0), lambda(0), rpm(0), speed(0), oilpres(0), gaspres(0), gear(0) {};
+	float boost;
+	float lmm;
+	float lambda;
+	uint16_t rpm;
+	uint16_t speed;
+	float oilpres;
+	float gaspres;
+	uint8_t gear;
+	uint16_t egt[NUMBER_OF_ATTACHED_TYPK];
+};
+
 class SensorData {
 public:
 	int anaIn[17];
@@ -33,7 +57,7 @@ public:
 	int ldCalPoint;             //where to draw the dot from the calibration
 
 
-	int calAgt[NUMBER_OF_ATTACHED_TYPK];  //All Typ K Values will be stored inside this array
+	uint16_t calEgt[NUMBER_OF_ATTACHED_TYPK];  //All Typ K Values will be stored inside this array
 
 	//RPM Smoothing:
 	int rpmReadings[RPMSMOOTH];                // the readings from the analog input
@@ -60,17 +84,18 @@ public:
 	int VDOPres3;
 	float batVolt;
 
-	//Saving of the MAx Values: (0=AGT, 1=Boost, 2=RPM)
-	unsigned int maxAgtValE[4];          //maximum AGT
-	float maxLdE[4];
-	long maxRpmE[4];            //maximum RPM
-	float maxLmmE[4];         //maximum LMM
-	int maxOilE[4];             //maximum Oilpressure
+	//new V2 style
+	MaxDataSet maxValues[MAXVALUES];
 
 
 #ifdef MULTIDISPLAY_V2
 	uint16_t speed;
 	uint8_t gear;
+
+	int speedReadings[SPEEDSMOOTH];                // the readings from the analog input
+	uint8_t speedIndex;                            // the index of the current reading
+	int speedTotal;                            // the running total
+	int speedAverage;
 
 	/*
 	 * Digifant
@@ -98,6 +123,10 @@ public:
 	void myconstructor();
 
 	void generate_debugData();
+
+	void saveMax(uint8_t maxEv);
+	void checkAndSaveMaxEgt ();
+
 };
 
 extern SensorData data;

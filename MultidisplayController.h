@@ -47,7 +47,7 @@ public:
 
 	void mainLoop();
 	void ChangeSerOut();
-	void CalibrateLD();
+	void calibrateLD();
 	void HeaderPrint();
 
 
@@ -81,7 +81,7 @@ private:
      *
      *  3: change serial mode: 2=enabled(string), 3=tunerpro adx request data
      *
-     *  4: eeprom: 1=save settings, 2 calibrate boost (measure and store ambient pressure)
+     *  4: V1 eeprom & config: 1=save settings, 2 calibrate boost (measure and store ambient pressure)
      *  			3 readSettings, 5 set lcd brightness, 4 set v1 n75 duty cycles
      *
      *  5: V2 dev debug / testing stuff
@@ -157,12 +157,13 @@ private:
 	void readTypK ( uint8_t channel );
 	void incTypKChannel () {
 		typK_state_cur_channel++;
-		if ( typK_state_cur_channel == NUMBER_OF_ATTACHED_TYPK )
+		if ( typK_state_cur_channel == NUMBER_OF_ATTACHED_TYPK ) {
 			typK_state_cur_channel = 0;
+			data.checkAndSaveMaxEgt();
+		}
 	}
 
 	void CheckLimits();
-	void SaveMax(uint8_t Num);
 
 	//button related functions
 	unsigned long buttonTime;   //Button time

@@ -22,6 +22,7 @@
 #include <EEPROM.h>
 #include <util.h>
 #include <stdint.h>
+#include <wiring.h>
 
 SensorData::SensorData () {
 }
@@ -65,16 +66,6 @@ void SensorData::myconstructor () {
 	VDOPres3 = 0;
 	batVolt = 0.0;
 
-
-	for ( int i = 0 ; i < 4 ; i++ ) {
-		maxAgtValE[i] = 0;
-		maxLdE[i] = 0;
-		maxRpmE[i] = 0;
-		maxLmmE[i] = 0;
-		maxOilE[i] = 0;
-	}
-
-
 	//rpm Smoothing init:
 	for (uint8_t i = 0; i < RPMSMOOTH; i++) {
 		rpmReadings[i] = 0;                      // initialize all the readings to 0
@@ -82,7 +73,7 @@ void SensorData::myconstructor () {
 
 	//TypK Array init:
 	for (uint8_t i = 0; i < NUMBER_OF_ATTACHED_TYPK ; i++) 	{
-		calAgt[i] = 0;
+		calEgt[i] = 0;
 	}
 
 #ifdef MULTIDISPLAY_V2
@@ -100,6 +91,15 @@ void SensorData::myconstructor () {
 	df_ect = 0;
 	df_iat = 0;
 	df_rpm = 0;
+
+	speedIndex = 0;
+	speedTotal = 0;
+	speedAverage = 0;
+	//speed Smoothing init:
+	for (uint8_t i = 0; i < SPEEDSMOOTH; i++) {
+		speedReadings[i] = 0;                      // initialize all the readings to 0
+	}
+
 #endif
 }
 
@@ -113,7 +113,7 @@ void SensorData::generate_debugData () {
 
 #ifdef TYPE_K
 	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++)
-		calAgt[i] = 88;
+		calEgt[i] = 88;
 #endif
 
 	batVolt=7;
@@ -128,4 +128,34 @@ void SensorData::generate_debugData () {
 
 	df_ignition = 6.0;
 	df_total_retard = 3;
+}
+
+void SensorData::saveMax(uint8_t maxEv) {
+	maxEv = constrain (maxEv, 0, MAXVALUES-1);
+
+	maxValues[maxEv].boost = calBoost;
+	maxValues[maxEv].lmm = calLMM;
+	maxValues[maxEv].lambda = calLambda;
+	maxValues[maxEv].rpm = calRPM;
+	maxValues[maxEv].speed = speed;
+	//FIXME change VDO storage to float and array!
+	maxValues[maxEv].oilpres = VDOPres1;
+	maxValues[maxEv].gaspres = VDOPres2;
+	maxValues[maxEv].gear = gear;
+	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++ )
+		maxValues[maxEv].egt[i] = calEgt[i];
+}
+
+void SensorData::checkAndSaveMaxEgt () {
+	//we're saving if me have a new max value over all channels!
+	uint16_t maxCur = 0;
+	uint16_t maxSaved = 0;
+	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++ ) {
+		if ( calEgt[i] > maxCur )
+			maxCur = calEgt[i];
+		if ( maxValues[MAXVAL_EGT].egt[i] > maxSaved )
+			maxSaved = maxValues[MAXVAL_EGT].egt[i];
+	}
+	if ( maxCur >= maxSaved )
+		saveMax (MAXVAL_EGT);
 }

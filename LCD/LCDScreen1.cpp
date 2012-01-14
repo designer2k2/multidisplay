@@ -67,7 +67,7 @@ void LCDScreen1::customDraw() {
 	//AGT1+AGT2/2 thats because off my 2 Probes
 //	char buf[12];
 //	lcdp->printIn( itoa((data.calAgt[0]+data.calAgt[1])/2, buf, 10));
-	lcdController.printInt( 0x80+5, (data.calAgt[0] + data.calAgt[1])/2);
+	lcdController.printInt( 0x80+5, (data.calEgt[0] + data.calEgt[1])/2);
 
 	lcdp->print(32);                           //Print a " " at the end, to clear in case its needed
 

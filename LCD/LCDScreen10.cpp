@@ -55,7 +55,7 @@ void LCDScreen10::customDraw() {
     lcdp->commandWrite(0x80 + 5);
     lcdController.printInt(0x80 + 5, data.calThrottle, 3 );
 //    lcdController.printFloat2DP(0x80 + 14, data.calCaseTemp);
-    lcdController.printInt(0x80 + 16, data.calAgt[0], 4);
+    lcdController.printInt(0x80 + 16, data.calEgt[0], 4);
     lcdController.printFloat2DP(lcdController.ystart[1] + 3, data.calLambdaF);
 #ifdef LAMBDA_E85
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[0]+16, PSTR("E85"));
