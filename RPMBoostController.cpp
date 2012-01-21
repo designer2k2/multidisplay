@@ -291,7 +291,7 @@ void RPMBoostController::serialSendN75Params (uint8_t serial) {
 	outbuf = 0;
 	if ( usePID )
 		outbuf |= 1;
-	Serial.write ( (uint8_t*) &outbuf16, sizeof(uint8_t) );
+	Serial.write ( (uint8_t*) &outbuf, sizeof(uint8_t) );
 
 	Serial.print("\3");
 

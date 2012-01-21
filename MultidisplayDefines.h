@@ -66,6 +66,7 @@
 //Options:
 
 #define V2DEVDEBUG 1
+#define BLUETOOTH_ON_SERIAL2 1
 
 //#define DEBUG 1
 //#define LCDTEST 1

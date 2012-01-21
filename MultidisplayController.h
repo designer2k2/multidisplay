@@ -196,7 +196,10 @@ private:
 	uint8_t df_kline_index;
 	uint8_t df_kline_status;
 	uint16_t df_kline_discarded_frames;
+#endif
 
+#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_SETUP_ON_SERIAL2)
+	unsigned long BTSerialTime;
 #endif
 
 #if defined(MULTIDISPLAY_V2) && defined(GEAR_RECOGNITION)
