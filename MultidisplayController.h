@@ -61,6 +61,7 @@ private:
     unsigned long FlashETimeU;
     unsigned long FlashTimeU;
 
+    uint16_t serialFreq;
     unsigned long serialTime;
 
     /**
@@ -107,6 +108,10 @@ private:
      *  		reply: STX 4 serial ETX	ACK!
      *  	10 get N75 params: 10 serial ETX
      *  		reply: STX tag=21 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable) ETX
+     * 		11 set serial frequency: 11 serial lowbyte hibyte
+     * 			reply: STX 4 serial ETX	ACK!
+     * 		12 reserved for get serial frequency: 12 serial
+     * 			reply: unimplemented!
      *
      *
      *  attention, you have to send ints, not chars over the serial line!

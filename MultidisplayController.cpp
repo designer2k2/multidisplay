@@ -199,21 +199,22 @@ void  MultidisplayController::myconstructor() {
 	Serial.println("MultiDisplay 1.1!");
 #endif
 
-#ifdef READFROMEEPROM
-	readSettingsFromEeprom();
-#endif
-
 	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
 	lcdController.init();
 
 	//Init the Buttons:
 	expanderWrite(0b10000011);        //This may needs to be modified when a third button is attached.
 
+	serialFreq = SERIALFREQ;
 	serialTime = millis();
 	typK_state = TYPK_STATE_NEXT_SELECT_CHANNEL;
 	typK_state_cur_channel = 0;
 
-#ifdef V2DEVDEBUG
+#ifdef READFROMEEPROM
+	readSettingsFromEeprom();
+#endif
+
+	#ifdef V2DEVDEBUG
 	v2devdebugflag = 0;
 #endif
 
@@ -791,7 +792,7 @@ void MultidisplayController::serialReceive() {
 				break;
 #endif
 			case 6:
-				//V2 N75 config
+				//V2 config
 				if ( bytes_read >= 2 ) {
 					switch ( srData.asBytes[0] ) {
 					case 1: // gearX mode(low=0 high=1) serial : request gearX high/low duty cycle map
@@ -862,6 +863,19 @@ void MultidisplayController::serialReceive() {
 							boostController.serialSendN75Params(srData.asBytes[1]);
 						}
 						break;
+					case 11:
+						//set serial frequency
+						if ( bytes_read >= 5 ) {
+							uint16_t f = srData.asBytes[2];
+							f += srData.asBytes[2] << 8;
+							serialFreq = f;
+							serialSendAck (srData.asBytes[1]);
+						}
+						break;
+					case 12:
+						//reserved for get serial frequency
+						break;
+
 					}
 
 				}
@@ -880,7 +894,7 @@ void MultidisplayController::serialSendAck (uint8_t serial) {
 }
 
 void MultidisplayController::saveSettings2Eeprom() {
-	EEPROM.write(100, lcdController.activeScreen );
+	EEPROM.write(EEPROM_ACTIVESCREEN, lcdController.activeScreen );
 
 #ifdef MULTIDISPLAY_V2
 	uint8_t ldp = data.ldCalPoint;
@@ -889,6 +903,10 @@ void MultidisplayController::saveSettings2Eeprom() {
 	float ldt = data.boostAmbientPressureBar;
 	if ( ldt > 0.0 && ldt < 1.2 )
 		EEPROMWriteLong (EEPROM_AMBIENTPRESSURE, ldt*1000);
+
+	EEPROM.write ( EEPROM_BRIGHTNESS, lcdController.brightness );
+
+	EEPROMWriteuint16( EEPROM_SERIALFREQ, serialFreq );
 #endif
 
 #ifdef BOOSTN75
@@ -899,7 +917,7 @@ void MultidisplayController::saveSettings2Eeprom() {
 
 void MultidisplayController::readSettingsFromEeprom() {
 	//what screen was last shown?
-	uint8_t t = EEPROM.read(100);
+	uint8_t t = EEPROM.read(EEPROM_ACTIVESCREEN);
 //	if ( t < SCREENCOUNT )
 //		lcdController.setActiveScreen (t);
 //	else
@@ -907,7 +925,7 @@ void MultidisplayController::readSettingsFromEeprom() {
 	//FIXME hack
 	lcdController.setActiveScreen (0);
 
-	lcdController.setBrightness (EEPROM.read(105));
+	lcdController.setBrightness (EEPROM.read(EEPROM_BRIGHTNESS));
 
 	uint8_t ldp = EEPROM.read(EEPROM_LDCALPOINT);
 	if ( ldp >= 0 && ldp <= 20 )
@@ -915,6 +933,10 @@ void MultidisplayController::readSettingsFromEeprom() {
 	float ldt = EEPROMReadLong(EEPROM_AMBIENTPRESSURE)/1000.0;      //gets the float back (thats accurate enough)
 	if ( ldt > 0.0 && ldt < 1.2 )
 		data.boostAmbientPressureBar = ldt;
+
+	uint16_t freq = EEPROMReaduint16(EEPROM_SERIALFREQ);
+	if ( freq < 0xFFFF )
+		serialFreq = freq;
 
 #ifdef BOOSTN75
 	boostController.n75_manual_normal = EEPROM.read (EEPROM_N75_MANUALDUTY_NORMAL);
