@@ -1630,7 +1630,7 @@ void MultidisplayController::mainLoop() {
 
 //		data.generate_debugData();
 		serialSend();
-		serialTime += SERIALFREQ;
+		serialTime += serialFreq;
 	}
 
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
