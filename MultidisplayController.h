@@ -52,7 +52,7 @@ public:
 
 
 
-private:
+//private:
     static const unsigned int PROGMEM tempTypK[];
     static const unsigned int PROGMEM tempVDOPressure[];
     static const unsigned int PROGMEM tempVDOTemp[];

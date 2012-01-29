@@ -34,6 +34,7 @@ LCDScreen11::~LCDScreen11() {
 void LCDScreen11::customInit() {
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[0], PSTR("RPM:"));
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[2], PSTR("gear:"));
+    lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[1]+10, PSTR("DF:"));
 }
 
 
@@ -51,6 +52,13 @@ void LCDScreen11::customDraw() {
 #ifdef BOOSTN75
     lcdController.printInt(lcdController.ystart[3], digitalRead(NORDSCHLEIFENPIN), 1);
     lcdController.printInt(lcdController.ystart[3] + 2, (int) boostController.boostOutput, 3);
+#endif
+
+#ifdef DIGIFANT_KLINE
+    lcdController.printInt(lcdController.ystart[2]+10, mController.df_kline_active_frame, 1);
+    lcdController.printInt(lcdController.ystart[2]+15, mController.df_kline_freq_milliseconds, 2);
+    lcdController.printInt(lcdController.ystart[3]+10, mController.df_kline_freq_helper0, 2);
+    lcdController.printInt(lcdController.ystart[3]+17, mController.df_kline_discarded_frames, 2);
 #endif
 
  }
