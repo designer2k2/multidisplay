@@ -1092,7 +1092,7 @@ void MultidisplayController::serialSend() {
 #endif
 
 		// 2 bytes
-		outbuf = float2fixedintb100(data.calBoost);
+		outbuf = float2fixedintb100(data.calAbsoluteBoost);
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
 #if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
 		Serial2.write ( (uint8_t*) &(outbuf), sizeof(int) );
