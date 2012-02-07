@@ -96,4 +96,10 @@ float fixedintb1002float (uint16_t in) {
 	return (float) (in / 100.0);
 }
 
+uint16_t float2fixedintb1000 (float in) {
+	return (uint16_t) (in * 1000.0);
+}
+float fixedintb10002float (uint16_t in) {
+	return (float) (in / 1000.0);
+}
 

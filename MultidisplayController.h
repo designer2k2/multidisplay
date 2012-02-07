@@ -106,12 +106,17 @@ public:
      *  		reply: STX 4 serial ETX	ACK!
      *  	9 set N75 params: 9 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable) ETX
      *  		reply: STX 4 serial ETX	ACK!
-     *  	10 get N75 params: 10 serial ETX
+     *  	10 get N75 params: 10 serial
      *  		reply: STX tag=21 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable) ETX
      * 		11 set serial frequency: 11 serial lowbyte hibyte
      * 			reply: STX 4 serial ETX	ACK!
      * 		12 reserved for get serial frequency: 12 serial
      * 			reply: unimplemented!
+     * 		13: get gear ratio: 13 serial
+     * 			reply: STX 17 serial gears gear*uint16(fixed_int_base1000) ETX
+     * 		14: set gear ratio: 14 serial gears gear*uint16(fixed_int_base1000)
+     * 			reply: STX 17 serial gears gear*uint16(fixed_int_base1000) ETX
+     *
      *
      *
      *  attention, you have to send ints, not chars over the serial line!
@@ -142,6 +147,7 @@ public:
 
 	void serialSend();
 	void serialSendAck (uint8_t serial);
+	void serialSendGearRatioMap (uint8_t serial);
 	void serialReceive();
 
 	int GetTypKTemp(unsigned int microVolts);

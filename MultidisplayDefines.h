@@ -197,11 +197,13 @@ typedef unsigned char byte;
 #define SERIALOUT_TUNERPRO_ADX 3
 
 //84 bytes
-#define SERIALOUT_BINARY_TAG 87
+#define SERIALOUT_BINARY_TAG 88
+#define SERIALOUT_BINARY_N75_TAG 23
 #define SERIALOUT_BINARY_TAG_N75_DUTY_MAP 22
 #define SERIALOUT_BINARY_TAG_N75_SETPOINT_MAP 38
 #define SERIALOUT_BINARY_TAG_ACK 4
 #define SERIALOUT_BINARY_TAG_N75_PARAMS 21
+#define SERIALOUT_BINARY_TAG_GEAR_RATIO_6G 17
 
 //send and receive each SERIALFREQ millisecs!
 #define SERIALFREQ 10
@@ -253,6 +255,9 @@ typedef unsigned char byte;
 #define EEPROM_N75_PID_aAT 14
 #define EEPROM_N75_PID_cAT 16
 #define EEPROM_N75_ENABLE_PID 18
+
+//6 x 16bit fixed int base 1000
+#define EEPROM_GEAR_RATIO_MAP_START 25
 
 //1 byte
 #define EEPROM_ACTIVESCREEN 100

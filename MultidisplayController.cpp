@@ -221,25 +221,6 @@ void  MultidisplayController::myconstructor() {
 #if defined(MULTIDISPLAY_V2) && defined(GEAR_RECOGNITION)
 	gear_state = GEAR_STATE_NEED_RECOGNITION;
 	last_gear = 0;
-
-	//TODO move to eeprom
-
-	//Corrado 02A ATB
-//	gear_ratio[0] = 13.0341;
-//	gear_ratio[1] = 7.26225;
-//	gear_ratio[2] = 4.64025;
-//	gear_ratio[3] = 3.34995;
-//	gear_ratio[4] = 2.74275;
-//	gear_ratio[5] = 2.74275;
-
-	//Corrado AYN
-	gear_ratio[0] = 13.918152;
-	gear_ratio[1] = 7.802712;
-	gear_ratio[2] = 4.95498;
-	gear_ratio[3] = 3.577164;
-	gear_ratio[4] = 2.785;
-	gear_ratio[5] = 2.785;
-
 #endif
 }
 
@@ -867,7 +848,7 @@ void MultidisplayController::serialReceive() {
 						//set serial frequency
 						if ( bytes_read >= 5 ) {
 							uint16_t f = srData.asBytes[2];
-							f += srData.asBytes[2] << 8;
+							f += srData.asBytes[3] << 8;
 							serialFreq = f;
 							serialSendAck (srData.asBytes[1]);
 						}
@@ -875,7 +856,25 @@ void MultidisplayController::serialReceive() {
 					case 12:
 						//reserved for get serial frequency
 						break;
-
+					case 13:
+						//get gear ratio map
+						if ( bytes_read >= 3 )
+							serialSendGearRatioMap (srData.asBytes[1]);
+						break;
+					case 14:
+						//set gear ratio map
+						if ( bytes_read >= 16 ) {
+							//14 serial gears gear*uint16(fixed_int_base1000)
+							if ( srData.asBytes[2] == 6 ) {
+								//only implemented for 6 gears!
+								for ( uint8_t i = 0 ; i < srData.asBytes[2] ; i++ ) {
+									uint16_t *p = (uint16_t*) srData.asBytes[3];
+									gear_ratio[i] = fixedintb10002float( *p );
+									p++;
+								}
+								serialSendGearRatioMap (srData.asBytes[1]);
+							}
+						}
 					}
 
 				}
@@ -893,7 +892,21 @@ void MultidisplayController::serialSendAck (uint8_t serial) {
 	Serial.write ( (uint8_t*) &(serial), sizeof(uint8_t) );
 	Serial.print("\3");
 }
-
+void MultidisplayController::serialSendGearRatioMap (uint8_t serial) {
+	if ( GEARS != 6 )
+		return; //unimplemented!
+	Serial.print("\2");
+	uint8_t outbuf = SERIALOUT_BINARY_TAG_GEAR_RATIO_6G;
+	Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
+	Serial.write ( (uint8_t*) &(serial), sizeof(uint8_t) );
+	outbuf = GEARS;
+	Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
+	for ( uint8_t i = 0 ; i < GEARS ; i++ ) {
+		uint16_t out = float2fixedintb1000( gear_ratio[i] );
+		Serial.write ( (uint8_t*) &(out), sizeof(uint16_t) );
+	}
+	Serial.print("\3");
+}
 void MultidisplayController::saveSettings2Eeprom() {
 	EEPROM.write(EEPROM_ACTIVESCREEN, lcdController.activeScreen );
 
@@ -908,6 +921,13 @@ void MultidisplayController::saveSettings2Eeprom() {
 	EEPROM.write ( EEPROM_BRIGHTNESS, lcdController.brightness );
 
 	EEPROMWriteuint16( EEPROM_SERIALFREQ, serialFreq );
+
+	// gear ratio
+	for ( uint8_t i = 0 ; i < GEARS ; i++ ) {
+		EEPROMWriteuint16( EEPROM_GEAR_RATIO_MAP_START + i*2,
+				float2fixedintb1000( gear_ratio[i] ) );
+	}
+
 #endif
 
 #ifdef BOOSTN75
@@ -939,6 +959,33 @@ void MultidisplayController::readSettingsFromEeprom() {
 	if ( freq < 0xFFFF )
 		serialFreq = freq;
 
+	// gear ratio
+	bool load_default_g = false;
+	for ( uint8_t i = 0 ; i < GEARS ; i++ ) {
+		uint16_t v = EEPROMReaduint16( EEPROM_GEAR_RATIO_MAP_START + 2*i );
+		if ( v < 0xFFFF )
+			gear_ratio[i] = fixedintb10002float( v );
+		else
+			load_default_g = true;
+	}
+	if ( load_default_g ) {
+		//Corrado 02A ATB
+	//	gear_ratio[0] = 13.0341;
+	//	gear_ratio[1] = 7.26225;
+	//	gear_ratio[2] = 4.64025;
+	//	gear_ratio[3] = 3.34995;
+	//	gear_ratio[4] = 2.74275;
+	//	gear_ratio[5] = 2.74275;
+
+		//Corrado AYN
+		gear_ratio[0] = 13.918152;
+		gear_ratio[1] = 7.802712;
+		gear_ratio[2] = 4.95498;
+		gear_ratio[3] = 3.577164;
+		gear_ratio[4] = 2.785;
+		gear_ratio[5] = 2.785;
+	}
+
 #ifdef BOOSTN75
 	boostController.n75_manual_normal = EEPROM.read (EEPROM_N75_MANUALDUTY_NORMAL);
 	boostController.n75_manual_race = EEPROM.read (EEPROM_N75_MANUALDUTY_RACE);
@@ -947,40 +994,6 @@ void MultidisplayController::readSettingsFromEeprom() {
 
 
 void MultidisplayController::serialSend() {
-
-//#ifdef BOOSTN75
-//
-//	if ( SerOut != SERIALOUT_TUNERPRO_ADX || SerOut != SERIALOUT_BINARY ) {
-//		Serial.print("\2");
-//		Serial.print("PID ");
-//		Serial.print(boostController.boostSetPoint);
-//		Serial.print(" ");
-//		Serial.print(data.calBoost);
-//		Serial.print(" ");
-//		Serial.print(boostController.boostOutput);
-//		Serial.print(" ");
-//		if ( boostController.boostPid != NULL ) {
-//#ifdef BOOSTPID
-//			Serial.print(boostController.boostPid->GetP_Param());
-//			Serial.print(" ");
-//			Serial.print(boostController.boostPid->GetI_Param());
-//			Serial.print(" ");
-//			Serial.print(boostController.boostPid->GetD_Param());
-//			Serial.print(" ");
-//			if (boostController.boostPid->GetMode()==AUTO)
-//				Serial.print("Automatic");
-//			else
-//				Serial.print("Manual");
-//#endif
-//		} else {
-//			Serial.print (" 0 0 0 M");
-//		}
-//
-//		Serial.print("\3");
-//		Serial.println();
-//
-//	}
-//#endif /* BOOSTN75 */
 
 	if ( SerOut != SERIALOUT_DISABLED ) {
 		Serial.print("\2");
@@ -1140,7 +1153,8 @@ void MultidisplayController::serialSend() {
 		Serial2.write ( (uint8_t*) &outbuf, sizeof(int) );
 #endif
 
-		//FIXME send as float
+		//FIXME send as float ??
+		//pressure is fixed int base 10
 		// 12 bytes
 		Serial.write ( (uint8_t*) &(data.VDOPres1), sizeof(int) );
 		Serial.write ( (uint8_t*) &(data.VDOPres2), sizeof(int) );
@@ -1166,6 +1180,8 @@ void MultidisplayController::serialSend() {
 		// 2 bytes
 		outbuf = float2fixedintb100(boostController.req_Boost);
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
+		// 1 byte N75 map pwm
+		Serial.write ( (uint8_t*) &(boostController.req_Boost_PWM), sizeof(uint8_t) );
 
 #if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
 		Serial2.write ( (uint8_t*) &(data.speed), sizeof(uint16_t) );
@@ -1174,26 +1190,21 @@ void MultidisplayController::serialSend() {
 		Serial2.write ( (uint8_t*) &(outbuf), sizeof(int) );
 #endif
 
-
-		//FIXME TODO do we need the pwm value from the map too ?
-
 		/*
-		 * flags: bit 0 : n75 pid enabled
+		 * reserved for flags:
+		 * bit 0 : n75 pid enabled
+		 * btt 1 : n75 pid aggressive settings
 		 */
 		outbuf = 0;
 		if ( boostController.usePID )
 			outbuf |= 1;
+		if ( boostController.aggressiveSettings )
+			outbuf |= 2;
+
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
 #if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
 		Serial2.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
 #endif
-
-		/*
-		 * TODO add
-		 * k,p,d, (?)
-		 * PID active
-		 * requested boost
-		 */
 
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
 		// 32 bytes

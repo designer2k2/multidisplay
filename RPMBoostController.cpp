@@ -75,8 +75,10 @@ void RPMBoostController::compute () {
 			if ( data.calBoost > cat  ) {
 				//double Kp, double Ki, double Kd
 				pid->SetTunings(cKp, cKi, cKd);
+				aggressiveSettings = false;
 			} else {
 				pid->SetTunings(aKp, aKi, aKd);
+				aggressiveSettings = true;
 			}
 			pid->Compute();
 			boostOutput = pidBoostOutput;

@@ -36,4 +36,7 @@ uint16_t float2fixedintb100 (float in);
 float fixedintb1002float (int in);
 float fixedintb1002float (uint16_t in);
 
+uint16_t float2fixedintb1000 (float in);
+float fixedintb10002float (uint16_t in);
+
 #endif /* UTIL_H_ */

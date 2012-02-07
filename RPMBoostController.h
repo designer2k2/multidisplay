@@ -64,6 +64,7 @@ public:
 	double pidBoostSetPoint;
 
 	bool usePID;
+	bool aggressiveSettings;
 
 	//! output from PID
 	double pidBoostOutput;
