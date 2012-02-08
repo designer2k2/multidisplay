@@ -104,10 +104,10 @@ public:
      *  		reply: STX 4 serial ETX	ACK!
      *  	8 serial save N75 params to eeprom
      *  		reply: STX 4 serial ETX	ACK!
-     *  	9 set N75 params: 9 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable) ETX
+     *  	9 set N75 params: 9 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable) bst_limit (16bit base 100)  ETX
      *  		reply: STX 4 serial ETX	ACK!
      *  	10 get N75 params: 10 serial
-     *  		reply: STX tag=21 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable) ETX
+     *  		reply: STX tag=21 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable) bst_limit (16bit base 100) ETX
      * 		11 set serial frequency: 11 serial lowbyte hibyte
      * 			reply: STX 4 serial ETX	ACK!
      * 		12 reserved for get serial frequency: 12 serial

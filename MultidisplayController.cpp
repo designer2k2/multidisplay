@@ -832,8 +832,9 @@ void MultidisplayController::serialReceive() {
 						break;
 					case 9:
 						//set n75 new params
-						// 9 set N75 params: 9 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100) flags (uint8 bit0=pid enable)
-						if ( bytes_read >= 20 ) {
+						// 9 set N75 params: 9 serial aKp aKi aKd cKp cKi cKd aAT cAT (16bit fixed uint16 base 100)
+						// flags (uint8 bit0=pid enable) bst_limit (16bit base 100)
+						if ( bytes_read >= 22 ) {
 							boostController.setN75Params( (uint16_t*) &(srData.asBytes[2]));
 							serialSendAck (srData.asBytes[1]);
 						}

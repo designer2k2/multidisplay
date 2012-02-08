@@ -80,6 +80,12 @@ void RPMBoostController::compute () {
 				pid->SetTunings(aKp, aKi, aKd);
 				aggressiveSettings = true;
 			}
+			//TODO test this on the road!
+			//check if current boost is too far away from the map values
+			//-> do we need to adjust the output pwm to a value nearer at the map value?
+			//if ( abs(req_Boost - data.calBoost) > (req_Boost/2) )
+			//	pidBoostOutput = req_Boost_PWM;
+
 			pid->Compute();
 			boostOutput = pidBoostOutput;
 		} else {
@@ -268,6 +274,7 @@ void RPMBoostController::setN75Params (uint16_t *data) {
 		usePID = true;
 	else
 		usePID = false;
+	n75_max_boost = fixedintb1002float ( * ((uint8_t*)data++) );
 }
 
 void RPMBoostController::serialSendN75Params (uint8_t serial) {
@@ -300,6 +307,9 @@ void RPMBoostController::serialSendN75Params (uint8_t serial) {
 	if ( usePID )
 		outbuf |= 1;
 	Serial.write ( (uint8_t*) &outbuf, sizeof(uint8_t) );
+
+	outbuf16 = float2fixedintb100(n75_max_boost);
+	Serial.write ( (uint8_t*) &outbuf16, sizeof(uint16_t) );
 
 	Serial.print("\3");
 
