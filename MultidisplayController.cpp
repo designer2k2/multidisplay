@@ -985,11 +985,6 @@ void MultidisplayController::readSettingsFromEeprom() {
 		gear_ratio[4] = 2.785;
 		gear_ratio[5] = 2.785;
 	}
-
-#ifdef BOOSTN75
-	boostController.n75_manual_normal = EEPROM.read (EEPROM_N75_MANUALDUTY_NORMAL);
-	boostController.n75_manual_race = EEPROM.read (EEPROM_N75_MANUALDUTY_RACE);
-#endif
 }
 
 

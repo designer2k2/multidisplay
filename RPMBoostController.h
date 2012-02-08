@@ -57,6 +57,9 @@ public:
 	uint8_t n75_manual_normal;
 	uint8_t n75_manual_race;
 
+	//TODO implement me!
+	double n75_max_boost;
+
 	double req_Boost_PWM;
 	double req_Boost;
 

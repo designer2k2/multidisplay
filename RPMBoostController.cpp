@@ -215,6 +215,12 @@ void RPMBoostController::loadParamsFromEEprom () {
 		usePID = false;
 	else
 		usePID = true;
+
+	uint16_t t2 = EEPROMReaduint16(EEPROM_N75_MAX_BOOST);
+	if ( t2 < 0xFFFF )
+		n75_max_boost = fixedintb1002float(t2);
+	else
+		n75_max_boost = 1.1;
 }
 
 void RPMBoostController::writeParamsToEEprom () {

@@ -255,6 +255,8 @@ typedef unsigned char byte;
 #define EEPROM_N75_PID_aAT 14
 #define EEPROM_N75_PID_cAT 16
 #define EEPROM_N75_ENABLE_PID 18
+//16bit
+#define EEPROM_N75_MAX_BOOST 19
 
 //6 x 16bit fixed int base 1000
 #define EEPROM_GEAR_RATIO_MAP_START 25
