@@ -106,6 +106,12 @@ void RPMBoostController::compute () {
 		else
 			boostOutput = 0;
 	}
+
+	//overboost protection
+	if ( data.calBoost > n75_max_boost ) {
+		boostOutput = boostOutput * 0.75;
+		pidBoostOutput = boostOutput;
+	}
 }
 
 void RPMBoostController::serialSendDutyMap ( uint8_t gear, uint8_t mode, uint8_t serial ) {
