@@ -482,6 +482,13 @@ void MultidisplayController::AnaConversion() {
 //	data.calBoostPSI = data.calBoostBar * BAR2PSI;
 	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
 #endif
+#ifdef BOOST_FREESCALE_MPXA6400A
+	data.calAbsoluteBoost = 5.0* ((float) data.anaIn[BOOSTPIN])/4096.0;             //only gets 0-5V
+	// Freescale MPXA6400A
+	// transfer function P = Vout/0.012105 + 3.477902
+	data.calAbsoluteBoost = (data.calAbsoluteBoost/0.012105 + 3.477902) / 100;     	//makes 0-400kPa out of it
+	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
+#endif
 #ifdef BOOST_BOSCH_200KPA
 	data.calAbsoluteBoost = 5.0* ((float) data.anaIn[BOOST2PIN])/4096.0;             //only gets 0-5V
 	data.calAbsoluteBoost = (data.calAbsoluteBoost + 0.25)/0.0252778;     	//makes 0-200kPa out of it

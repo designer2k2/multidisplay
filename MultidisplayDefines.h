@@ -38,6 +38,7 @@
 //define this if you measure the boost with SM-VAC/Boost instead of Motorola MPX4250AP / Bosch 200kpa
 //#define BOOST_PLX_SMVACBOOST
 //#define BOOST_MOTOROLA_MPX4250
+//#define BOOST_FREESCALE_MPXA6400A
 //on boostpin2
 #define BOOST_BOSCH_200KPA
 
