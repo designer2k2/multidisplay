@@ -71,6 +71,40 @@ const unsigned int MultidisplayController::tempTypK[] =
 		51431
 };
 
+
+/*
+Lookup Table for the Oilpressure:
+from 0-5Bar in steps of 0.5Bar, the list is in 12Bit Digital Reading
+when supplied with 5V and a 220Ohm Resistor in series
+(measuring the Voltage on the Sensor)
+it has a increasing Resistance with the Pressure (11-184 Ohm).
+
+potential divider (Spannungssteiler)
+
++5V ---- [ R1 = 220 Ohm ] --|-- [ VDO Sensor R2 ] ------------ GND
+                            |
+                            |- AVR ADC ----------------------- GND
+
+        |        U1         |     U2                |
+
+        U2 = U * R2/(R1+R2)
+*/
+const unsigned int MultidisplayController::tempVDOPressure5Bar[] =
+{
+		195,
+		477,
+		721,
+		934,
+		1112,
+		1280,
+		1422,
+		1550,
+		1667,
+		1768,
+		1866,
+		1866
+};
+
 //Lookup Table for the Oilpressure: (12 Values)
 //from 0-10Bar in steps of 1Bar, the list is in 12Bit Digital Reading when supplied with 5V and a 220Ohm Resistor in series
 //(measuring the Voltage on the Sensor)
