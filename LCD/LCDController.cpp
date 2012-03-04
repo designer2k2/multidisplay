@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <avr/pgmspace.h>
 #include "wiring.h"
 
 #include "MultidisplayDefines.h"
@@ -354,8 +355,8 @@ void LCDController::printFloat(uint8_t pos, float f, uint16_t dp ) {
 
 const unsigned char LCDController::idata1[] = {28,28,28,30,30,31,31,31};  // 1--- k
 const unsigned char LCDController::idata2[] = {7,7,7,15,15,31,31,31};     // -1-- k
-const prog_uint8_t LCDController::idata3[] = {31,31,31,28,28,28,28,28};  // --1- k
-const prog_uint8_t LCDController::idata4[] = {24,28,30,15,7,7,7,7};      // ---1 k
+const uint8_t LCDController::idata3[] PROGMEM = {31,31,31,28,28,28,28,28};  // --1- k
+const uint8_t PROGMEM LCDController::idata4[] = {24,28,30,15,7,7,7,7};      // ---1 k
 
 void LCDController::cgramIntro() {
 	lcdUploadUdef5x8_P (1,idata1);

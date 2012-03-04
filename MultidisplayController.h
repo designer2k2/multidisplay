@@ -55,7 +55,6 @@ public:
 //private:
     static const unsigned int PROGMEM tempTypK[];
     static const unsigned int PROGMEM tempVDOPressure[];
-    static const unsigned int PROGMEM tempVDOPressure5Bar[];
     static const unsigned int PROGMEM tempVDOTemp[];
     uint8_t IOport2;
     TwoWire wire;

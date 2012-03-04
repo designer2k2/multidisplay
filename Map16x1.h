@@ -8,6 +8,8 @@
 #ifndef MAP16X1_H_
 #define MAP16X1_H_
 
+#include <avr/pgmspace.h>
+
 #include "util.h"
 
 class Map16x1 {
@@ -33,5 +35,17 @@ public:
 
 	double *data;
 };
+
+
+class MapVdo5Bar {
+public:
+	MapVdo5Bar();
+
+	uint16_t map (uint8_t idx);
+
+	static const uint16_t PROGMEM lookupVDOPressure5Bar[];
+};
+
+extern MapVdo5Bar mapVdo5Bar;
 
 #endif /* MAP16X1_H_ */

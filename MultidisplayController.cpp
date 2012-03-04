@@ -24,6 +24,7 @@
 #include "LCDScreen7.h"
 #include "BoostController.h"
 #include "RPMBoostController.h"
+#include "Map16x1.h"
 
 #include <stdlib.h>
 #include <inttypes.h>
@@ -71,39 +72,6 @@ const unsigned int MultidisplayController::tempTypK[] =
 		51431
 };
 
-
-/*
-Lookup Table for the Oilpressure:
-from 0-5Bar in steps of 0.5Bar, the list is in 12Bit Digital Reading
-when supplied with 5V and a 220Ohm Resistor in series
-(measuring the Voltage on the Sensor)
-it has a increasing Resistance with the Pressure (11-184 Ohm).
-
-potential divider (Spannungssteiler)
-
-+5V ---- [ R1 = 220 Ohm ] --|-- [ VDO Sensor R2 ] ------------ GND
-                            |
-                            |- AVR ADC ----------------------- GND
-
-        |        U1         |     U2                |
-
-        U2 = U * R2/(R1+R2)
-*/
-const unsigned int MultidisplayController::tempVDOPressure5Bar[] =
-{
-		195,
-		477,
-		721,
-		934,
-		1112,
-		1280,
-		1422,
-		1550,
-		1667,
-		1768,
-		1866,
-		1866
-};
 
 //Lookup Table for the Oilpressure: (12 Values)
 //from 0-10Bar in steps of 1Bar, the list is in 12Bit Digital Reading when supplied with 5V and a 220Ohm Resistor in series
@@ -221,6 +189,7 @@ void  MultidisplayController::myconstructor() {
 
 	//bluetooth module
 	Serial2.begin(115200);
+//	Serial2.begin(9600);
 
 	wire.begin();                  //Start the Wire Libary for the PCF8574
 
@@ -642,7 +611,8 @@ void MultidisplayController::AnaConversion() {
 	data.VDOTemp1 = GetVDOTemp(data.anaIn[VDOT1PIN]);
 	data.VDOTemp2 = GetVDOTemp(data.anaIn[VDOT2PIN]);
 	data.VDOTemp3 = GetVDOTemp(data.anaIn[VDOT3PIN]);
-	data.VDOPres1 = GetVDOPressure(data.anaIn[VDOP1PIN]);
+	data.VDOPres1 = mapVdo5Bar.map ( data.anaIn[VDOP2PIN] >> 7 );
+	//FIXME complete rewrite to mBar
 	data.VDOPres2 = GetVDOPressure(data.anaIn[VDOP2PIN]);
 	data.VDOPres3 = GetVDOPressure(data.anaIn[VDOP3PIN]);
 
@@ -1378,7 +1348,12 @@ int MultidisplayController::GetVDOTemp(unsigned int ADWreading) {
 	return LookedupValue;
 }
 
-//Converts the ADW Reading into 0.1Bar (must be divided by 10 for Bar)
+
+
+/*
+ * Converts the ADW Reading into 0.1Bar (must be divided by 10 for Bar)
+ * @deprecated too slow!
+ */
 int MultidisplayController::GetVDOPressure(unsigned int ADWreading) {
 	int LookedupValue = 0;
 	//This searches the 2 surrounding values, and then linear interpolates between them.

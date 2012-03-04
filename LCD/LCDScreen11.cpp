@@ -33,6 +33,7 @@ LCDScreen11::~LCDScreen11() {
 
 void LCDScreen11::customInit() {
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[0], PSTR("RPM:"));
+    lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[1], PSTR("P1:"));
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[2], PSTR("gear:"));
     lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[1]+10, PSTR("DF:"));
 }
@@ -42,10 +43,11 @@ void LCDScreen11::customDraw() {
     lcdController.printInt(0x80 + 5, data.calRPM, 4 );
     lcdController.printInt(0x80 + 10, data.rpm_map_idx, 3 );
 
-    lcdController.printInt(lcdController.ystart[1], digitalRead(V2_BUTTON1), 1);
-    lcdController.printInt(lcdController.ystart[1]+2, digitalRead(V2_BUTTON2), 1);
-    lcdController.printInt(lcdController.ystart[1]+4, digitalRead(V2_BUTTON3), 1);
-    lcdController.printInt(lcdController.ystart[1]+6, digitalRead(V2_BUTTON4), 1);
+//    lcdController.printInt(lcdController.ystart[1], digitalRead(V2_BUTTON1), 1);
+//    lcdController.printInt(lcdController.ystart[1]+2, digitalRead(V2_BUTTON2), 1);
+//    lcdController.printInt(lcdController.ystart[1]+4, digitalRead(V2_BUTTON3), 1);
+//    lcdController.printInt(lcdController.ystart[1]+6, digitalRead(V2_BUTTON4), 1);
+    lcdController.printInt(lcdController.ystart[1]+3, data.VDOPres1, 4);
 
     lcdController.printInt(lcdController.ystart[2]+6, digitalRead(data.gear), 1);
 
