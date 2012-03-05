@@ -173,7 +173,8 @@
 #define RPMSMOOTH 5                 //how many readings will be taken for the smoothing (5 is quick and smooth, 10 would be supersmooth but its getting slow)
 #define RPMMAX 3400                 //its about 8k
 
-#define SPEEDFACTOR 0.33332
+//#define SPEEDFACTOR 0.33332
+#define SPEEDFACTOR 0.078125
 #define SPEEDSMOOTH 5
 #define SPEEDPIN 4 //analog 4
 
