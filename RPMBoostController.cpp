@@ -280,7 +280,10 @@ void RPMBoostController::setN75Params (uint16_t *data) {
 		usePID = true;
 	else
 		usePID = false;
-	n75_max_boost = fixedintb1002float ( * ((uint8_t*)data++) );
+	uint8_t* t = (uint8_t*) data;
+	++t;
+	data = (uint16_t*) t;
+	n75_max_boost = fixedintb1002float ( *data );
 }
 
 void RPMBoostController::serialSendN75Params (uint8_t serial) {
