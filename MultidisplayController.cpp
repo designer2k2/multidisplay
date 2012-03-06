@@ -151,6 +151,9 @@ void  MultidisplayController::myconstructor() {
 	pinMode (CLUTCHPIN, INPUT);
 	digitalWrite( CLUTCHPIN, HIGH); // turn on pullup resistors
 
+	pinMode (SPEEDPIN, INPUT);
+	digitalWrite (SPEEDPIN, LOW);
+
 	pinMode (N75PIN, OUTPUT);
 	//http://www.arduino.cc/playground/Main/TimerPWMCheatsheet
 	//http://www.arcfn.com/2009/07/secrets-of-arduino-pwm.html
