@@ -614,10 +614,12 @@ void MultidisplayController::AnaConversion() {
 	data.VDOTemp1 = GetVDOTemp(data.anaIn[VDOT1PIN]);
 	data.VDOTemp2 = GetVDOTemp(data.anaIn[VDOT2PIN]);
 	data.VDOTemp3 = GetVDOTemp(data.anaIn[VDOT3PIN]);
-	data.VDOPres1 = mapVdo5Bar.map ( data.anaIn[VDOP2PIN] >> 7 );
+
 	//FIXME complete rewrite to mBar
-	data.VDOPres2 = GetVDOPressure(data.anaIn[VDOP2PIN]);
-	data.VDOPres3 = GetVDOPressure(data.anaIn[VDOP3PIN]);
+	data.VDOPres1 = mapVdo5Bar.map ( data.anaIn[VDOP1PIN] >> 7 );
+	data.VDOPres2 = mapVdo5Bar.map ( data.anaIn[VDOP2PIN] >> 7 );
+	data.VDOPres3 = mapVdo5Bar.map ( data.anaIn[VDOP3PIN] >> 7 );
+	//data.VDOPres3 = GetVDOPressure(data.anaIn[VDOP3PIN]);
 
 }
 

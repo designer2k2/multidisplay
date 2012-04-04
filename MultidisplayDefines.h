@@ -36,11 +36,11 @@
 #define LAMBDA_WIDEBAND
 
 //define this if you measure the boost with SM-VAC/Boost instead of Motorola MPX4250AP / Bosch 200kpa
-#define BOOST_PLX_SMVACBOOST
+//#define BOOST_PLX_SMVACBOOST
 //#define BOOST_MOTOROLA_MPX4250
 //#define BOOST_FREESCALE_MPXA6400A
 //on boostpin2
-//#define BOOST_BOSCH_200KPA
+#define BOOST_BOSCH_200KPA
 
 #define GEARS 6
 #define GEAR_RECOGNITION
@@ -67,7 +67,8 @@
 //Options:
 
 #define V2DEVDEBUG 1
-#define BLUETOOTH_ON_SERIAL2 1
+//#define BLUETOOTH_ON_SERIAL2 1
+//#define BLUETOOTH_SETUP_ON_SERIAL2
 
 //#define DEBUG 1
 //#define LCDTEST 1
@@ -207,7 +208,7 @@ typedef unsigned char byte;
 #define SERIALOUT_BINARY_TAG_GEAR_RATIO_6G 17
 
 //send and receive each SERIALFREQ millisecs!
-#define SERIALFREQ 10
+#define SERIALFREQ 100
 //#define SERIALFREQ 800
 
 
