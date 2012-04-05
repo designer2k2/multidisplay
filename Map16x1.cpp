@@ -72,10 +72,16 @@ void Map16x1Double::writeToEeprom (int address) {
 MapVdo5Bar::MapVdo5Bar () {
 }
 
-uint16_t MapVdo5Bar::map(uint8_t idx) {
+uint16_t MapVdo5Bar::map16(uint8_t idx) {
     uint8_t l = idx & 0xF;
     idx = idx >> 4;
     return idx < 0xF ? (( ( l * pgm_read_word(&lookupVDOPressure5Bar[idx+1]) ) + ( -1 * (l-16) * pgm_read_word(&lookupVDOPressure5Bar[idx])) ) / 16) : pgm_read_word(&lookupVDOPressure5Bar[idx]);
+}
+
+uint16_t MapVdo5Bar::map32(uint8_t idx) {
+    uint8_t l = idx & 0x7;
+    idx = idx >> 3;
+    return idx < 0x1F ? (( ( l * pgm_read_word(&lookupVDOPressure5Bar[idx+1]) ) + ( -1 * (l-8) * pgm_read_word(&lookupVDOPressure5Bar[idx])) ) / 8) : pgm_read_word(&lookupVDOPressure5Bar[idx]);
 }
 
 /*
@@ -92,8 +98,9 @@ uint16_t MapVdo5Bar::map(uint8_t idx) {
  *         U2 = U * R2/(R1+R2)
  *
  *
- * 12 bit AD -> max 4096
- * >> 7 gives 32 map cells. max is 5Bar = 1866 => we store only the lower 16 values!
+ * 12 bit AD -> max 4096 >> 4 max 255
+ * -> map to 32x1 map
+ * max is 5Bar = 1866 => we store only the lower 16 values!
  *
  * stores the pressure in mBar for 16 steps of ad readings
  * [0, 128, 256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920]

@@ -149,7 +149,7 @@ void  MultidisplayController::myconstructor() {
 	pinMode (NORDSCHLEIFENPIN, INPUT);
 	digitalWrite( NORDSCHLEIFENPIN, HIGH); // turn on pullup resistors
 	pinMode (CLUTCHPIN, INPUT);
-	digitalWrite( CLUTCHPIN, HIGH); // turn on pullup resistors
+	digitalWrite( CLUTCHPIN, LOW); // turn on pullup resistors
 
 	pinMode (SPEEDPIN, INPUT);
 	digitalWrite (SPEEDPIN, LOW);
@@ -591,6 +591,8 @@ void MultidisplayController::AnaConversion() {
 
 	data.speedAverage = data.speedTotal / SPEEDSMOOTH;               // calculate the average
 	data.speed = data.speedAverage*SPEEDFACTOR;                   // apply the factor for calibration
+	//DEBUG
+	data.speed = data.anaIn[SPEEDPIN];
 
 	//Check if the speed is a new Max speed Event
 	if ( data.speed >= data.maxValues[MAXVAL_SPEED].speed ) {
@@ -615,10 +617,23 @@ void MultidisplayController::AnaConversion() {
 	data.VDOTemp2 = GetVDOTemp(data.anaIn[VDOT2PIN]);
 	data.VDOTemp3 = GetVDOTemp(data.anaIn[VDOT3PIN]);
 
-	//FIXME complete rewrite to mBar
-	data.VDOPres1 = mapVdo5Bar.map ( data.anaIn[VDOP1PIN] >> 7 );
-	data.VDOPres2 = mapVdo5Bar.map ( data.anaIn[VDOP2PIN] >> 7 );
-	data.VDOPres3 = mapVdo5Bar.map ( data.anaIn[VDOP3PIN] >> 7 );
+	if ( data.anaIn[VDOP1PIN] > 4090 )
+		data.VDOPres1 = 0;
+	else
+		data.VDOPres1 = mapVdo5Bar.map32 ( data.anaIn[VDOP1PIN] >> 4 );
+
+	if ( data.anaIn[VDOP2PIN] > 4090 )
+		data.VDOPres2 = 0;
+	else
+		data.VDOPres2 = mapVdo5Bar.map32 ( data.anaIn[VDOP2PIN] >> 4 );
+
+	if ( data.anaIn[VDOP2PIN] > 4090 )
+		data.VDOPres3 = 0;
+	else
+		data.VDOPres3 = mapVdo5Bar.map32 ( data.anaIn[VDOP3PIN] >> 4 );
+
+//	data.VDOPres3 = data.anaIn[VDOP3PIN];
+
 	//data.VDOPres3 = GetVDOPressure(data.anaIn[VDOP3PIN]);
 
 }

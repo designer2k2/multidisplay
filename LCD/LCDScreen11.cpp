@@ -47,7 +47,9 @@ void LCDScreen11::customDraw() {
 //    lcdController.printInt(lcdController.ystart[1]+2, digitalRead(V2_BUTTON2), 1);
 //    lcdController.printInt(lcdController.ystart[1]+4, digitalRead(V2_BUTTON3), 1);
 //    lcdController.printInt(lcdController.ystart[1]+6, digitalRead(V2_BUTTON4), 1);
-    lcdController.printInt(lcdController.ystart[1]+3, data.VDOPres1, 4);
+
+    //    lcdController.printInt(lcdController.ystart[1]+3, data.VDOPres1, 4);
+    lcdController.printFloat2DP(lcdController.ystart[1]+3, (float) (data.VDOPres1/1000.0) );
 
     lcdController.printInt(lcdController.ystart[2]+6, digitalRead(data.gear), 1);
 
