@@ -42,6 +42,7 @@ void LCDScreen11::customInit() {
 void LCDScreen11::customDraw() {
     lcdController.printInt(0x80 + 5, data.calRPM, 4 );
     lcdController.printInt(0x80 + 10, data.rpm_map_idx, 3 );
+    lcdController.printInt(0x80 + 14, data.speed );
 
 //    lcdController.printInt(lcdController.ystart[1], digitalRead(V2_BUTTON1), 1);
 //    lcdController.printInt(lcdController.ystart[1]+2, digitalRead(V2_BUTTON2), 1);
@@ -51,7 +52,9 @@ void LCDScreen11::customDraw() {
     //    lcdController.printInt(lcdController.ystart[1]+3, data.VDOPres1, 4);
     lcdController.printFloat2DP(lcdController.ystart[1]+3, (float) (data.VDOPres1/1000.0) );
 
-    lcdController.printInt(lcdController.ystart[2]+6, digitalRead(data.gear), 1);
+    lcdController.printInt(lcdController.ystart[2]+6, data.gear, 1);
+    lcdController.printInt(lcdController.ystart[2]+8, digitalRead(CLUTCHPIN), 1);
+
 
 #ifdef BOOSTN75
     lcdController.printInt(lcdController.ystart[3], digitalRead(NORDSCHLEIFENPIN), 1);

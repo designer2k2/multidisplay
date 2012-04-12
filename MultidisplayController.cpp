@@ -582,7 +582,7 @@ void MultidisplayController::AnaConversion() {
 
 	//Speed
 	data.speedTotal -= data.speedReadings[data.speedIndex];
-	data.speedReadings[data.speedIndex] = data.anaIn[SPEEDPIN];
+	data.speedReadings[data.speedIndex] = analogRead(SPEEDPIN);
 	data.speedTotal += data.speedReadings[data.speedIndex];
 	data.speedIndex = data.speedIndex++;
 
@@ -591,8 +591,6 @@ void MultidisplayController::AnaConversion() {
 
 	data.speedAverage = data.speedTotal / SPEEDSMOOTH;               // calculate the average
 	data.speed = data.speedAverage*SPEEDFACTOR;                   // apply the factor for calibration
-	//DEBUG
-	data.speed = data.anaIn[SPEEDPIN];
 
 	//Check if the speed is a new Max speed Event
 	if ( data.speed >= data.maxValues[MAXVAL_SPEED].speed ) {
