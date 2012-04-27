@@ -147,7 +147,9 @@ public:
 
 	void serialSend();
 	void serialSendAck (uint8_t serial);
+#ifdef GEAR_RECOGNITION
 	void serialSendGearRatioMap (uint8_t serial);
+#endif
 	void serialReceive();
 
 	int GetTypKTemp(unsigned int microVolts);

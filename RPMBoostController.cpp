@@ -54,7 +54,7 @@ void RPMBoostController::toggleMode (uint8_t nmode) {
 void RPMBoostController::compute () {
 	uint8_t gear_index = constrain (data.gear - 1, 0, GEARS-1);
 
-	if ( mode == BOOST_RACE ) {
+	if ( mode == BOOST_MODE_RACE ) {
 		req_Boost_PWM = highboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
 		req_Boost = highboost_pid_boost[gear_index]->map(data.rpm_map_idx);
 //		boostOutput = highboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
@@ -232,7 +232,7 @@ void RPMBoostController::loadParamsFromEEprom () {
 	if ( t2 < 0xFFFF )
 		n75_max_boost = fixedintb1002float(t2);
 	else
-		n75_max_boost = 1.1;
+		n75_max_boost = 1.6;
 }
 
 void RPMBoostController::writeParamsToEEprom () {

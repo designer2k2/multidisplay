@@ -127,13 +127,19 @@
  * n75 (out) (right)
  * free (warn led) (left)
  *
- * K11 2xanalog (arduino pin 1 und 2)
+ * K11 2xanalog (arduino pin A1 und A2)
  * 2xdigital: 15,16
  * nordschleifen switch (switch must be connected to ground!) (left)
  * free (lambda relais) (right)
  */
+#ifdef MULTIDISPLAY_V1
 #define NORDSCHLEIFENPIN 15
-#define CLUTCHPIN 16
+#else
+#define NORDSCHLEIFENPIN A1
+#endif
+
+#define CLUTCHPIN A2
+
 //left of lcd pins
 #define FREEPWM2 10
 #define N75PIN 11

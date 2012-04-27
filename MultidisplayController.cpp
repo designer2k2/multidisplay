@@ -149,20 +149,25 @@ void  MultidisplayController::myconstructor() {
 	pinMode (NORDSCHLEIFENPIN, INPUT);
 	digitalWrite( NORDSCHLEIFENPIN, HIGH); // turn on pullup resistors
 	pinMode (CLUTCHPIN, INPUT);
-	digitalWrite( CLUTCHPIN, LOW); // turn on pullup resistors
+	digitalWrite( CLUTCHPIN, LOW);
 
 	pinMode (SPEEDPIN, INPUT);
 	digitalWrite (SPEEDPIN, LOW);
 
 	pinMode (N75PIN, OUTPUT);
+#if defined(MULTIDISPLAY_V2)
+	TCCR1B = TCCR1B & 0b11111000 | 0x7;
+#else
+
 	//http://www.arduino.cc/playground/Main/TimerPWMCheatsheet
 	//http://www.arcfn.com/2009/07/secrets-of-arduino-pwm.html
 	//set pwm freq tp 30Hz
 	//11
 	TCCR2B = (TCCR2B & 0b11111000) | 0x7;
+	//	pinMode (FREEPWM2, OUTPUT);
+	//	TCCR1B = (TCCR1B & 0b11111000) | 0x5;
+#endif
 
-//	pinMode (FREEPWM2, OUTPUT);
-//	TCCR1B = (TCCR1B & 0b11111000) | 0x5;
 
 	//set pin modes
 	pinMode(DATAOUT, OUTPUT);
@@ -205,7 +210,7 @@ void  MultidisplayController::myconstructor() {
 	Serial.println("MultiDisplay 1.1!");
 #endif
 
-	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
+//	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
 	lcdController.init();
 
 	//Init the Buttons:
@@ -630,8 +635,6 @@ void MultidisplayController::AnaConversion() {
 	else
 		data.VDOPres3 = mapVdo5Bar.map32 ( data.anaIn[VDOP3PIN] >> 4 );
 
-//	data.VDOPres3 = data.anaIn[VDOP3PIN];
-
 	//data.VDOPres3 = GetVDOPressure(data.anaIn[VDOP3PIN]);
 
 }
@@ -751,10 +754,12 @@ void MultidisplayController::serialReceive() {
 #endif
 					case 4:
 						//set new manual n75 boost dutycycles
+#ifdef BOOSTN75
 						if (bytes_read >= 4) {
 							boostController.n75_manual_normal = srData.asBytes[1];
 							boostController.n75_manual_race = srData.asBytes[2];
 						}
+#endif
 						break;
 					}
 				}
@@ -783,7 +788,9 @@ void MultidisplayController::serialReceive() {
 							v2devdebugflag = v2devdebugflag  & 253;
 						break;
 					case 3: //set manual n75 duty cycle
+#ifdef BOOSTN75
 						boostController.boostOutput = (double) srData.asBytes[1];
+#endif
 						break;
 					case 4: //bluetooth test / config
 						switch ( srData.asBytes[1] ) {
@@ -805,6 +812,7 @@ void MultidisplayController::serialReceive() {
 				//V2 config
 				if ( bytes_read >= 2 ) {
 					switch ( srData.asBytes[0] ) {
+#ifdef BOOSTN75
 					case 1: // gearX mode(low=0 high=1) serial : request gearX high/low duty cycle map
 						if ( bytes_read >= 5 ) {
 							boostController.serialSendDutyMap ( srData.asBytes[1], srData.asBytes[2], srData.asBytes[3]);
@@ -874,6 +882,7 @@ void MultidisplayController::serialReceive() {
 							boostController.serialSendN75Params(srData.asBytes[1]);
 						}
 						break;
+#endif
 					case 11:
 						//set serial frequency
 						if ( bytes_read >= 5 ) {
@@ -887,11 +896,14 @@ void MultidisplayController::serialReceive() {
 						//reserved for get serial frequency
 						break;
 					case 13:
+#ifdef GEAR_RECOGNITION
 						//get gear ratio map
 						if ( bytes_read >= 3 )
 							serialSendGearRatioMap (srData.asBytes[1]);
+#endif
 						break;
 					case 14:
+#ifdef GEAR_RECOGNITION
 						//set gear ratio map
 						if ( bytes_read >= 16 ) {
 							//14 serial gears gear*uint16(fixed_int_base1000)
@@ -905,7 +917,10 @@ void MultidisplayController::serialReceive() {
 								serialSendGearRatioMap (srData.asBytes[1]);
 							}
 						}
-					}
+#endif
+						break;
+
+					} //switch
 
 				}
 				break;
@@ -922,6 +937,8 @@ void MultidisplayController::serialSendAck (uint8_t serial) {
 	Serial.write ( (uint8_t*) &(serial), sizeof(uint8_t) );
 	Serial.print("\3");
 }
+
+#ifdef GEAR_RECOGNITION
 void MultidisplayController::serialSendGearRatioMap (uint8_t serial) {
 	if ( GEARS != 6 )
 		return; //unimplemented!
@@ -937,6 +954,8 @@ void MultidisplayController::serialSendGearRatioMap (uint8_t serial) {
 	}
 	Serial.print("\3");
 }
+#endif
+
 void MultidisplayController::saveSettings2Eeprom() {
 	EEPROM.write(EEPROM_ACTIVESCREEN, lcdController.activeScreen );
 
@@ -952,11 +971,13 @@ void MultidisplayController::saveSettings2Eeprom() {
 
 	EEPROMWriteuint16( EEPROM_SERIALFREQ, serialFreq );
 
+#ifdef GEAR_RECOGNITION
 	// gear ratio
 	for ( uint8_t i = 0 ; i < GEARS ; i++ ) {
 		EEPROMWriteuint16( EEPROM_GEAR_RATIO_MAP_START + i*2,
 				float2fixedintb1000( gear_ratio[i] ) );
 	}
+#endif
 
 #endif
 
@@ -990,6 +1011,7 @@ void MultidisplayController::readSettingsFromEeprom() {
 		serialFreq = freq;
 
 	// gear ratio
+#ifdef GEAR_RECOGNITION
 	bool load_default_g = false;
 	for ( uint8_t i = 0 ; i < GEARS ; i++ ) {
 		uint16_t v = EEPROMReaduint16( EEPROM_GEAR_RATIO_MAP_START + 2*i );
@@ -1015,6 +1037,8 @@ void MultidisplayController::readSettingsFromEeprom() {
 		gear_ratio[4] = 2.785;
 		gear_ratio[5] = 2.785;
 	}
+#endif
+
 }
 
 
@@ -1115,68 +1139,38 @@ void MultidisplayController::serialSend() {
 		// 1 byte
 		outbuf = SERIALOUT_BINARY_TAG;
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-		Serial2.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
-#endif
 		//32bit / 4 byte
 		Serial.write ( (uint8_t*) &(time), sizeof(unsigned long) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-		Serial2.write ( (uint8_t*) &(time), sizeof(unsigned long) );
-#endif
 		// 2 bytes
 		Serial.write ( (uint8_t*) &(data.calRPM), sizeof(int) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-		Serial2.write ( (uint8_t*) &(data.calRPM), sizeof(int) );
-#endif
 
 		// 2 bytes
 		outbuf = float2fixedintb100(data.calAbsoluteBoost);
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-		Serial2.write ( (uint8_t*) &(outbuf), sizeof(int) );
-#endif
 
 		//8bit are enough / 1 byte
 		Serial.write ( (uint8_t*) &(data.calThrottle), sizeof(uint8_t) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-		Serial2.write ( (uint8_t*) &(data.calThrottle), sizeof(uint8_t) );
-#endif
 
 		// 2 bytes
 		outbuf = float2fixedintb100(data.calLambdaF);
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-		Serial2.write ( (uint8_t*) &outbuf, sizeof(int) );
-#endif
 
 		// 2 bytes
 		outbuf = float2fixedintb100(data.calLMM);
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-		Serial2.write ( (uint8_t*) &outbuf, sizeof(int) );
-#endif
 
 		// 2 bytes
 		outbuf = float2fixedintb100(data.calCaseTemp);
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-		Serial2.write ( (uint8_t*) &outbuf, sizeof(int) );
-#endif
 
 		//8 x 16 bit -> 16 bytes
 		for ( uint8_t i = 0 ; i < MAX_ATTACHED_TYPK ; i++) {
 			Serial.write ( (uint8_t*) &(data.calEgt[i]), sizeof(int) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-			Serial2.write ( (uint8_t*) &(data.calEgt[i]), sizeof(int) );
-#endif
 		}
 
 		// 2 bytes
 		outbuf = float2fixedintb100(data.batVolt);
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-		Serial2.write ( (uint8_t*) &outbuf, sizeof(int) );
-#endif
 
 		//FIXME send as float ??
 		//pressure is fixed int base 10
@@ -1187,66 +1181,56 @@ void MultidisplayController::serialSend() {
 		Serial.write ( (uint8_t*) &(data.VDOTemp1), sizeof(int) );
 		Serial.write ( (uint8_t*) &(data.VDOTemp2), sizeof(int) );
 		Serial.write ( (uint8_t*) &(data.VDOTemp3), sizeof(int) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-		Serial2.write ( (uint8_t*) &(data.VDOPres1), sizeof(int) );
-		Serial2.write ( (uint8_t*) &(data.VDOPres2), sizeof(int) );
-		Serial2.write ( (uint8_t*) &(data.VDOPres3), sizeof(int) );
-		Serial2.write ( (uint8_t*) &(data.VDOTemp1), sizeof(int) );
-		Serial2.write ( (uint8_t*) &(data.VDOTemp2), sizeof(int) );
-		Serial2.write ( (uint8_t*) &(data.VDOTemp3), sizeof(int) );
-#endif
 
 		// 2 bytes
 		Serial.write ( (uint8_t*) &(data.speed), sizeof(uint16_t) );
 		// 1 byte
 		Serial.write ( (uint8_t*) &(data.gear), sizeof(uint8_t) );
 		// 1 byte N75 dutycycle
-		Serial.write ( (uint8_t*) &(boostController.boostOutput), sizeof(uint8_t) );
+#ifdef BOOSTN75
+		outbuf = (uint8_t) boostController.boostOutput;
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
+#else
+		outbuf = 0;
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
+#endif
 		// 2 bytes
-		outbuf = float2fixedintb100(boostController.req_Boost);
+#ifdef BOOSTN75
+		outbuf = float2fixedintb100( (float) boostController.req_Boost);
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
 		// 1 byte N75 map pwm
-		Serial.write ( (uint8_t*) &(boostController.req_Boost_PWM), sizeof(uint8_t) );
-
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-		Serial2.write ( (uint8_t*) &(data.speed), sizeof(uint16_t) );
-		Serial2.write ( (uint8_t*) &(data.gear), sizeof(uint8_t) );
-		Serial2.write ( (uint8_t*) &(boostController.boostOutput), sizeof(uint8_t) );
-		Serial2.write ( (uint8_t*) &(outbuf), sizeof(int) );
+		outbuf = (uint8_t) boostController.req_Boost_PWM;
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
+#else
+		outbuf = 0;
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
 #endif
 
 		/*
 		 * reserved for flags:
 		 * bit 0 : n75 pid enabled
-		 * btt 1 : n75 pid aggressive settings
+		 * bit 1 : n75 pid aggressive settings
 		 */
 		outbuf = 0;
+#ifdef BOOSTN75
 		if ( boostController.usePID )
 			outbuf |= 1;
 		if ( boostController.aggressiveSettings )
 			outbuf |= 2;
-
-		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-		Serial2.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
 #endif
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
 
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
 		// 32 bytes
 		if ( df_kline_last_frame_completely_received < 255 ) {
 			for ( uint8_t i = 1 ; i < (DF_KLINEFRAMESIZE-1) ; i++ ) {
 				Serial.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[i]), sizeof(uint8_t) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-				Serial2.write ( (uint8_t*) &(df_klineData[df_kline_last_frame_completely_received].asBytes[i]), sizeof(uint8_t) );
-#endif
 			}
 		} else {
 			uint8_t tmp = 0;
 			for ( uint8_t i = 0 ; i < (DF_KLINEFRAMESIZE-2) ; i++ ) {
 				Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-#if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_ON_SERIAL2)
-				Serial2.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
-#endif
 			}
 		}
 #endif
@@ -1981,6 +1965,10 @@ void MultidisplayController::DFConvertReceivedData() {
 	data.df_cyl4_retard = ( df_klineData[df_kline_last_frame_completely_received].asBytes[16] * 0.351563 );
 	data.df_total_retard = data.df_cyl1_retard + data.df_cyl2_retard + data.df_cyl3_retard + data.df_cyl4_retard;
 }
+
+#endif
+
+#if defined(MULTIDISPLAY_V2) && defined(GEAR_RECOGNITION)
 
 void MultidisplayController::gear_computation () {
 

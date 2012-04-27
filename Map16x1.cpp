@@ -50,11 +50,17 @@ Map16x1Double::~Map16x1Double() {
 	free (data);
 }
 
-uint8_t Map16x1Double::map (uint8_t idx) {
+//uint8_t Map16x1Double::map (uint8_t idx) {
+//    uint8_t l = idx & 0xF;
+//    idx = idx >> 4;
+//    return idx < 0xF ? (( ( l * data[idx+1] ) + ( -1 * (l-16) * data[idx]) ) / 16) : data[idx];
+//}
+double Map16x1Double::map (uint8_t idx) {
     uint8_t l = idx & 0xF;
     idx = idx >> 4;
     return idx < 0xF ? (( ( l * data[idx+1] ) + ( -1 * (l-16) * data[idx]) ) / 16) : data[idx];
 }
+
 
 void Map16x1Double::loadFromEeprom (int address) {
 	for ( uint8_t i = 0 ; i < 16 ; i++ )

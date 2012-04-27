@@ -29,7 +29,8 @@ public:
 	Map16x1Double();
 	virtual ~Map16x1Double();
 
-	uint8_t map (uint8_t idx);
+//	uint8_t map (uint8_t idx);
+	double map (uint8_t idx);
 	void loadFromEeprom (int address);
 	void writeToEeprom (int address);
 
