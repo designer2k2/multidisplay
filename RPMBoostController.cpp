@@ -101,10 +101,11 @@ void RPMBoostController::compute () {
 	} else {
 		//no PID
 		//we want a silent N75 on idle
-		if ( data.calRPM > 1200 || data.calThrottle > 15 )
-			boostOutput = req_Boost_PWM;
-		else
-			boostOutput = 0;
+//		if ( data.calRPM > 1200 || data.calThrottle > 15 )
+//			boostOutput = req_Boost_PWM;
+//		else
+//			boostOutput = 0;
+		boostOutput = req_Boost_PWM;
 	}
 
 	//overboost protection

@@ -1,4 +1,4 @@
-/*w
+/*
     Copyright 2009-10 Stephan Martin, Dominik Gummel
 
     This file is part of Multidisplay.
@@ -36,14 +36,18 @@
 #define LAMBDA_WIDEBAND
 
 //define this if you measure the boost with SM-VAC/Boost instead of Motorola MPX4250AP / Bosch 200kpa
-#define BOOST_PLX_SMVACBOOST
+//#define BOOST_PLX_SMVACBOOST
 //#define BOOST_MOTOROLA_MPX4250
 //#define BOOST_FREESCALE_MPXA6400A
 //on boostpin2
-//#define BOOST_BOSCH_200KPA
+#define BOOST_BOSCH_200KPA
 
 #define GEARS 6
 #define GEAR_RECOGNITION
+//215 40 R16
+//#define ABROLLUMFANG 1.764
+//195 50 R15
+#define ABROLLUMFANG 1.757
 
 #define BOOSTN75
 #define BOOST_NORMAL 1.0

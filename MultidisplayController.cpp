@@ -587,7 +587,7 @@ void MultidisplayController::AnaConversion() {
 
 	//Speed
 	data.speedTotal -= data.speedReadings[data.speedIndex];
-	data.speedReadings[data.speedIndex] = analogRead(SPEEDPIN);
+	data.speedReadings[data.speedIndex] = analogRead(SPEEDPIN) * 5;
 	data.speedTotal += data.speedReadings[data.speedIndex];
 	data.speedIndex = data.speedIndex++;
 
@@ -1706,6 +1706,7 @@ void MultidisplayController::mainLoop() {
 	}
 
 	if ( millis() > gear_computation_time ) {
+		gear_state = GEAR_STATE_NEED_RECOGNITION;
 		gear_computation();
 		gear_computation_time += GEAR_COMPUTATION_INTERVALL;
 	}
@@ -1982,12 +1983,11 @@ void MultidisplayController::gear_computation () {
 		 *
 		 */
 
-#define ABROLLUMFANG 1.764
 		ratio = ( data.calRPM * 6 * ABROLLUMFANG ) / ( data.speed * 100 );
 
 		for ( uint8_t i = 0 ; i < GEARS ; i++ ) {
-			float lower = gear_ratio[i] * 0.9;
-			float upper = gear_ratio[i] * 1.1;
+			float lower = gear_ratio[i] * 0.8;
+			float upper = gear_ratio[i] * 1.2;
 
 			if ( (lower < ratio) && (ratio < upper) ) {
 				data.gear = i+1;
