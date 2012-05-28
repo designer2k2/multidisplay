@@ -158,7 +158,7 @@ void  MultidisplayController::myconstructor() {
 #if defined(MULTIDISPLAY_V2)
 	//http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1235060559/15
 	//122Hz
-	TCCR1B = TCCR1B & 0b11111000 | 0x4;
+	TCCR1B = TCCR1B & 0b11111000 | 0x5;
 #else
 
 	//http://www.arduino.cc/playground/Main/TimerPWMCheatsheet
