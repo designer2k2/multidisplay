@@ -94,14 +94,14 @@ void RPMBoostController::compute () {
 			pidBoostOutput = req_Boost_PWM;
 			//set the map pwm as output pwm
 			//we want a silent N75 on idle
-			if ( data.calRPM > 1200 || data.calThrottle > 15 )
+			if ( data.calRPM > 1200 && data.calThrottle > 50 )
 				boostOutput = req_Boost_PWM;
 			else boostOutput = 0;
 		}
 	} else {
 		//no PID
 		//we want a silent N75 on idle
-		if ( data.calRPM > 1200 || data.calThrottle > 15 )
+		if ( data.calRPM > 1200 && data.calThrottle > 50 )
 			boostOutput = req_Boost_PWM;
 		else
 			boostOutput = 0;
