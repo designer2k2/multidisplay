@@ -1655,7 +1655,6 @@ void MultidisplayController::mainLoop() {
 
 	if ( millis() > serialTime ) {
 		serialReceive();
-
 //		data.generate_debugData();
 		serialSend();
 		serialTime += serialFreq;
