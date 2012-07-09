@@ -589,7 +589,7 @@ void MultidisplayController::AnaConversion() {
 
 	//Speed
 	data.speedTotal -= data.speedReadings[data.speedIndex];
-	data.speedReadings[data.speedIndex] = analogRead(SPEEDPIN) * 5;
+	data.speedReadings[data.speedIndex] = analogRead(SPEEDPIN);
 	data.speedTotal += data.speedReadings[data.speedIndex];
 	data.speedIndex = data.speedIndex++;
 
