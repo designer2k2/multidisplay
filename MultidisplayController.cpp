@@ -1960,6 +1960,8 @@ void MultidisplayController::DFKlineSerialReceive() {
 }
 
 void MultidisplayController::DFConvertReceivedData() {
+	//remember: 68HC11 is big endian
+	//avr8 is little endian!
 	data.df_ignition = ( df_klineData[df_kline_last_frame_completely_received].asBytes[8] * -0.351563 ) + 73.9;
 	data.df_cyl1_retard = ( df_klineData[df_kline_last_frame_completely_received].asBytes[10] * 0.351563 );
 	data.df_cyl2_retard = ( df_klineData[df_kline_last_frame_completely_received].asBytes[12] * 0.351563 );
