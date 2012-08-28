@@ -911,8 +911,8 @@ void MultidisplayController::serialReceive() {
 							//14 serial gears gear*uint16(fixed_int_base1000)
 							if ( srData.asBytes[2] == 6 ) {
 								//only implemented for 6 gears!
+								uint16_t *p = (uint16_t*) &(srData.asBytes[3]);
 								for ( uint8_t i = 0 ; i < srData.asBytes[2] ; i++ ) {
-									uint16_t *p = (uint16_t*) srData.asBytes[3];
 									gear_ratio[i] = fixedintb10002float( *p );
 									p++;
 								}
@@ -1685,26 +1685,26 @@ void MultidisplayController::mainLoop() {
 
 #if defined(MULTIDISPLAY_V2) && defined(GEAR_RECOGNITION)
 
-	/*
-	 * clutch in -> sw connects through
-	 * clutch separates -> infinity resistance
-	 *
-	 * -> add pulldown
-	 *
-	 * init: after start gear 1
-	 *
-	 */
-	if ( ! digitalRead(CLUTCHPIN) ) {
-		//clutch pedal pressed
-		gear_state = GEAR_STATE_NEED_RECOGNITION_WAIT_FOR_CLUTCH_IN;
-	} else {
-		if ( gear_state == GEAR_STATE_NEED_RECOGNITION_WAIT_FOR_CLUTCH_IN ) {
-			gear_state = GEAR_STATE_NEED_RECOGNITION;
-			last_gear = data.gear;
-			gear_wait_before_idle = millis() + GEAR_WAIT_MSECS_BEFORE_IDLE;
-			gear_computation();
-		}
-	}
+//	/*
+//	 * clutch in -> sw connects through
+//	 * clutch separates -> infinity resistance
+//	 *
+//	 * -> add pulldown
+//	 *
+//	 * init: after start gear 1
+//	 *
+//	 */
+//	if ( ! digitalRead(CLUTCHPIN) ) {
+//		//clutch pedal pressed
+//		gear_state = GEAR_STATE_NEED_RECOGNITION_WAIT_FOR_CLUTCH_IN;
+//	} else {
+//		if ( gear_state == GEAR_STATE_NEED_RECOGNITION_WAIT_FOR_CLUTCH_IN ) {
+//			gear_state = GEAR_STATE_NEED_RECOGNITION;
+//			last_gear = data.gear;
+//			gear_wait_before_idle = millis() + GEAR_WAIT_MSECS_BEFORE_IDLE;
+//			gear_computation();
+//		}
+//	}
 
 	if ( millis() > gear_computation_time ) {
 		gear_state = GEAR_STATE_NEED_RECOGNITION;
@@ -1986,6 +1986,14 @@ void MultidisplayController::gear_computation () {
 		 *
 		 */
 
+		if ( data.speed == 0 ) {
+			data.gear = 0;
+			if ( data.calThrottle >= 50 )
+				data.gear = 1;
+			gear_state = GEAR_STATE_MATCHED;
+			return;
+		}
+
 		ratio = ( data.calRPM * 6 * ABROLLUMFANG ) / ( data.speed * 100 );
 
 		for ( uint8_t i = 0 ; i < GEARS ; i++ ) {
@@ -1998,12 +2006,12 @@ void MultidisplayController::gear_computation () {
 				return;
 			} else {
 				// no gear found
-				if ( gear_wait_before_idle < millis() ) {
-					//we waited long enough
-					if ( data.calThrottle == 0 && data.calRPM <= GEAR_IDLE_RPM )
-						// we're idle with no gear
-						data.gear = 0;
-				}
+//				if ( gear_wait_before_idle < millis() ) {
+//					//we waited long enough
+//					if ( data.calThrottle == 0 && data.calRPM <= GEAR_IDLE_RPM )
+//						// we're idle with no gear
+//						data.gear = 0;
+//				}
 				/*
 				 * should we save the rpm before the clutch was pressed ?
 				 * this would allow to see quick (new rpm lower or greater)
