@@ -1997,8 +1997,20 @@ void MultidisplayController::gear_computation () {
 		ratio = ( data.calRPM * 6 * ABROLLUMFANG ) / ( data.speed * 100 );
 
 		for ( uint8_t i = 0 ; i < GEARS ; i++ ) {
-			float lower = gear_ratio[i] * 0.8;
-			float upper = gear_ratio[i] * 1.2;
+			float lower = 0;
+			if ( i > 0 ) {
+				float delta = (gear_ratio[i-1] - gear_ratio[i]) / 2;
+				lower = gear_ratio[i] - delta;
+			}
+			else
+				lower = gear_ratio[i] * 0.8;
+
+			float upper = 0;
+			if ( i < (GEARS-1) ) {
+				float delta = (gear_ratio[i] - gear_ratio[i+1]) / 2;
+				upper = gear_ratio[i] + delta;
+			} else
+				upper = gear_ratio[i] * 1.2;
 
 			if ( (lower < ratio) && (ratio < upper) ) {
 				data.gear = i+1;
