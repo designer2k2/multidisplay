@@ -97,6 +97,7 @@ void RPMBoostController::compute () {
 			if ( data.calRPM > 1200 && data.calThrottle > 50 )
 				boostOutput = req_Boost_PWM;
 			else boostOutput = 0;
+//			boostOutput = req_Boost_PWM;
 		}
 	} else {
 		//no PID
@@ -105,7 +106,7 @@ void RPMBoostController::compute () {
 			boostOutput = req_Boost_PWM;
 		else
 			boostOutput = 0;
-		//test
+//		//test
 //		boostOutput = req_Boost_PWM;
 	}
 
@@ -172,11 +173,23 @@ void RPMBoostController::setSetpointMap ( uint8_t gear, uint8_t mode, uint16_t *
 }
 
 void RPMBoostController::loadMapsFromEEprom () {
-	for ( uint8_t i = 0; i < GEARS ; i++ ) {
-		highboost_duty_cycle[i]->loadFromEeprom( EEPROM_N75_HIGH_DUTY_CYCLE_MAPS + i*16 );
-		highboost_pid_boost[i]->loadFromEeprom( EEPROM_N75_PID_HIGH_SETPOINT_MAPS + i*32 );
-		lowboost_duty_cycle[i]->loadFromEeprom( EEPROM_N75_LOW_DUTY_CYCLE_MAPS + i*16 );
-		lowboost_pid_boost[i]->loadFromEeprom( EEPROM_N75_PID_LOW_SETPOINT_MAPS + i*32);
+	if ( EEPROMReaduint16(EEPROM_N75_PID_LOW_SETPOINT_MAPS) == 0xFFFF ) {
+		//load default map values
+		for ( uint8_t i = 0; i < GEARS ; i++ ) {
+			for ( uint8_t j = 0; j < 16 ; j++ ) {
+			*(highboost_duty_cycle[i]->data + j) = 180;
+			*(highboost_pid_boost[i]->data + j) = 1.0;
+			*(lowboost_duty_cycle[i]->data + j) = 100;
+			*(lowboost_pid_boost[i]->data + j) = 0.7;
+			}
+		}
+	} else {
+		for ( uint8_t i = 0; i < GEARS ; i++ ) {
+			highboost_duty_cycle[i]->loadFromEeprom( EEPROM_N75_HIGH_DUTY_CYCLE_MAPS + i*16 );
+			highboost_pid_boost[i]->loadFromEeprom( EEPROM_N75_PID_HIGH_SETPOINT_MAPS + i*32 );
+			lowboost_duty_cycle[i]->loadFromEeprom( EEPROM_N75_LOW_DUTY_CYCLE_MAPS + i*16 );
+			lowboost_pid_boost[i]->loadFromEeprom( EEPROM_N75_PID_LOW_SETPOINT_MAPS + i*32);
+		}
 	}
 }
 void RPMBoostController::loadParamsFromEEprom () {

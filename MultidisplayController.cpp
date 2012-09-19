@@ -157,7 +157,8 @@ void  MultidisplayController::myconstructor() {
 	pinMode (N75PIN, OUTPUT);
 #if defined(MULTIDISPLAY_V2)
 	//http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1235060559/15
-	//122Hz
+	//Audi S2 N75
+	//30Hz
 	TCCR1B = TCCR1B & 0b11111000 | 0x5;
 #else
 
@@ -165,6 +166,7 @@ void  MultidisplayController::myconstructor() {
 	//http://www.arcfn.com/2009/07/secrets-of-arduino-pwm.html
 	//set pwm freq tp 30Hz
 	//11
+	//Audi S2 N75
 	TCCR2B = (TCCR2B & 0b11111000) | 0x7;
 	//	pinMode (FREEPWM2, OUTPUT);
 	//	TCCR1B = (TCCR1B & 0b11111000) | 0x5;
@@ -524,7 +526,7 @@ void MultidisplayController::AnaConversion() {
 	data.calLambda = map(data.anaIn[LAMBDAPIN], 0, 4096, 0, 200);
 #else
 	data.calLambda = map(data.anaIn[LAMBDAPIN], LAMBDAMIN, LAMBDAMAX, 0, 200);    //gets about the 0-1V into 0-200 values
-	data.calLambdaF = (flaot) data.calLambda;
+	data.calLambdaF = (float) data.calLambda;
 #endif
 	data.calLambda = constrain(data.calLambda, 0, 200);
 
