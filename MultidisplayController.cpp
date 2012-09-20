@@ -493,7 +493,7 @@ void MultidisplayController::AnaConversion() {
 #ifdef BOOST_MOTOROLA_MPX4250
 	//or Motorola MPX 4250 datasheet
 	data.calAbsoluteBoost = 5.0* ((float) data.anaIn[BOOSTPIN])/4096.0;             //only gets 0-5V
-	data.calAbsoluteBoost = (data.calAbsoluteBoost * 50 - 10)/100;     	//makes 0-250kPa out of it
+	data.calAbsoluteBoost = (data.calAbsoluteBoost + 0.2)/0.02;     	//makes 0-250kPa out of it
 //	data.calBoostPSI = data.calBoostBar * BAR2PSI;
 	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
 #endif
