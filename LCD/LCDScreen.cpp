@@ -23,6 +23,8 @@
 #include "wiring.h"
 #include "MultidisplayController.h"
 
+#ifdef LCD
+
 LCDScreen::LCDScreen() {
 	lcdp = lcdController.lcdp;
 	this->flags.all = 0;
@@ -86,4 +88,4 @@ void LCDScreen::draw () {
 }
 
 
-
+#endif /* LCD */

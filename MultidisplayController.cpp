@@ -214,8 +214,10 @@ void  MultidisplayController::myconstructor() {
 	Serial.println("MultiDisplay 1.1!");
 #endif
 
+#ifdef LCD
 //	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
 	lcdController.init();
+#endif
 
 	//Init the Buttons:
 	expanderWrite(0b10000011);        //This may needs to be modified when a third button is attached.
@@ -753,7 +755,9 @@ void MultidisplayController::serialReceive() {
 						readSettingsFromEeprom();
 						break;
 					case 5:
+#ifdef LCD
 						lcdController.setBrightness(srData.asBytes[1]);
+#endif
 						break;
 #endif
 					case 4:
@@ -961,7 +965,9 @@ void MultidisplayController::serialSendGearRatioMap (uint8_t serial) {
 #endif
 
 void MultidisplayController::saveSettings2Eeprom() {
+#ifdef LCD
 	EEPROM.write(EEPROM_ACTIVESCREEN, lcdController.activeScreen );
+#endif
 
 #ifdef MULTIDISPLAY_V2
 	uint8_t ldp = data.ldCalPoint;
@@ -971,7 +977,9 @@ void MultidisplayController::saveSettings2Eeprom() {
 	if ( ldt > 0.0 && ldt < 1.2 )
 		EEPROMWriteLong (EEPROM_AMBIENTPRESSURE, ldt*1000);
 
+#ifdef LCD
 	EEPROM.write ( EEPROM_BRIGHTNESS, lcdController.brightness );
+#endif
 
 	EEPROMWriteuint16( EEPROM_SERIALFREQ, serialFreq );
 
@@ -992,6 +1000,7 @@ void MultidisplayController::saveSettings2Eeprom() {
 }
 
 void MultidisplayController::readSettingsFromEeprom() {
+#ifdef LCD
 	//what screen was last shown?
 	uint8_t t = EEPROM.read(EEPROM_ACTIVESCREEN);
 //	if ( t < SCREENCOUNT )
@@ -1002,6 +1011,7 @@ void MultidisplayController::readSettingsFromEeprom() {
 	lcdController.setActiveScreen (0);
 
 	lcdController.setBrightness (EEPROM.read(EEPROM_BRIGHTNESS));
+#endif
 
 	uint8_t ldp = EEPROM.read(EEPROM_LDCALPOINT);
 	if ( ldp >= 0 && ldp <= 20 )
@@ -1509,7 +1519,10 @@ void MultidisplayController::readTypK ( uint8_t channel ) {
 //This checks certain values if they exceed limits or not, if so an alarm is triggered
 void MultidisplayController::CheckLimits()
 {
-	uint8_t Brightness = lcdController.brightness;
+	uint8_t Brightness = 0;
+#ifdef LCD
+	Brightness = lcdController.brightness;
+#endif
 	uint8_t FlashTrigger=0;
 
 	/*
@@ -1557,15 +1570,21 @@ void MultidisplayController::CheckLimits()
 			}
 
 			FlashTimeU = millis() + FLASH_TIME;      //And save the Next Changetime
+#ifdef LCD
 			lcdController.setBrightness(Brightness);              //And set the Brightness
+#endif
 		}
 	}
 	else {
 		//?!?
-		Brightness = EEPROM.read(105);           //Set back the Brightness
+		Brightness = EEPROM.read(EEPROM_BRIGHTNESS);           //Set back the Brightness
+#ifdef LCD
 		lcdController.setBrightness(Brightness);              //And set the Brightness
+#endif
 	}
+#ifdef LCD
 	lcdController.setBrightness(Brightness);
+#endif
 
 }
 
@@ -1603,7 +1622,9 @@ void MultidisplayController::mainLoop() {
 	// }
 
 	// ui knows what screen is active and draws it!
+#ifdef LCD
 	lcdController.draw();
+#endif
 
 #ifdef MULTIDISPLAY_V1
 	// button check for V1
@@ -1615,7 +1636,9 @@ void MultidisplayController::mainLoop() {
 	//Saves the Screen when needed:
 	if(millis()>= ScreenSave) {
 		//and now save it:
-		EEPROM.write(100, lcdController.activeScreen);
+#ifdef LCD
+		EEPROM.write(EEPROM_ACTIVESCREEN, lcdController.activeScreen);
+#endif
 		//And also prevent a double save!
 		ScreenSave = 429400000;        // (thats close to 50days of runtime...)
 	}
@@ -1735,7 +1758,10 @@ void MultidisplayController::buttonAHold() {
 	Serial.println ("A Hold");
 #endif
 
+#ifdef LCD
 	lcdController.toggleScreen();
+#endif
+
 	//Set the Timestamp for the Save:
 	ScreenSave = millis() + SCREENSAVEDELAY;
 
@@ -1756,26 +1782,20 @@ void MultidisplayController::buttonAPressed() {
 	Serial.println ("A pressed");
 #endif
 
-	switch(lcdController.activeScreen){
-	case 1:
-		ChangeSerOut();      //Switch from RAW to Cal to Nothing and vise versa.
-		break;
-	case 2:
-		//Toggle A and B MCP
-		lcdController.myScreens[1]->toggleScreenAB();
-		break;
-	case 3:
-		ChangeSerOut();      //Switch from RAW to Cal to Nothing and vise versa.
-		break;
+//	switch(lcdController.activeScreen){
+//	case 2:
+////		//Toggle A and B MCP
+//		lcdController.myScreens[1]->toggleScreenAB();
+//		break;
 //	case 6:                 //Switches the 2 Row Screen
 //		lcdController.myScreens[5]->toggleScreenAB();
 //		break;
 //	case 7:
 //		lcdController.myScreens[6]->toggleRefreshCounter();
 //		break;
-	default:
-		break;
-	}
+//	default:
+//		break;
+//	}
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -1786,20 +1806,14 @@ void MultidisplayController::buttonBHold() {
 	Serial.println ("B Hold");
 #endif
 
-	//Serial.print(time*1);
-	//Serial.print(";");
-	//Serial.println("Button B Hold");
-
+#ifdef LCD
 	switch(lcdController.activeScreen){
 	case 0:
-		break;
-	case 1:
-		//The Calibration from the LD will be done
-		calibrateLD();
 		break;
 	default:
 		break;
 	}
+#endif
 
 }
 
@@ -1815,6 +1829,7 @@ void MultidisplayController::buttonBPressed() {
 	//Serial.print(";");
 	//Serial.println("Button B Pressed");
 
+#ifdef LCD
 	LCDScreen* l;
 
 	switch(lcdController.activeScreen){
@@ -1830,7 +1845,7 @@ void MultidisplayController::buttonBPressed() {
 		lcdController.toggleBrightness();
 
 		//and save the new value:
-		EEPROM.write(105,lcdController.brightness);
+		EEPROM.write(EEPROM_BRIGHTNESS,lcdController.brightness);
 		break;
 
 	case 7:
@@ -1853,6 +1868,7 @@ void MultidisplayController::buttonBPressed() {
 	default:
 		break;
 	}
+#endif
 }
 
 //-------------------------------------------------------------------------------------------------------

@@ -39,6 +39,8 @@
 #include "LCDScreen10.h"
 #include "LCDScreen11.h"
 
+#ifdef LCD
+
 const uint8_t	LCDController::ystart[] = { 0x80, 0xC0, 0x94, 0xD4 };
 
 LCDController::LCDController() {
@@ -782,3 +784,5 @@ void LCDController::printString (uint8_t pos, char* str) {
 		lcdp->commandWrite (pos);
 	lcdp->printIn (str);
 }
+
+#endif /* LCD */

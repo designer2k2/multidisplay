@@ -14,6 +14,8 @@
 #include "BoostController.h"
 #include "RPMBoostController.h"
 
+#ifdef LCD
+
 LCDScreen10::LCDScreen10() {
 	flags.f.doCal=1;
 	flags.f.doTypK = 1;
@@ -86,3 +88,5 @@ void LCDScreen10::customDraw() {
 #endif
 
  }
+
+#endif /* LCD */

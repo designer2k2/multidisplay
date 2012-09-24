@@ -38,7 +38,11 @@ ToDo:
 */
 
 SensorData data;
+
+#ifdef LCD
 LCDController lcdController;
+#endif
+
 MultidisplayController mController;
 #ifdef BOOSTN75
 RPMBoostController boostController;
@@ -49,7 +53,9 @@ int main(void) {
     init();
 
     data.myconstructor();
+#ifdef LCD
     lcdController.myconstructor();
+#endif
 #ifdef BOOSTN75
 	boostController.myconstructor();
 #endif

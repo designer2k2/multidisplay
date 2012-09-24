@@ -36,11 +36,11 @@
 #define LAMBDA_WIDEBAND
 
 //define this if you measure the boost with SM-VAC/Boost instead of Motorola MPX4250AP / Bosch 200kpa
-#define BOOST_PLX_SMVACBOOST
+//#define BOOST_PLX_SMVACBOOST
 //#define BOOST_MOTOROLA_MPX4250
 //#define BOOST_FREESCALE_MPXA6400A
 //on boostpin2
-//#define BOOST_BOSCH_200KPA
+#define BOOST_BOSCH_200KPA
 
 #define GEARS 6
 #define GEAR_RECOGNITION
@@ -230,6 +230,8 @@ typedef unsigned char byte;
 #define SCOPE_RPM 3
 #define SCOPE_THROTTLE 4
 #define SCOPE_LAMBDA 5
+
+#define LCD
 
 //buffer in LCDController
 #define LCD_BUFSIZE 21
