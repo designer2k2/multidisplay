@@ -22,7 +22,6 @@
 #include "LCDScreen.h"
 #include "LCDScreen8.h"
 #include "LCDScreen7.h"
-#include "BoostController.h"
 #include "RPMBoostController.h"
 #include "Map16x1.h"
 
@@ -30,11 +29,9 @@
 #include <inttypes.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-#include <wiring.h>
+#include <Arduino.h>
 #include <EEPROM.h>
-#include <WProgram.h>
 
-#include <PID_Beta6.h>
 #include <digitalWriteFast.h>
 
 

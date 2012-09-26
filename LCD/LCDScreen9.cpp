@@ -19,7 +19,7 @@
 
 
 #include "LCDScreen9.h"
-#include "WProgram.h"
+#include "Arduino.h"
 #include "MultidisplayDefines.h"
 #include "MultidisplayController.h"
 #include "LCDController.h"

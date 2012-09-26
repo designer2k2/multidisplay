@@ -18,12 +18,11 @@
 */
 
 
-#include <wiring.h>
+#include <Arduino.h>
 
 #include "LCDController.h"
 #include "MultidisplayController.h"
 #include "SensorData.h"
-#include "BoostController.h"
 #include "RPMBoostController.h"
 
 /*

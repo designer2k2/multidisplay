@@ -7,11 +7,10 @@
 
 #include "LCDScreen10.h"
 
-#include "WProgram.h"
+#include "Arduino.h"
 #include "MultidisplayDefines.h"
 #include "MultidisplayController.h"
 #include "LCDController.h"
-#include "BoostController.h"
 #include "RPMBoostController.h"
 
 #ifdef LCD

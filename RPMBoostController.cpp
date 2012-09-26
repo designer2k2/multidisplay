@@ -8,7 +8,7 @@
 #include "RPMBoostController.h"
 #include "Map16x1.h"
 #include "SensorData.h"
-#include <wiring.h>
+#include <Arduino.h>
 #include <HardwareSerial.h>
 #include "EEPROM.h"
 
@@ -102,12 +102,12 @@ void RPMBoostController::compute () {
 	} else {
 		//no PID
 		//we want a silent N75 on idle
-		if ( data.calRPM > 1200 && data.calThrottle > 50 )
-			boostOutput = req_Boost_PWM;
-		else
-			boostOutput = 0;
+//		if ( data.calRPM > 1200 && data.calThrottle > 50 )
+//			boostOutput = req_Boost_PWM;
+//		else
+//			boostOutput = 0;
 //		//test
-//		boostOutput = req_Boost_PWM;
+		boostOutput = req_Boost_PWM;
 	}
 
 	//overboost protection
