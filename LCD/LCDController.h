@@ -29,7 +29,7 @@ class LCDScreen;
 
 #ifdef MULTIDISPLAY_V2
 //8
-#define SCREENCOUNT 1
+#define SCREENCOUNT 2
 #else
 #define SCREENCOUNT 1
 #endif
