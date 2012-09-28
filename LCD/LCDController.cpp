@@ -75,6 +75,9 @@ void LCDController::init() {
 	case 2:
 		screen3_init();
 		break;
+	case 3:
+		screen4_init();
+		break;
 	}
 }
 
@@ -88,6 +91,9 @@ void LCDController::draw() {
 		break;
 	case 2:
 		screen3_draw();
+		break;
+	case 3:
+		screen4_draw();
 		break;
 	}
 }
@@ -873,4 +879,37 @@ void LCDController::screen3_draw() {
 //	printInt (0, refreshCounter);
 
 }
+
+void LCDController::screen4_init() {
+	cgramBigFont4();
+	lcd.lcdCommandWriteAndPrintIn_P(0x80, PSTR("Boost:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0x94, PSTR("Max:"));
+}
+
+
+void LCDController::screen4_draw() {
+
+	lcd.commandWrite(0xC0+7);
+	if(data.calBoost < 0.0 ) {
+		lcd.print(2);
+		lcd.print(2);
+	} else {
+		lcd.printIn("  ");
+	}
+
+	//bigNum(abs(CalBoost)*1000,0,9,1);
+
+	printBigNum ( (double)data.calBoost, LCD_WIDTH-9, 9, 0, LCD_BIGFONT_4);
+
+	//Check for new MaxLD
+	if(data.calBoost > data.maxLd) {
+		data.maxLd  = data.calBoost;
+	}
+
+//	lcd2.commandWrite(0xD4);
+//	lcdController.printFloat2DP(data.maxLd);                    //Max Boost
+	lcdController.printFloat2DP(0xD4,data.maxLd);                    //Max Boost
+ }
+
+
 #endif /* LCD */

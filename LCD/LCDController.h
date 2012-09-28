@@ -30,7 +30,7 @@ class LCDScreen;
 
 #ifdef MULTIDISPLAY_V2
 //8
-#define SCREENCOUNT 3
+#define SCREENCOUNT 4
 #else
 #define SCREENCOUNT 1
 #endif
@@ -177,6 +177,8 @@ public:
 	int scopeMax;
 	void screen3_init();
 	void screen3_draw();
+	void screen4_init();
+	void screen4_draw();
 
 private:
 	char *cbuf;
