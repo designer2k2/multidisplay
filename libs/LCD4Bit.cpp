@@ -170,7 +170,7 @@ void LCD4Bit::printInBlank() {
 //send the clear screen command to the LCD
 void LCD4Bit::clear(){
   commandWrite(CMD_CLR);
-  delay(1);
+  delay(3);
 }
 
 

@@ -156,7 +156,7 @@ void  MultidisplayController::myconstructor() {
 	//http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1235060559/15
 	//Audi S2 N75
 	//30Hz
-	TCCR1B = TCCR1B & 0b11111000 | 0x5;
+	TCCR1B = TCCR1B & (0b11111000 | 0x5);
 #else
 
 	//http://www.arduino.cc/playground/Main/TimerPWMCheatsheet
@@ -212,6 +212,7 @@ void  MultidisplayController::myconstructor() {
 #endif
 
 #ifdef LCD
+	lcdController.myconstructor();
 //	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
 	lcdController.init();
 #endif
@@ -236,6 +237,13 @@ void  MultidisplayController::myconstructor() {
 	gear_state = GEAR_STATE_NEED_RECOGNITION;
 	last_gear = 0;
 #endif
+
+	drawTime = 0;
+
+	//LiquidCrystal lib doesnt works with the displaytech 204A :(
+//	lcd.begin(20,4, LCD_5x10DOTS);
+//	lcd.clear();
+
 }
 
 /*
@@ -1620,7 +1628,10 @@ void MultidisplayController::mainLoop() {
 
 	// ui knows what screen is active and draws it!
 #ifdef LCD
-	lcdController.draw();
+	if ( drawTime < millis() ) {
+		lcdController.draw();
+		drawTime = millis() + LCD_DRAW_TIME;
+	}
 #endif
 
 #ifdef MULTIDISPLAY_V1
@@ -1827,44 +1838,44 @@ void MultidisplayController::buttonBPressed() {
 	//Serial.println("Button B Pressed");
 
 #ifdef LCD
-	LCDScreen* l;
-
-	switch(lcdController.activeScreen){
-	case 0:
-		break;
-	case 1:
-		//The MaxLD will be reset!
-		data.maxLd = 0.0;
-		data.maxLdt = data.ldCalPoint;
-		break;
-	case 2:
-		//Change LCD brightness
-		lcdController.toggleBrightness();
-
-		//and save the new value:
-		EEPROM.write(EEPROM_BRIGHTNESS,lcdController.brightness);
-		break;
-
-	case 7:
-		l = lcdController.getLCDScreen(6);
-		if ( l ) {
-			((LCDScreen7*)l)->min = 0;
-			((LCDScreen7*)l)->max = 5000;
-
-			((LCDScreen7*)l)->toggleMode();
-		}
-		break;
-
-	case 8:
-		l = lcdController.getLCDScreen(7);
-		if ( l ) {
-			((LCDScreen8*)l)->toggleMax();
-		}
-		break;
-
-	default:
-		break;
-	}
+//	LCDScreen* l;
+//
+//	switch(lcdController.activeScreen){
+//	case 0:
+//		break;
+//	case 1:
+//		//The MaxLD will be reset!
+//		data.maxLd = 0.0;
+//		data.maxLdt = data.ldCalPoint;
+//		break;
+//	case 2:
+//		//Change LCD brightness
+//		lcdController.toggleBrightness();
+//
+//		//and save the new value:
+//		EEPROM.write(EEPROM_BRIGHTNESS,lcdController.brightness);
+//		break;
+//
+//	case 7:
+//		l = lcdController.getLCDScreen(6);
+//		if ( l ) {
+//			((LCDScreen7*)l)->min = 0;
+//			((LCDScreen7*)l)->max = 5000;
+//
+//			((LCDScreen7*)l)->toggleMode();
+//		}
+//		break;
+//
+//	case 8:
+//		l = lcdController.getLCDScreen(7);
+//		if ( l ) {
+//			((LCDScreen8*)l)->toggleMax();
+//		}
+//		break;
+//
+//	default:
+//		break;
+//	}
 #endif
 }
 

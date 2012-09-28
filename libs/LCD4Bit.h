@@ -35,4 +35,6 @@ private:
   void pushByte(int value);
 };
 
+extern LCD4Bit lcd;
+
 #endif

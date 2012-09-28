@@ -38,19 +38,19 @@ LCDScreen5::LCDScreen5() {
 
 
 void LCDScreen5::customInit() {
-	lcdp->lcdCommandWriteAndPrintIn_P (0x80, PSTR("Boost:"));
-	lcdp->lcdCommandWriteAndPrintIn_P (0x94, PSTR("Max:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0x80, PSTR("Boost:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0x94, PSTR("Max:"));
 }
 
 
 void LCDScreen5::customDraw() {
 
-	lcdp->commandWrite(0xC0+7);
+	lcd.commandWrite(0xC0+7);
 	if(data.calBoost < 0.0 ) {
-		lcdp->print(2);
-		lcdp->print(2);
+		lcd.print(2);
+		lcd.print(2);
 	} else {
-		lcdp->printIn("  ");
+		lcd.printIn("  ");
 	}
 
 	//bigNum(abs(CalBoost)*1000,0,9,1);
@@ -63,7 +63,7 @@ void LCDScreen5::customDraw() {
 		data.maxLd  = data.calBoost;
 	}
 
-//	lcdp->commandWrite(0xD4);
+//	lcd2.commandWrite(0xD4);
 //	lcdController.printFloat2DP(data.maxLd);                    //Max Boost
 	lcdController.printFloat2DP(0xD4,data.maxLd);                    //Max Boost
  }

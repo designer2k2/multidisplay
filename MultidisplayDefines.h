@@ -232,6 +232,7 @@ typedef unsigned char byte;
 #define SCOPE_LAMBDA 5
 
 #define LCD
+#define LCD_DRAW_TIME 300
 
 //buffer in LCDController
 #define LCD_BUFSIZE 21

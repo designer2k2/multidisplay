@@ -40,11 +40,11 @@ LCDScreen8::LCDScreen8() {
 
 
 void LCDScreen8::customInit() {
-	lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[0], PSTR("Max "));
-	lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[1], PSTR("LD:       RPM:"));
-	lcdp->lcdCommandWriteAndPrintIn_P (lcdController.ystart[2], PSTR("LMM:      EGT:"));
+	lcd.lcdCommandWriteAndPrintIn_P(lcdController.ystart[0], PSTR("Max "));
+	lcd.lcdCommandWriteAndPrintIn_P(lcdController.ystart[1], PSTR("LD:       RPM:"));
+	lcd.lcdCommandWriteAndPrintIn_P(lcdController.ystart[2], PSTR("LMM:      EGT:"));
 	//line 4
-	//lcdp->lcdCommandWriteAndPrintIn_P(lcdController.ystart[3], PSTR("T7:       T8:"));
+	//lcd.lcdCommandAndPrintIn_P(lcdController.ystart[3], PSTR("T7:       T8:"));
 }
 
 

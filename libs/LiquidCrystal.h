@@ -83,6 +83,13 @@ public:
   void command(uint8_t);
   
   using Print::write;
+
+
+  void lcdCommandAndPrintIn_P(uint8_t cmd, const char *chars);
+  void lcdSetCursorAndPrintIn_P(uint8_t col, uint8_t row, const char *chars);
+  void write_P(const char *msg);
+  void printIn_P(const char *msg);
+
 private:
   void send(uint8_t, uint8_t);
   void write4bits(uint8_t);

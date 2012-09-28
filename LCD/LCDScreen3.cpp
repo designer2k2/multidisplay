@@ -34,13 +34,13 @@ LCDScreen3::LCDScreen3() {
 
 void LCDScreen3::customInit() {
 	//Line1
-	lcdp->lcdCommandWriteAndPrintIn_P  (0x80, PSTR("LAM:"));
+	lcd.lcdCommandWriteAndPrintIn_P (0x80, PSTR("LAM:"));
 	//Line=2
-	lcdp->lcdCommandWriteAndPrintIn_P (0xC0, PSTR("LD :"));
+	lcd.lcdCommandWriteAndPrintIn_P(0xC0, PSTR("LD :"));
 	//Line=3
-	lcdp->lcdCommandWriteAndPrintIn_P (0x94, PSTR("THR:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0x94, PSTR("THR:"));
 	//Line=4
-	lcdp->lcdCommandWriteAndPrintIn_P (0xD4, PSTR("RPM:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0xD4, PSTR("RPM:"));
 }
 
 
@@ -63,39 +63,39 @@ void LCDScreen3::customDraw()  {
 	//Print the Values:
 
 
-//	lcdp->commandWrite(0x80+5);
-//	lcdp->printIn(itoa(data.calLambda, buf, 10));
+//	lcd.command(0x80+5);
+//	lcd.printIn(itoa(data.calLambda, buf, 10));
 #ifdef LAMBDA_WIDEBAND
 	lcdController.printFloat2DP(0x80+5, data.calLambdaF);
 #else
 	lcdController.printInt(0x80+5, data.calLambda);
 #endif
-	lcdp->print(32);
-	lcdp->commandWrite(0xC0+4);
+	lcd.print(32);
+	lcd.commandWrite(0xC0+4);
 
 	if(data.calBoost<0.0) {
-		lcdp->printIn_P(PSTR("-"));
+		lcd.printIn_P(PSTR("-"));
 	} else {
-		lcdp->printIn_P(PSTR(" "));
+		lcd.printIn_P(PSTR(" "));
 	}
 	lcdController.printFloat2DP(abs(data.calBoost));              //Shows current Boost
 
-	lcdp->print(32);
+	lcd.print(32);
 	lcdController.printInt(0x94+5, data.calThrottle);
-	lcdp->print(32);
+	lcd.print(32);
 	//gets rid of the last 10, thats not needed.
 	lcdController.printInt(0xD4+5, (data.calRPM/10)*10);
-	lcdp->print(32);
+	lcd.print(32);
 
 
 	//Now lets make the Bars:
-	lcdp->commandWrite(0x80+10);
+	lcd.commandWrite(0x80+10);
 	lcdController.drawBar(10,data.calLambda/2);
-	lcdp->commandWrite(0xC0+10);
+	lcd.commandWrite(0xC0+10);
 	lcdController.drawBar(10,boostMapped);
-	lcdp->commandWrite(0x94+10);
+	lcd.commandWrite(0x94+10);
 	lcdController.drawBar(10,data.calThrottle);
-	lcdp->commandWrite(0xD4+10);
+	lcd.commandWrite(0xD4+10);
 	lcdController.drawBar(10,rpmMapped);
 }
 

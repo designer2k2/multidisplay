@@ -33,22 +33,22 @@ LCDScreen2::LCDScreen2() {
 void LCDScreen2::customInit() {
 	if (flags.f.mode > 1) {
 		//Line1
-		lcdp->lcdCommandWriteAndPrintIn_P  (0x80, PSTR("A1:       A2:"));
+		lcd.lcdCommandWriteAndPrintIn_P (0x80, PSTR("A1:       A2:"));
 		//Line=2
-		lcdp->lcdCommandWriteAndPrintIn_P(0xC0, PSTR("A3:       A4:"));
+		lcd.lcdCommandWriteAndPrintIn_P (0xC0, PSTR("A3:       A4:"));
 		//Line=3
-		lcdp->lcdCommandWriteAndPrintIn_P(0x94, PSTR("A5:       A6:"));
+		lcd.lcdCommandWriteAndPrintIn_P (0x94, PSTR("A5:       A6:"));
 		//Line=4
-		lcdp->lcdCommandWriteAndPrintIn_P(0xD4, PSTR("A7:       A8:"));
+		lcd.lcdCommandWriteAndPrintIn_P (0xD4, PSTR("A7:       A8:"));
 	} else {
 		//Line=4
-		lcdp->lcdCommandWriteAndPrintIn_P(0x80, PSTR("B1:       B2:"));
+		lcd.lcdCommandWriteAndPrintIn_P (0x80, PSTR("B1:       B2:"));
 		//Line=2
-		lcdp->lcdCommandWriteAndPrintIn_P(0xC0, PSTR("B3:       B4:"));
+		lcd.lcdCommandWriteAndPrintIn_P (0xC0, PSTR("B3:       B4:"));
 		//Line=3
-		lcdp->lcdCommandWriteAndPrintIn_P(0x94, PSTR("B5:       B6:"));
+		lcd.lcdCommandWriteAndPrintIn_P (0x94, PSTR("B5:       B6:"));
 		//Line=4
-		lcdp->lcdCommandWriteAndPrintIn_P(0xD4, PSTR("B7:       B8:"));
+		lcd.lcdCommandWriteAndPrintIn_P (0xD4, PSTR("B7:       B8:"));
 	}
 }
 

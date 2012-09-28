@@ -39,10 +39,10 @@ void LCDScreen4::customInit() {
 	//Typ K Screen
 
 	//Line1
-	lcdp->lcdCommandWriteAndPrintIn_P (0x80, PSTR("T1:       T2:"));
-	lcdp->lcdCommandWriteAndPrintIn_P (0xC0, PSTR("T3:       T4:"));
-	lcdp->lcdCommandWriteAndPrintIn_P (0x94, PSTR("T5:       T6:"));
-	lcdp->lcdCommandWriteAndPrintIn_P (0xD4, PSTR("T7:       T8:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0x80, PSTR("T1:       T2:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0xC0, PSTR("T3:       T4:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0x94, PSTR("T5:       T6:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0xD4, PSTR("T7:       T8:"));
 }
 
 

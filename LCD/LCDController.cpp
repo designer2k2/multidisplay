@@ -26,6 +26,7 @@
 #include "Arduino.h"
 
 #include "MultidisplayDefines.h"
+#include "MultidisplayController.h"
 #include "LCDController.h"
 #include "LCDScreen1.h"
 #include "LCDScreen2.h"
@@ -50,53 +51,45 @@ void  LCDController::myconstructor() {
 //	activeScreen = SCREENCOUNT-1;
 	activeScreen = 0;
 	brightness = 2;
-	lcdp = new LCD4Bit(4);
+
+//	lcdp = new LiquidCrystal(4,2, 6,7,8,9);
+//	lcd.begin(20,4);
+
 	cbuf = (char*) malloc (sizeof(char) * LCD_BUFSIZE);
 
-	lcdp->init();
+	lcd.init();
 
     for ( int i = 0 ; i < 20 ; i++ )
             scopeInt[i]=0;
-
-    //FIXME button modes commented out
-#ifdef MULTIDISPLAY_V2
-//    myScreens[0] = new LCDScreen1();
-//    myScreens[1] = new LCDScreen2();
-//    myScreens[2] = new LCDScreen3();
-//    myScreens[3] = new LCDScreen4();
-//    myScreens[4] = new LCDScreen5();
-//    myScreens[5] = new LCDScreen6();
-//    myScreens[6] = new LCDScreen9();
-//    myScreens[7] = new LCDScreen10();
-
-    myScreens[0] = new LCDScreen10();
-    myScreens[1] = new LCDScreen11();
-//    myScreens[2] = new LCDScreen3();
-//    myScreens[3] = new LCDScreen4();
-//    myScreens[4] = new LCDScreen5();
-//    myScreens[5] = new LCDScreen6();
-//    myScreens[6] = new LCDScreen9();
-//    myScreens[7] = new LCDScreen8();
-
-//    myScreens[8] = new LCDScreen8();
-//    myScreens[9] = new LCDScreen11();
-#else
-    myScreens[0] = new LCDScreen10();
-#endif
 }
 
 void LCDController::init() {
-	myScreens[activeScreen]->init();
-}
-
-LCDScreen* LCDController::getLCDScreen ( uint8_t num ) {
-	if ( num > SCREENCOUNT )
-		return NULL;
-	return myScreens[num];
+	lcd.clear();
+	switch (activeScreen) {
+	case 0:
+		screen1_init();
+		break;
+	case 1:
+		screen2_init();
+		break;
+	case 2:
+		screen3_init();
+		break;
+	}
 }
 
 void LCDController::draw() {
-	myScreens[activeScreen]->draw();
+	switch (activeScreen) {
+	case 0:
+		screen1_draw();
+		break;
+	case 1:
+		screen2_draw();
+		break;
+	case 2:
+		screen3_draw();
+		break;
+	}
 }
 
 //The LCD brightness, what could be cycled through
@@ -213,17 +206,17 @@ void LCDController::cgramBigFont4() {
  */
 void LCDController::printOneNumber2(uint8_t digit, uint8_t x_offset, uint8_t y_offset) {
 	// Line 1 of the one digit number
-	lcdp->commandWrite( ystart[y_offset] + x_offset); //Line1
+	lcd.commandWrite( ystart[y_offset] + x_offset); //Line1
 
-	lcdp->print (bn12[digit*3+digit*1]);
-	lcdp->print (bn12[digit*3+1+digit*1]);
-	lcdp->print (bn12[digit*3+2+digit*1]);
+	lcd.print (bn12[digit*3+digit*1]);
+	lcd.print (bn12[digit*3+1+digit*1]);
+	lcd.print (bn12[digit*3+2+digit*1]);
 
 	// Line 2 of the one-digit number
-	lcdp->commandWrite(ystart[y_offset+1] + x_offset); // Line 2
-	lcdp->print(bn22[digit*3+digit*1]);
-	lcdp->print(bn22[digit*3+1+digit*1]);
-	lcdp->print(bn22[digit*3+2+digit*1]);
+	lcd.commandWrite(ystart[y_offset+1] + x_offset); // Line 2
+	lcd.print(bn22[digit*3+digit*1]);
+	lcd.print(bn22[digit*3+1+digit*1]);
+	lcd.print(bn22[digit*3+2+digit*1]);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -238,28 +231,28 @@ void LCDController::printOneNumber4(uint8_t digit, uint8_t x_offset, uint8_t y_o
 	//TODO do we need the 4. col in the bnx4 arrays?
 
 	// Line 1 of the one digit number
-	lcdp->commandWrite( ystart[y_offset] + x_offset);                  //Line 1
-	lcdp->print(bn14[digit*4]);
-	lcdp->print(bn14[digit*4+1]);
-	lcdp->print(bn14[digit*4+2]);
+	lcd.commandWrite( ystart[y_offset] + x_offset);                  //Line 1
+	lcd.print(bn14[digit*4]);
+	lcd.print(bn14[digit*4+1]);
+	lcd.print(bn14[digit*4+2]);
 
 	// Line 2 of the one-digit number
-	lcdp->commandWrite( ystart[y_offset+1] + x_offset);
-	lcdp->print(bn24[digit*4]);
-	lcdp->print(bn24[digit*4+1]);
-	lcdp->print(bn24[digit*4+2]);
+	lcd.commandWrite( ystart[y_offset+1] + x_offset);
+	lcd.print(bn24[digit*4]);
+	lcd.print(bn24[digit*4+1]);
+	lcd.print(bn24[digit*4+2]);
 
 	// Line 3 of the one digit number
-	lcdp->commandWrite( ystart[y_offset+2] + x_offset);
-	lcdp->print(bn34[digit*4]);
-	lcdp->print(bn34[digit*4+1]);
-	lcdp->print(bn34[digit*4+2]);
+	lcd.commandWrite( ystart[y_offset+2] + x_offset);
+	lcd.print(bn34[digit*4]);
+	lcd.print(bn34[digit*4+1]);
+	lcd.print(bn34[digit*4+2]);
 
 	// Line 4 of the one-digit number
-	lcdp->commandWrite( ystart[y_offset+3] + x_offset);
-	lcdp->print(bn44[digit*4]);
-	lcdp->print(bn44[digit*4+1]);
-	lcdp->print(bn44[digit*4+2]);
+	lcd.commandWrite( ystart[y_offset+3] + x_offset);
+	lcd.print(bn44[digit*4]);
+	lcd.print(bn44[digit*4+1]);
+	lcd.print(bn44[digit*4+2]);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -270,7 +263,7 @@ void LCDController::printOneNumber4(uint8_t digit, uint8_t x_offset, uint8_t y_o
  */
 void LCDController::blanks(uint8_t c) {
 	for ( uint8_t i = 0 ; i < c ; i++ )
-		lcdp->print(254);
+		lcd.print(254);
 }
 
 
@@ -334,7 +327,7 @@ void LCDController::printFloat2DP(float f) {
  */
 void LCDController::printFloat(float f, uint16_t dp) {
 	float2string ( cbuf, f, dp );
-	lcdp->printIn(cbuf);
+	lcd.printIn(cbuf);
 }
 
 /**
@@ -351,7 +344,7 @@ void LCDController::printFloat2DP(uint8_t pos, float f) {
  * \param dp factor for the decimal places: 10^x for x decimal places, e.g. 10^2 = 100 to get 2 decimal places
  */
 void LCDController::printFloat(uint8_t pos, float f, uint16_t dp ) {
-	lcdp->commandWrite(pos);
+	lcd.commandWrite(pos);
 	printFloat (f, dp);
 }
 
@@ -390,25 +383,25 @@ void LCDController::lcdShowIntro(int delayValue) {
 	cgramIntro();
 	cgramIntro2();
 
-//	//Show the Intro:
-//	lcdp->commandWrite(0x80+2);                  //Line1
-//	lcdp->print(1);
-//	lcdp->print(2);
-//	lcdp->commandWrite(0x80+10);                  //Line1
-//	lcdp->print(3);
-//	lcdp->print(4);
-//
-//	lcdp->commandWrite(0xC0+2); 			//Line2
-//	lcdp->print(5);
-//	lcdp->print(6);
-//	lcdp->printIn_P ( PSTR("ulti") );
-//	lcdp->commandWrite(0xC0+10); 			//Line2
-//	lcdp->print(7);
-//	lcdp->print(8);
-//	lcdp->printIn_P ( PSTR("isplay") );
-//
-//	lcdp->commandWrite(0xD4+1);                  //Line=4
-//	lcdp->printIn_P ( PSTR("www.designer2k2.at") );
+	//Show the Intro:
+	lcd.commandWrite(0x80+2);                  //Line1
+	lcd.print(1);
+	lcd.print(2);
+	lcd.commandWrite(0x80+10);                  //Line1
+	lcd.print(3);
+	lcd.print(4);
+
+	lcd.commandWrite(0xC0+2); 			//Line2
+	lcd.print(5);
+	lcd.print(6);
+	lcd.printIn_P ( PSTR("ulti") );
+	lcd.commandWrite(0xC0+10); 			//Line2
+	lcd.print(7);
+	lcd.print(8);
+	lcd.printIn_P ( PSTR("isplay") );
+
+	lcd.commandWrite(0xD4+1);                  //Line=4
+	lcd.printIn_P ( PSTR("www.designer2k2.at") );
 
 	//Set the LCD brightness: (This turns on the Light, looks nice)
 	setBrightness(2);
@@ -441,8 +434,8 @@ void LCDController::lcdShowIntro(int delayValue) {
 void LCDController::lcdUploadUdef5x8_P(uint8_t charIndex, const uint8_t *data) {
 	charIndex = charIndex << 3;
 	for (uint8_t i = 0; i < 8; i++) {
-		lcdp->commandWrite(0x40 | charIndex | i);
-		lcdp->print( pgm_read_byte (data+i) );
+		lcd.commandWrite(0x40 | charIndex | i);
+		lcd.print( pgm_read_byte (data+i) );
 	}
 }
 
@@ -453,8 +446,8 @@ void LCDController::lcdUploadUdef5x8_P(uint8_t charIndex, const uint8_t *data) {
 void LCDController::lcdUploadUdef5x8(uint8_t charIndex, const uint8_t *data) {
 	charIndex = charIndex << 3;
 	for (uint8_t i = 0; i < 8; i++) {
-		lcdp->commandWrite(0x40 | charIndex | i);
-		lcdp->print( data[i] );
+		lcd.commandWrite(0x40 | charIndex | i);
+		lcd.print( data[i] );
 	}
 }
 
@@ -503,7 +496,7 @@ void LCDController::drawBar(uint8_t digits, uint8_t value) {
 	uint8_t Curs = value/10;
 	for (uint8_t i=0; i < digits; i++) {
 		if ( i<Curs ) {
-			lcdp->print(255);
+			lcd.print(255);
 		} else {
 
 			if(i==Curs) {
@@ -512,12 +505,12 @@ void LCDController::drawBar(uint8_t digits, uint8_t value) {
 				int ChrW = (value - Curs*10)/2;
 
 				if(ChrW==0) {
-					lcdp->printIn(" ");
+					lcd.printIn(" ");
 				} else {
-					lcdp->print(ChrW);
+					lcd.print(ChrW);
 				}
 			} else {
-				lcdp->printIn(" ");
+				lcd.printIn(" ");
 			}
 		}
 	}
@@ -572,66 +565,66 @@ void LCDController::drawVertBar(uint8_t val, uint8_t pos) {
 //		else if ( i < printPos )
 //			draw = 255;
 //		//now draw it!
-//		lcdp->commandWrite( ystart[i] + pos);
-//		lcdp->print( draw );
+//		lcd.commandWrite( ystart[i] + pos);
+//		lcd.print( draw );
 //	}
 
 	//now lets make a switch case depending on the PrintPos.
 	switch(printPos){
 	case 0:
 		//so there is only one character /3 blanks and the character in the lowest position
-		lcdp->commandWrite(0x80+pos);              //Line 1
-		lcdp->print(254); //Blank
-		lcdp->commandWrite(0xC0+pos);              //Line 2
-		lcdp->print(254); //Blank
-		lcdp->commandWrite(0x94+pos);              //Line 3
-		lcdp->print(254); //Blank
-		lcdp->commandWrite(0xD4+pos);              //Line 4
-		lcdp->print(mod); //The Custom Character presenting the value
+		lcd.commandWrite(0x80+pos);              //Line 1
+		lcd.print(254); //Blank
+		lcd.commandWrite(0xC0+pos);              //Line 2
+		lcd.print(254); //Blank
+		lcd.commandWrite(0x94+pos);              //Line 3
+		lcd.print(254); //Blank
+		lcd.commandWrite(0xD4+pos);              //Line 4
+		lcd.print(mod); //The Custom Character presenting the value
 		break;
 	case 1:
 		//so there is only one character /1 fulls and the character in the 2nd position
-		lcdp->commandWrite(0x80+pos);              //Line 1
-		lcdp->print(254); //Blank
-		lcdp->commandWrite(0xC0+pos);              //Line 2
-		lcdp->print(254); //Blank
-		lcdp->commandWrite(0x94+pos);              //Line 3
-		lcdp->print(mod); //The Custom Character presenting the value
-		lcdp->commandWrite(0xD4+pos);              //Line 4
-		lcdp->print(255); //Full
+		lcd.commandWrite(0x80+pos);              //Line 1
+		lcd.print(254); //Blank
+		lcd.commandWrite(0xC0+pos);              //Line 2
+		lcd.print(254); //Blank
+		lcd.commandWrite(0x94+pos);              //Line 3
+		lcd.print(mod); //The Custom Character presenting the value
+		lcd.commandWrite(0xD4+pos);              //Line 4
+		lcd.print(255); //Full
 		break;
 	case 2:
 		//so there is only one character /2 fulls and the character in the 3rd position
-		lcdp->commandWrite(0x80+pos);              //Line 1
-		lcdp->print(254); //Blank
-		lcdp->commandWrite(0xC0+pos);              //Line 2
-		lcdp->print(mod); //The Custom Character presenting the value
-		lcdp->commandWrite(0x94+pos);              //Line 3
-		lcdp->print(255); //Full
-		lcdp->commandWrite(0xD4+pos);              //Line 4
-		lcdp->print(255); //Full
+		lcd.commandWrite(0x80+pos);              //Line 1
+		lcd.print(254); //Blank
+		lcd.commandWrite(0xC0+pos);              //Line 2
+		lcd.print(mod); //The Custom Character presenting the value
+		lcd.commandWrite(0x94+pos);              //Line 3
+		lcd.print(255); //Full
+		lcd.commandWrite(0xD4+pos);              //Line 4
+		lcd.print(255); //Full
 		break;
 	case 3:
 		//so there is only one character /3 fulls and the character in the highest position
-		lcdp->commandWrite(0x80+pos);              //Line 1
-		lcdp->print(mod); //The Custom Character presenting the value
-		lcdp->commandWrite(0xC0+pos);              //Line 2
-		lcdp->print(255); //Full
-		lcdp->commandWrite(0x94+pos);              //Line 3
-		lcdp->print(255); //Full
-		lcdp->commandWrite(0xD4+pos);              //Line 4
-		lcdp->print(255); //Full
+		lcd.commandWrite(0x80+pos);              //Line 1
+		lcd.print(mod); //The Custom Character presenting the value
+		lcd.commandWrite(0xC0+pos);              //Line 2
+		lcd.print(255); //Full
+		lcd.commandWrite(0x94+pos);              //Line 3
+		lcd.print(255); //Full
+		lcd.commandWrite(0xD4+pos);              //Line 4
+		lcd.print(255); //Full
 		break;
 	case 4:
 		//easy, eveything is full!
-		lcdp->commandWrite(0x80+pos);              //Line 1
-		lcdp->print(255); //Full
-		lcdp->commandWrite(0xC0+pos);              //Line 2
-		lcdp->print(255); //Full
-		lcdp->commandWrite(0x94+pos);              //Line 3
-		lcdp->print(255); //Full
-		lcdp->commandWrite(0xD4+pos);              //Line 4
-		lcdp->print(255); //Full
+		lcd.commandWrite(0x80+pos);              //Line 1
+		lcd.print(255); //Full
+		lcd.commandWrite(0xC0+pos);              //Line 2
+		lcd.print(255); //Full
+		lcd.commandWrite(0x94+pos);              //Line 3
+		lcd.print(255); //Full
+		lcd.commandWrite(0xD4+pos);              //Line 4
+		lcd.print(255); //Full
 		break;
 	}
 
@@ -719,7 +712,7 @@ void LCDController::printBigNum (char* str, uint8_t length, uint8_t x_offset, ui
     //clear digits in front
     if ( length - screenlen > 0 ) {
     	for ( uint8_t l = 0 ; l < type ; l++ ) {
-    		lcdp->commandWrite( ystart[l + y_offset] + x_offset);
+    		lcd.commandWrite( ystart[l + y_offset] + x_offset);
     		blanks( length - stringlen );
     	}
     }
@@ -731,18 +724,18 @@ void LCDController::printBigNum (char* str, uint8_t length, uint8_t x_offset, ui
 	for ( uint8_t i = 0 ; i < stringlen ; i++ ) {
 		if ( i == 0 && negative ) {
 			if ( type == LCD_BIGFONT_4 )
-				lcdp->commandWrite( ystart[y_offset+1] + x_offset);
+				lcd.commandWrite( ystart[y_offset+1] + x_offset);
 			else
-				lcdp->commandWrite( ystart[y_offset] + x_offset);
-			lcdp->print(8);
+				lcd.commandWrite( ystart[y_offset] + x_offset);
+			lcd.print(8);
 			x_offset++;
 		} else {
 			if ( i == dp_pos ) {
 				//TODO print bigger decimal point!
 				if ( type == LCD_BIGFONT_4 )
-					lcdp->print (255);
+					lcd.print (255);
 				else
-					lcdp->print(5);
+					lcd.print(5);
 			} else {
 				//draw only of we have space
 				if ( ! ((x_offset + 4) > end) ) {
@@ -772,7 +765,7 @@ void LCDController::printInt (uint8_t pos, int value, uint8_t length) {
 /**
  * prints a integer value to postion pos
  */
-//void LCDController::printInt (uint8_t pos, int value) {
+//void LCDController::printt (uint8_t pos, int value) {
 //	itoa (value, cbuf, 10);
 //	printString (pos, cbuf);
 //}
@@ -781,8 +774,103 @@ void LCDController::printInt (uint8_t pos, int value, uint8_t length) {
  */
 void LCDController::printString (uint8_t pos, char* str) {
 	if (pos >= 0x80)
-		lcdp->commandWrite (pos);
-	lcdp->printIn (str);
+		lcd.commandWrite (pos);
+	lcd.printIn (str);
 }
 
+void LCDController::screen1_init() {
+    lcd.lcdCommandWriteAndPrintIn_P (0x80, PSTR("L  :"));
+    lcd.lcdCommandWriteAndPrintIn_P (0x80+9, PSTR("AGT:"));
+    lcd.lcdCommandWriteAndPrintIn_P (0xC0, PSTR("BST:"));
+    lcd.lcdCommandWriteAndPrintIn_P (0xC0+9, PSTR("P1 :"));
+}
+
+
+void LCDController::screen1_draw() {
+    printFloat2DP(ystart[0] + 4, data.calLambdaF);
+//    lcdController.printInt(lcdController.ystart[0] + 13, data.calThrottle, 3 );
+
+    printFloat2DP(ystart[1] + 4, data.calBoost);
+    printInt(ystart[1] + 13, data.VDOPres1, 4);
+}
+
+void LCDController::screen2_init() {
+    lcd.lcdCommandWriteAndPrintIn_P(ystart[0], PSTR("gear:"));
+    lcd.lcdCommandWriteAndPrintIn_P(ystart[0]+9, PSTR("speed:"));
+    lcd.lcdCommandWriteAndPrintIn_P(ystart[1], PSTR("Digifant:"));
+//    lcd.lcdCommandWriteAndPrintIn_P(lcdController.ystart[2] + 0, PSTR("ECT:"));
+//    lcd.lcdCommandWriteAndPrintIn_P(lcdController.ystart[2] + 9, PSTR("Ign:"));
+    lcd.lcdCommandWriteAndPrintIn_P(ystart[3] + 0, PSTR("LC :"));
+}
+void LCDController::screen2_draw() {
+    printInt(0x80 + 6, data.gear, 1 );
+    printInt(0x80 + 15, data.speed, 3 );
+#ifdef DIGIFANT_KLINE
+    printInt(ystart[2]+10, mController.df_kline_active_frame, 1);
+    printInt(ystart[2]+15, mController.df_kline_freq_milliseconds, 2);
+    printInt(ystart[3]+10, mController.df_kline_freq_helper0, 2);
+    printInt(ystart[3]+17, mController.df_kline_discarded_frames, 2);
+#endif
+}
+
+void LCDController::screen3_init() {
+	cgramVertBar();
+	scopeMin=0;
+	scopeMax=5000;
+}
+void LCDController::screen3_draw() {
+	//new Constrains if needed
+	int ScopeVal = 0;
+
+//	switch(flags.f.mode){
+//	case SCOPE_BOOST:
+//		ScopeVal = data.anaIn[BOOSTPIN];
+//		break;
+//	case SCOPE_THROTTLE:
+//		ScopeVal = data.calThrottle;
+//		break;
+//	case SCOPE_LMM:
+//		ScopeVal = data.calLMM;
+//		break;
+//	case SCOPE_RPM:
+//		ScopeVal = data.calRPM;
+//		break;
+//	case SCOPE_LAMBDA:
+//		ScopeVal = data.calLambda;
+//		break;
+//	default:
+//		break;
+//	}
+	ScopeVal = data.calLambda;
+
+//#ifdef LCDTEST
+	ScopeVal = random (5000);
+//#endif
+
+	if(ScopeVal < scopeMin)    {
+		scopeMin = ScopeVal;
+	}
+	if(ScopeVal > scopeMax)    {
+		scopeMax = ScopeVal;
+	}
+
+	//Get the Data:
+	int d = 0;
+	d = map(ScopeVal, scopeMin, scopeMax, 0, 33);
+	d = constrain(d, 0, 32);
+
+	//Show only the rightmost bar: (live screen)
+	drawVertBar(d,19);
+
+	//Feed it into the Buffer (on the right side)
+	scopeInt[19] = d;
+	scopeMode();
+
+	//Draw the Caption:
+	//Line1
+//	printInt(0x80, flags.f.mode);
+//	lcd.printIn(":");
+//	printInt (0, refreshCounter);
+
+}
 #endif /* LCD */

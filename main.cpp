@@ -46,15 +46,18 @@ MultidisplayController mController;
 #ifdef BOOSTN75
 RPMBoostController boostController;
 #endif
+//doesnt work with DisplayTech 204A in 4Bit mode :(
+//LiquidCrystal lcd(4,11, 2, 6,7,8,9);
+LCD4Bit lcd(4);
 
 int main(void) {
 	/* Must call init for arduino to work properly */
     init();
 
     data.myconstructor();
-#ifdef LCD
-    lcdController.myconstructor();
-#endif
+//#ifdef LCD
+//    lcdController.myconstructor();
+//#endif
 #ifdef BOOSTN75
 	boostController.myconstructor();
 #endif

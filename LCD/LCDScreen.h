@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 #include <avr/pgmspace.h>
-#include <LCD4Bit.h>
+#include <LiquidCrystal.h>
 
 #include <LCDController.h>
 
@@ -59,11 +59,13 @@ struct lcd_init_t {
 
 /**
  * abstract base class for an lcd screen
+ *
+ * @deprecated
  */
 class LCDScreen {
 public:
 	LCDScreen();
-	LCDScreen (LCD4Bit* lcdp, uint16_t flags);
+	LCDScreen (uint16_t flags);
 
 
 	void init ();
@@ -74,7 +76,6 @@ public:
 	void toggleScreenAB();
 	void toggleRefreshCounter ();
 
-	LCD4Bit* lcdp;
 	screen_flags_t flags;
 
 

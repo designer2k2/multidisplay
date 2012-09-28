@@ -26,16 +26,16 @@
 #ifdef LCD
 
 LCDScreen::LCDScreen() {
-	lcdp = lcdController.lcdp;
 	this->flags.all = 0;
 }
 
-LCDScreen::LCDScreen(LCD4Bit *lcdp, uint16_t flags) : lcdp(lcdp) {
+LCDScreen::LCDScreen(uint16_t flags) {
 	this->flags.all = flags;
 }
 
 void LCDScreen::init() {
-	lcdp->init ();
+	//TODO FIXME speed me up!
+	lcd.clear();
 
 	//Load the specific data:
 	if (flags.f.loadBar)

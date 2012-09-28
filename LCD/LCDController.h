@@ -23,13 +23,14 @@
 #include <stdlib.h>
 #include <avr/pgmspace.h>
 #include <LCD4Bit.h>
+#include <LiquidCrystal.h>
 
 
 class LCDScreen;
 
 #ifdef MULTIDISPLAY_V2
 //8
-#define SCREENCOUNT 2
+#define SCREENCOUNT 3
 #else
 #define SCREENCOUNT 1
 #endif
@@ -45,8 +46,6 @@ public:
 	//dont use the constructor because I want to control when the global objects get initialized
 	void myconstructor();
 
-	LCD4Bit* lcdp;
-
 	/***
 	 * screen layout:
 	 * screen1: egt, boost, maxboost, lambda bar, boost bar, castetemp, ldcalpoint
@@ -60,15 +59,11 @@ public:
 	 * screen9: vdo temp and pressures
 	 */
 
-	LCDScreen* myScreens[SCREENCOUNT];
-
 	void init ();
 	void draw ();
 
 	void toggleScreen ();
 	void setActiveScreen (uint8_t as);
-
-	LCDScreen* getLCDScreen ( uint8_t num );
 
 	uint8_t activeScreen;
 	uint8_t brightness;
@@ -174,6 +169,14 @@ public:
 
 	int scopeInt[20];      //needed for the Scrolling Scope
 
+	void screen1_init();
+	void screen1_draw();
+	void screen2_init();
+	void screen2_draw();
+	int scopeMin;
+	int scopeMax;
+	void screen3_init();
+	void screen3_draw();
 
 private:
 	char *cbuf;

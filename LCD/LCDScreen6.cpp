@@ -40,14 +40,14 @@ LCDScreen6::LCDScreen6() {
 
 void LCDScreen6::customInit() {
 	if ( flags.f.mode == SCREENA ) {
-		lcdp->lcdCommandWriteAndPrintIn_P (0x80, PSTR("Boost:"));
-		lcdp->lcdCommandWriteAndPrintIn_P (0x94, PSTR("Temp:"));
+		lcd.lcdCommandWriteAndPrintIn_P(0x80, PSTR("Boost:"));
+		lcd.lcdCommandWriteAndPrintIn_P(0x94, PSTR("Temp:"));
 	 } else {
-		 lcdp->lcdCommandWriteAndPrintIn_P (0x80, PSTR("T1:   "));
-		 lcdp->lcdCommandWriteAndPrintIn_P (0x94, PSTR("T2:   "));
+		 lcd.lcdCommandWriteAndPrintIn_P(0x80, PSTR("T1:   "));
+		 lcd.lcdCommandWriteAndPrintIn_P(0x94, PSTR("T2:   "));
 
 		 //Clear the - from the screen A
-		 lcdp->lcdCommandWriteAndPrintIn_P (0x80+7, PSTR("  "));
+		 lcd.lcdCommandWriteAndPrintIn_P(0x80+7, PSTR("  "));
 	 }
 
 	refreshCounter  = 5;
@@ -59,12 +59,12 @@ void LCDScreen6::customDraw()  {
 	if ( flags.f.mode == SCREENA ){
 		//The Boost:
 
-		lcdp->commandWrite(0x80+7);
+		lcd.commandWrite(0x80+7);
 		if(data.calBoost<0.0) {
-			lcdp->print(2);
-			lcdp->print(2);
+			lcd.print(2);
+			lcd.print(2);
 		} else {
-			lcdp->printIn("  ");
+			lcd.printIn("  ");
 		}
 
 //		lcdController.bigNum(abs(data.calBoost)*1000,0,9,1);

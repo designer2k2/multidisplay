@@ -102,7 +102,7 @@ void LCDScreen7::customDraw() {
 	//Draw the Caption:
 	//Line1
 	lcdController.printInt(0x80, flags.f.mode);
-	lcdp->printIn(":");
+	lcd.printIn(":");
 	lcdController.printInt (0, refreshCounter);
 
 	Serial.println(mController.time);

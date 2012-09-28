@@ -27,8 +27,7 @@
 #include <avr/pgmspace.h>
 #include"SensorData.h"
 #include "LCD/LCDController.h"
-
-class PID_Beta6;
+#include "LiquidCrystal.h"
 
 
 
@@ -63,6 +62,8 @@ public:
 
     uint16_t serialFreq;
     unsigned long serialTime;
+
+    unsigned long drawTime;
 
     /**
      *  ============ pc -> arduino ==================

@@ -74,12 +74,19 @@ void LiquidCrystal::init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t en
   }
   pinMode(_enable_pin, OUTPUT);
   
-  if (fourbitmode)
-    _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
-  else 
+  if (fourbitmode) {
+	  pinMode(_data_pins[0], OUTPUT);
+	  pinMode(_data_pins[1], OUTPUT);
+	  pinMode(_data_pins[2], OUTPUT);
+	  pinMode(_data_pins[3], OUTPUT);
+	  //fixed
+//    _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
+	  _displayfunction = LCD_4BITMODE | LCD_2LINE | LCD_5x10DOTS;
+  } else
     _displayfunction = LCD_8BITMODE | LCD_1LINE | LCD_5x8DOTS;
   
-  begin(16, 1);  
+  //fixed
+  begin(20, 4, LCD_5x10DOTS);
 }
 
 void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
@@ -170,9 +177,9 @@ void LiquidCrystal::home()
   delayMicroseconds(2000);  // this command takes a long time!
 }
 
-void LiquidCrystal::setCursor(uint8_t col, uint8_t row)
-{
+void LiquidCrystal::setCursor(uint8_t col, uint8_t row) {
   int row_offsets[] = { 0x00, 0x40, 0x14, 0x54 };
+//  int row_offsets[] = { 0x00, 0x14, 0x40, 0x54 };
   if ( row >= _numlines ) {
     row = _numlines-1;    // we count rows starting w/0
   }
@@ -307,4 +314,29 @@ void LiquidCrystal::write8bits(uint8_t value) {
   }
   
   pulseEnable();
+}
+
+/* **************** custom addon **************** */
+void LiquidCrystal::lcdSetCursorAndPrintIn_P(uint8_t col, uint8_t row, const char *chars) {
+	setCursor(col,row);
+//	printIn_P(chars);
+	write_P(chars);
+}
+
+void LiquidCrystal::lcdCommandAndPrintIn_P(uint8_t cmd, const char *chars) {
+	command (cmd);
+	printIn_P(chars);
+}
+void LiquidCrystal::write_P(const char *msg) {
+  while (pgm_read_byte(msg) != 0x00) {
+    write(pgm_read_byte(msg++));
+  }
+}
+
+void LiquidCrystal::printIn_P(const char *msg) {
+  uint8_t i;  //fancy int.  avoids compiler warning when comparing i with strlen()'s uint8_t
+//  for (i=0;i < strlen_P(msg);i++){
+  while (pgm_read_byte(msg) != 0x00) {
+    print(pgm_read_byte(msg++));
+  }
 }

@@ -38,10 +38,10 @@ LCDScreen9::LCDScreen9() {
 
 //VDO Screen
 void LCDScreen9::customInit() {
-	lcdp->lcdCommandWriteAndPrintIn_P (0x80, PSTR("VDO Screen:"));
-	lcdp->lcdCommandWriteAndPrintIn_P (0xC0, PSTR("T1:       P1:"));
-	lcdp->lcdCommandWriteAndPrintIn_P (0x94, PSTR("T2:       P2:"));
-	lcdp->lcdCommandWriteAndPrintIn_P (0xD4, PSTR("T3:       P3:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0x80, PSTR("VDO Screen:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0xC0, PSTR("T1:       P1:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0x94, PSTR("T2:       P2:"));
+	lcd.lcdCommandWriteAndPrintIn_P(0xD4, PSTR("T3:       P3:"));
 }
 
 void LCDScreen9::customDraw() {
