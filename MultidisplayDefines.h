@@ -32,6 +32,7 @@
 //#define VR6_MOTRONIC
 #define DIGIFANT
 #define DIGIFANT_KLINE
+#define USE_DIGIFANT_MAPSENSOR
 
 #define LAMBDA_WIDEBAND
 

@@ -18,7 +18,7 @@
 */
 
 
-#include <wiring.h>
+#include <Arduino.h>
 
 #include "LCDController.h"
 #include "MultidisplayController.h"

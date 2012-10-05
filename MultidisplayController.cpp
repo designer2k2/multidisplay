@@ -19,9 +19,6 @@
 
 #include "MultidisplayController.h"
 #include "LCDController.h"
-#include "LCDScreen.h"
-#include "LCDScreen8.h"
-#include "LCDScreen7.h"
 #include "RPMBoostController.h"
 #include "Map16x1.h"
 
@@ -29,9 +26,8 @@
 #include <inttypes.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-#include <wiring.h>
+#include <Arduino.h>
 #include <EEPROM.h>
-#include <WProgram.h>
 
 #include <digitalWriteFast.h>
 
@@ -500,7 +496,7 @@ void MultidisplayController::AnaConversion() {
 #endif
 #ifdef BOOST_MOTOROLA_MPX4250
 	//or Motorola MPX 4250 datasheet
-	data.calAbsoluteBoost =((5.0 * (data.anaIn[BOOSTPIN]/4096.0)) + 0.2) / 0.02; //0-250kpa
+	data.calAbsoluteBoost = ( ((5.0 * (data.anaIn[BOOSTPIN]/4096.0)) + 0.2) / 0.02 ) / 100; //Bar
 	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
 #endif
 #ifdef BOOST_FREESCALE_MPXA6400A
@@ -1993,6 +1989,16 @@ void MultidisplayController::DFConvertReceivedData() {
 	data.df_cyl3_retard = ( df_klineData[df_kline_last_frame_completely_received].asBytes[14] * 0.351563 );
 	data.df_cyl4_retard = ( df_klineData[df_kline_last_frame_completely_received].asBytes[16] * 0.351563 );
 	data.df_total_retard = data.df_cyl1_retard + data.df_cyl2_retard + data.df_cyl3_retard + data.df_cyl4_retard;
+
+#ifdef USE_DIGIFANT_MAPSENSOR
+	//400kpa
+//	data.calAbsoluteBoost = ((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) / 0.012105 + 3.477902) / 100;
+	//200kpa
+	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) + 0.25) / 0.0252778 ) / 100;
+	//250kpa
+//	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) + 0.2) / 0.02) / 100;
+	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;
+#endif
 }
 
 #endif

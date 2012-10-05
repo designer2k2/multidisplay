@@ -852,7 +852,7 @@
 								<option id="de.innot.avreclipse.cppcompiler.option.debug.level.1453822688" name="Generate Debugging Info" superClass="de.innot.avreclipse.cppcompiler.option.debug.level" value="de.innot.avreclipse.cppcompiler.option.debug.level.none" valueType="enumerated"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.1276765123" name="Optimization Level" superClass="de.innot.avreclipse.cppcompiler.option.optimize" value="de.innot.avreclipse.cppcompiler.optimize.size" valueType="enumerated"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.incpath.449186167" name="Include Paths (-I)" superClass="de.innot.avreclipse.cppcompiler.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arduinoDuemilanoveCore-1.0.1}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arduinoDuemilanoveCore}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/avr/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/LCD}&quot;"/>
@@ -867,7 +867,7 @@
 							<tool id="de.innot.avreclipse.tool.linker.winavr.app.release.1948021021" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.release"/>
 							<tool command="avr-g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="de.innot.avreclipse.tool.cpplinker.app.release.1910003974" name="AVR C++ Linker" superClass="de.innot.avreclipse.tool.cpplinker.app.release">
 								<option id="de.innot.avreclipse.cpplinker.option.libpath.232737145" name="Libraries Path (-L)" superClass="de.innot.avreclipse.cpplinker.option.libpath" valueType="stringList">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arduinoDuemilanoveCore-1.0.1/Release}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arduinoDuemilanoveCore/Release}&quot;"/>
 								</option>
 								<option id="de.innot.avreclipse.cpplinker.option.libs.1513941840" name="Libraries (-l)" superClass="de.innot.avreclipse.cpplinker.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="arduinocore"/>

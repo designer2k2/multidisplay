@@ -28,17 +28,7 @@
 #include "MultidisplayDefines.h"
 #include "MultidisplayController.h"
 #include "LCDController.h"
-#include "LCDScreen1.h"
-#include "LCDScreen2.h"
-#include "LCDScreen3.h"
-#include "LCDScreen4.h"
-#include "LCDScreen5.h"
-#include "LCDScreen6.h"
-#include "LCDScreen7.h"
-#include "LCDScreen8.h"
-#include "LCDScreen9.h"
-#include "LCDScreen10.h"
-#include "LCDScreen11.h"
+
 
 #ifdef LCD
 
@@ -947,4 +937,5 @@ void LCDController::screen5_draw() {
 	lcd.commandWrite(0xC0+10);
 	lcdController.drawBar(10,boostMapped);
 }
+
 #endif /* LCD */

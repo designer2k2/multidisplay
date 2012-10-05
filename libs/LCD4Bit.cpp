@@ -27,10 +27,10 @@ extern "C" {
   #include <string.h> //needed for strlen()
   #include <inttypes.h>
   #include <avr/pgmspace.h>
-  #include "WConstants.h"  //all things wiring / arduino
 }
+#include <Arduino.h>  //all things wiring / arduino
 
-#include "wiring.h"
+
 
 //command bytes for LCD
 #define CMD_CLR 0x01
