@@ -22,7 +22,7 @@
 #include <EEPROM.h>
 #include <util.h>
 #include <stdint.h>
-#include <Arduino.h>
+#include <wiring.h>
 
 SensorData::SensorData () {
 }

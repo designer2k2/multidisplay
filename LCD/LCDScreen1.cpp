@@ -19,7 +19,7 @@
 
 #include <avr/pgmspace.h>
 
-#include "Arduino.h"
+#include "WProgram.h"
 #include "MultidisplayDefines.h"
 #include "MultidisplayController.h"
 #include "LCDController.h"

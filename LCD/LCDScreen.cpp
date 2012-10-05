@@ -20,7 +20,7 @@
 #include "LCDController.h"
 #include "LCDScreen.h"
 #include "LCD4Bit.h"
-#include "Arduino.h"
+#include "wiring.h"
 #include "MultidisplayController.h"
 
 #ifdef LCD

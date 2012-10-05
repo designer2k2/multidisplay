@@ -23,7 +23,8 @@
 #include <string.h>
 #include <math.h>
 #include <avr/pgmspace.h>
-#include "Arduino.h"
+#include "wiring.h"
+#include "WProgram.h"
 
 #include "MultidisplayDefines.h"
 #include "MultidisplayController.h"

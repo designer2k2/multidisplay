@@ -27,7 +27,7 @@
 #include <avr/pgmspace.h>
 #include"SensorData.h"
 #include "LCD/LCDController.h"
-#include "LiquidCrystal.h"
+
 
 
 

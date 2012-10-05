@@ -22,7 +22,6 @@
 
 #include <stdint.h>
 #include <avr/pgmspace.h>
-#include <LiquidCrystal.h>
 
 #include <LCDController.h>
 

@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <avr/pgmspace.h>
 #include <LCD4Bit.h>
-#include <LiquidCrystal.h>
 
 
 class LCDScreen;

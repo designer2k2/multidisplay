@@ -29,8 +29,9 @@
 #include <inttypes.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-#include <Arduino.h>
+#include <wiring.h>
 #include <EEPROM.h>
+#include <WProgram.h>
 
 #include <digitalWriteFast.h>
 
@@ -156,7 +157,7 @@ void  MultidisplayController::myconstructor() {
 	//http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1235060559/15
 	//Audi S2 N75
 	//30Hz
-	TCCR1B = TCCR1B & (0b11111000 | 0x5);
+	TCCR1B = (TCCR1B & 0b11111000) | 0x5;
 #else
 
 	//http://www.arduino.cc/playground/Main/TimerPWMCheatsheet
