@@ -500,9 +500,7 @@ void MultidisplayController::AnaConversion() {
 #endif
 #ifdef BOOST_MOTOROLA_MPX4250
 	//or Motorola MPX 4250 datasheet
-	data.calAbsoluteBoost = 5.0* ((float) data.anaIn[BOOSTPIN])/4096.0;             //only gets 0-5V
-	data.calAbsoluteBoost = (data.calAbsoluteBoost + 0.2)/0.02;     	//makes 0-250kPa out of it
-//	data.calBoostPSI = data.calBoostBar * BAR2PSI;
+	data.calAbsoluteBoost =((5.0 * (data.anaIn[BOOSTPIN]/4096.0)) + 0.2) / 0.02; //0-250kpa
 	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
 #endif
 #ifdef BOOST_FREESCALE_MPXA6400A
@@ -607,7 +605,7 @@ void MultidisplayController::AnaConversion() {
 		data.speedIndex = 0;
 
 	data.speedAverage = data.speedTotal / SPEEDSMOOTH;               // calculate the average
-	data.speed = data.speedAverage*SPEEDFACTOR;                   // apply the factor for calibration
+	data.speed = data.speedAverage * SPEEDFACTOR * SPEEDCORRECTIONFACTOR;                   // apply the factor for calibration
 
 	//Check if the speed is a new Max speed Event
 	if ( data.speed >= data.maxValues[MAXVAL_SPEED].speed ) {
@@ -980,7 +978,7 @@ void MultidisplayController::saveSettings2Eeprom() {
 	if ( ldp >= 0 && ldp <= 20 )
 		EEPROM.write(EEPROM_LDCALPOINT, ldp);
 	float ldt = data.boostAmbientPressureBar;
-	if ( ldt > 0.0 && ldt < 1.2 )
+//	if ( ldt > 0.0 && ldt < 1.2 )
 		EEPROMWriteLong (EEPROM_AMBIENTPRESSURE, ldt*1000);
 
 #ifdef LCD
@@ -1023,7 +1021,7 @@ void MultidisplayController::readSettingsFromEeprom() {
 	if ( ldp >= 0 && ldp <= 20 )
 		data.ldCalPoint = ldp;
 	float ldt = EEPROMReadLong(EEPROM_AMBIENTPRESSURE)/1000.0;      //gets the float back (thats accurate enough)
-	if ( ldt > 0.0 && ldt < 1.2 )
+//	if ( ldt > 0.0 && ldt < 1.2 )
 		data.boostAmbientPressureBar = ldt;
 
 	uint16_t freq = EEPROMReaduint16(EEPROM_SERIALFREQ);

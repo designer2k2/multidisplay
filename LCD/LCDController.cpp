@@ -23,8 +23,7 @@
 #include <string.h>
 #include <math.h>
 #include <avr/pgmspace.h>
-#include "wiring.h"
-#include "WProgram.h"
+#include <Arduino.h>
 
 #include "MultidisplayDefines.h"
 #include "MultidisplayController.h"
@@ -79,6 +78,9 @@ void LCDController::init() {
 	case 3:
 		screen4_init();
 		break;
+	case 4:
+		screen5_init();
+		break;
 	}
 }
 
@@ -95,6 +97,9 @@ void LCDController::draw() {
 		break;
 	case 3:
 		screen4_draw();
+		break;
+	case 4:
+		screen5_draw();
 		break;
 	}
 }
@@ -889,7 +894,6 @@ void LCDController::screen4_init() {
 
 
 void LCDController::screen4_draw() {
-
 	lcd.commandWrite(0xC0+7);
 	if(data.calBoost < 0.0 ) {
 		lcd.print(2);
@@ -912,5 +916,35 @@ void LCDController::screen4_draw() {
 	lcdController.printFloat2DP(0xD4,data.maxLd);                    //Max Boost
  }
 
+void LCDController::screen5_init() {
+	cgramBar();
+	//Line1
+	lcd.lcdCommandWriteAndPrintIn_P (0x80, PSTR("LAM:"));
+	//Line=2
+//	lcd.lcdCommandWriteAndPrintIn_P(0xC0, PSTR("LD :"));
+//	//Line=3
+//	lcd.lcdCommandWriteAndPrintIn_P(0x94, PSTR("THR:"));
+//	//Line=4
+//	lcd.lcdCommandWriteAndPrintIn_P(0xD4, PSTR("RPM:"));
 
+}
+void LCDController::screen5_draw() {
+#ifdef LCDTEST
+	data.anaIn[BOOSTPIN] = random (4096);
+	data.anaIn[RPMPIN] = random (RPMMAX);
+	data.calLambda = random (200);
+	data.calThrottle = random (100);
+#endif
+
+	//First, show the Bars on the last 10 Chars:
+
+	int boostMapped  = map(data.anaIn[BOOSTPIN], 0, 4096, 0, 100);
+	boostMapped = constrain(boostMapped, 0, 100);
+
+	//Now lets make the Bars:
+	lcd.commandWrite(0x80+10);
+	lcdController.drawBar(10,boostMapped);
+	lcd.commandWrite(0xC0+10);
+	lcdController.drawBar(10,boostMapped);
+}
 #endif /* LCD */

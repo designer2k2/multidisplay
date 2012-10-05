@@ -29,7 +29,7 @@ class LCDScreen;
 
 #ifdef MULTIDISPLAY_V2
 //8
-#define SCREENCOUNT 4
+#define SCREENCOUNT 5
 #else
 #define SCREENCOUNT 1
 #endif
@@ -178,6 +178,8 @@ public:
 	void screen3_draw();
 	void screen4_init();
 	void screen4_draw();
+	void screen5_init();
+	void screen5_draw();
 
 private:
 	char *cbuf;

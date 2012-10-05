@@ -247,7 +247,7 @@ void RPMBoostController::loadParamsFromEEprom () {
 	if ( t2 < 0xFFFF )
 		n75_max_boost = fixedintb1002float(t2);
 	else
-		n75_max_boost = 1.6;
+		n75_max_boost = 1.8;
 }
 
 void RPMBoostController::writeParamsToEEprom () {
@@ -263,6 +263,7 @@ void RPMBoostController::writeParamsToEEprom () {
 		EEPROM.write(EEPROM_N75_ENABLE_PID, 1);
 	else
 		EEPROM.write(EEPROM_N75_ENABLE_PID, 0);
+	EEPROMWriteuint16(EEPROM_N75_MAX_BOOST, float2fixedintb100(n75_max_boost) );
 }
 
 void RPMBoostController::writeMapsToEEprom () {

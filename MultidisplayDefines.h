@@ -186,6 +186,7 @@
 
 //#define SPEEDFACTOR 0.390625
 #define SPEEDFACTOR 0.38
+#define SPEEDCORRECTIONFACTOR 0.9
 #define SPEEDSMOOTH 5
 #define SPEEDPIN 4 //analog 4
 
