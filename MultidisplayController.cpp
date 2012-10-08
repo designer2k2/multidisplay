@@ -142,8 +142,10 @@ void  MultidisplayController::myconstructor() {
 	//test
 	pinMode (NORDSCHLEIFENPIN, INPUT);
 	digitalWrite( NORDSCHLEIFENPIN, HIGH); // turn on pullup resistors
-	pinMode (CLUTCHPIN, INPUT);
-	digitalWrite( CLUTCHPIN, LOW);
+#ifdef LAMBDASTANDALONE
+	pinMode (LAMBDASTANDALONE, INPUT);
+	digitalWrite( LAMBDASTANDALONE, LOW);
+#endif
 
 	pinMode (SPEEDPIN, INPUT);
 	digitalWrite (SPEEDPIN, LOW);
@@ -531,6 +533,12 @@ void MultidisplayController::AnaConversion() {
 	data.calLambdaF = (float) data.calLambda;
 #endif
 	data.calLambda = constrain(data.calLambda, 0, 200);
+
+#ifdef LAMBDA_STANDALONE
+	//Lambda Standalone Patch -> hängt am Arduino direkt!	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /4096)) * 2 + 10 ) / 14.7;
+	//nur 10Bit ADC!
+	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /1024)) * 2 + 10 ) / 14.7;
+#endif
 
 	//CaseTemp: (damped)
 	data.calCaseTemp = data.calCaseTemp*0.9 + (500.0*data.anaIn[CASETEMPPIN]/4096.0)*0.1;  //thats how to get Â°C out from a LM35 with 12Bit ADW
@@ -1106,24 +1114,52 @@ void MultidisplayController::serialSend() {
 		Serial.print(";");
 		Serial.print(data.VDOTemp3);
 		break;
+//	case SERIALOUT_TUNERPRO_ADX:
+//		uint16_t outbuf;
+//
+//		Serial.write ( (uint8_t*) &(data.calRPM), sizeof(int) );
+//		//hack for DF data frequency
+////		Serial.write ( (uint8_t*) &( df_kline_freq_milliseconds ), sizeof(int) );
+//
+//		Serial.write ( (uint8_t*) &(data.calThrottle), sizeof(int) );
+//
+//		outbuf = float2fixedintb100(data.calLambdaF);
+//		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
+//
+//		outbuf = float2fixedintb100(data.calAbsoluteBoost);
+//		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
+//
+//		Serial.write ( (uint8_t*) &(data.calEgt[0]), sizeof(int) );
+//		Serial.write ( (uint8_t*) &(data.calEgt[1]), sizeof(int) );
 	case SERIALOUT_TUNERPRO_ADX:
-		uint16_t outbuf;
+		int outbuf;
+		float f;
 
-		Serial.write ( (uint8_t*) &(data.calRPM), sizeof(int) );
-		//hack for DF data frequency
-//		Serial.write ( (uint8_t*) &( df_kline_freq_milliseconds ), sizeof(int) );
-
-		Serial.write ( (uint8_t*) &(data.calThrottle), sizeof(int) );
-
-		outbuf = float2fixedintb100(data.calLambdaF);
+		//1. Lambda Raw
+		outbuf = analogRead (LAMBDASTANDALONE);
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
+		f = ( (5.0*( ((float) outbuf) /1024)) * 2 + 10 ) / 14.7;
+		outbuf = float2fixedintb100(f);
+		//2. Lambda float
+		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
+		//3. Digifant total retard
+		outbuf = float2fixedintb100(data.df_total_retard);
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
 
-		outbuf = float2fixedintb100(data.calAbsoluteBoost);
+		//4. Boost
+		outbuf = float2fixedintb100(data.calBoost);
+//		outbuf = float2fixedintb100(data.calAbsoluteBoost);
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
 
+		//5. AGT
 		Serial.write ( (uint8_t*) &(data.calEgt[0]), sizeof(int) );
-		Serial.write ( (uint8_t*) &(data.calEgt[1]), sizeof(int) );
 
+		//6. Flags
+		//bit 0: WOT
+		//bit 1: idle
+
+		//7. ECT
+		//8. IAT
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
 
 		if ( df_kline_last_frame_completely_received < 255 ) {
@@ -1603,6 +1639,11 @@ void MultidisplayController::mainLoop() {
 //		data.anaIn[i] = read_adc (i);
 	}
 
+#ifdef LAMBDASTANDALONE
+	//Lambda Standalone Patch -> hängt am Arduino direkt!
+	data.anaIn[LAMBDAPIN] = analogRead (LAMBDASTANDALONE);
+#endif
+
 	AnaConversion();
 
 
@@ -1994,10 +2035,14 @@ void MultidisplayController::DFConvertReceivedData() {
 	//400kpa
 //	data.calAbsoluteBoost = ((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) / 0.012105 + 3.477902) / 100;
 	//200kpa
-	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) + 0.25) / 0.0252778 ) / 100;
+//	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) + 0.25) / 0.0252778 ) / 100;
 	//250kpa
 //	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) + 0.2) / 0.02) / 100;
-	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;
+	//300kpa
+	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0]/255.0)) + 0.1765) / 0.0159) / 100;
+
+//	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;
+	data.calBoost = data.calAbsoluteBoost - 1.0;
 #endif
 }
 
