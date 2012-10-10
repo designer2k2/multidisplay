@@ -2039,7 +2039,7 @@ void MultidisplayController::DFConvertReceivedData() {
 	//250kpa
 //	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) + 0.2) / 0.02) / 100;
 	//300kpa
-	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0]/255.0)) + 0.1765) / 0.0159) / 100;
+	data.calAbsoluteBoost =  (float) (((5.0 * ((df_klineData[df_kline_last_frame_completely_received].asBytes[0])/255.0)) + 0.1765) / 0.0159) / 100.0;
 
 //	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;
 	data.calBoost = data.calAbsoluteBoost - 1.0;
