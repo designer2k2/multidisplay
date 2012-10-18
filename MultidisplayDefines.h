@@ -141,7 +141,7 @@
 #endif
 
 #define LAMBDA_WIDEBAND
-#define LAMBDASTANDALONE A2
+//#define LAMBDASTANDALONE A2
 
 //left of lcd pins
 #define FREEPWM2 10

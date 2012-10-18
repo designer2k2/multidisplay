@@ -458,15 +458,6 @@ void MultidisplayController::expanderWrite(byte _data) {
 	wire.endTransmission();
 }
 
-byte MultidisplayController::expanderRead() {
-	byte _data = 0;
-	wire.requestFrom(EXPANDER, 1);
-	if(wire.available()) {
-		_data = wire.receive();
-	}
-	return _data;
-}
-
 void MultidisplayController::expanderWrite2(byte _data) {
 	wire.beginTransmission(EXPANDER2);
 	wire.send(_data);
@@ -476,6 +467,15 @@ void MultidisplayController::expanderWrite2(byte _data) {
 byte MultidisplayController::expanderRead2() {
 	byte _data = 0;
 	wire.requestFrom(EXPANDER2, 1);
+	if(wire.available()) {
+		_data = wire.receive();
+	}
+	return _data;
+}
+
+byte MultidisplayController::expanderRead() {
+	byte _data = 0;
+	wire.requestFrom(EXPANDER, 1);
 	if(wire.available()) {
 		_data = wire.receive();
 	}
@@ -516,6 +516,7 @@ void MultidisplayController::AnaConversion() {
 	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
 #endif
 
+
     //Calibration for RPM (its 2.34!)
 	//Check if the Boost is a new Max Boost Event
 	if( data.calBoost >= data.maxValues[MAXVAL_BOOST].boost ) 	{
@@ -534,7 +535,7 @@ void MultidisplayController::AnaConversion() {
 #endif
 	data.calLambda = constrain(data.calLambda, 0, 200);
 
-#ifdef LAMBDA_STANDALONE
+#ifdef LAMBDASTANDALONE
 	//Lambda Standalone Patch -> hängt am Arduino direkt!	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /4096)) * 2 + 10 ) / 14.7;
 	//nur 10Bit ADC!
 	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /1024)) * 2 + 10 ) / 14.7;
@@ -1136,7 +1137,11 @@ void MultidisplayController::serialSend() {
 		float f;
 
 		//1. Lambda Raw
+#ifdef LAMBDASTANDALONE
 		outbuf = analogRead (LAMBDASTANDALONE);
+#else
+		outbuf = 0;
+#endif
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
 		f = ( (5.0*( ((float) outbuf) /1024)) * 2 + 10 ) / 14.7;
 		outbuf = float2fixedintb100(f);
@@ -2022,6 +2027,10 @@ void MultidisplayController::DFKlineSerialReceive() {
 }
 
 void MultidisplayController::DFConvertReceivedData() {
+	/*
+	 * remember: data starts at Index 1!
+	 */
+
 	//remember: 68HC11 is big endian
 	//avr8 is little endian!
 	data.df_ignition = ( df_klineData[df_kline_last_frame_completely_received].asBytes[8] * -0.351563 ) + 73.9;
@@ -2038,9 +2047,12 @@ void MultidisplayController::DFConvertReceivedData() {
 //	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) + 0.25) / 0.0252778 ) / 100;
 	//250kpa
 //	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) + 0.2) / 0.02) / 100;
-	//300kpa
-	data.calAbsoluteBoost =  (float) (((5.0 * ((df_klineData[df_kline_last_frame_completely_received].asBytes[0])/255.0)) + 0.1765) / 0.0159) / 100.0;
+	//kpa
+	data.calAbsoluteBoost = ( (5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[1]/255.0)) + 0.2) / 0.02;
+	data.calAbsoluteBoost = data.calAbsoluteBoost / 100.0;
 
+	//300kpa
+//	data.calAbsoluteBoost =  (float) (((5.0 * ((df_klineData[df_kline_last_frame_completely_received].asBytes[0])/255.0)) + 0.1765) / 0.0159) / 100.0;
 //	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;
 	data.calBoost = data.calAbsoluteBoost - 1.0;
 #endif
