@@ -524,10 +524,31 @@ void MultidisplayController::AnaConversion() {
 	}
 
 	//Lambda:
+	/*
+	 * http://www.nxtgenmustang.com/forum/showthread.php/111-Wideband-Transfer-Functions
+	 * Wideband Transfer Functions:
+AEM: (v*2)+10
+AFM1000: (v*2)+8
+DynoJet Wideband Commander: (v*1.6)+10
+EGT PLX: (v*368.2)+32
+G100: (v*1.4)+9
+Innovative LM-1: (v*2)+10
+LC-1 (Innovative): (v*3)+7.35
+LM-1 (Innovative): (v*2)+10
+PLX: (v*2)+10
+SCT EGT: (v*368.2)+32
+Tech Edge 2AO: (v*2)+9
+Zeitronix: (v*2)+9.6
+	 */
 #ifdef LAMBDA_WIDEBAND
+#ifdef LAMBDA_PLX_SMAFR
 	//http://www.plxdevices.com/InstallationInstructions/SM-AFRUsersGuide.pdf
 	// air fuel ratio = 2*Voltage + 10
 	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /4096)) * 2 + 10 ) / 14.7;
+#endif
+#ifdef LAMBDA_INNOVATE_LC1
+	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /4096)) * 3 + 7.35 ) / 14.7;
+#endif
 	data.calLambda = map(data.anaIn[LAMBDAPIN], 0, 4096, 0, 200);
 #else
 	data.calLambda = map(data.anaIn[LAMBDAPIN], LAMBDAMIN, LAMBDAMAX, 0, 200);    //gets about the 0-1V into 0-200 values
@@ -2042,17 +2063,17 @@ void MultidisplayController::DFConvertReceivedData() {
 
 #ifdef USE_DIGIFANT_MAPSENSOR
 	//400kpa
-//	data.calAbsoluteBoost = ((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) / 0.012105 + 3.477902) / 100;
+	data.calAbsoluteBoost = ((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[1] /255.0)) / 0.012105 + 3.477902) / 100;
 	//200kpa
-//	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) + 0.25) / 0.0252778 ) / 100;
+//	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[1] /255.0)) + 0.25) / 0.0252778 ) / 100;
 	//250kpa
-//	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[0] /255.0)) + 0.2) / 0.02) / 100;
+//	data.calAbsoluteBoost = (((5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[1] /255.0)) + 0.2) / 0.02) / 100;
 	//kpa
-	data.calAbsoluteBoost = ( (5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[1]/255.0)) + 0.2) / 0.02;
-	data.calAbsoluteBoost = data.calAbsoluteBoost / 100.0;
+//	data.calAbsoluteBoost = ( (5.0 * (df_klineData[df_kline_last_frame_completely_received].asBytes[1]/255.0)) + 0.2) / 0.02;
+//	data.calAbsoluteBoost = data.calAbsoluteBoost / 100.0;
 
 	//300kpa
-//	data.calAbsoluteBoost =  (float) (((5.0 * ((df_klineData[df_kline_last_frame_completely_received].asBytes[0])/255.0)) + 0.1765) / 0.0159) / 100.0;
+//	data.calAbsoluteBoost =  (float) (((5.0 * ((df_klineData[df_kline_last_frame_completely_received].asBytes[1])/255.0)) + 0.1765) / 0.0159) / 100.0;
 //	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;
 	data.calBoost = data.calAbsoluteBoost - 1.0;
 #endif
