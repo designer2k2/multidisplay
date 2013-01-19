@@ -615,8 +615,9 @@ Zeitronix: (v*2)+9.6
 	if ( data.calRPM >= data.maxValues[MAXVAL_RPM].rpm ) {
 		data.saveMax(MAXVAL_RPM);
 	}
-	data.rpm_map_idx = (uint8_t) map ( constrain (data.calRPM, 0, RPM_MAX_FOR_BOOST_CONTROL),
-			0, RPM_MAX_FOR_BOOST_CONTROL, 0, 255);
+	data.rpm_map_idx = (uint8_t) map (
+			constrain (data.calRPM, RPM_MIN_FOR_BOOST_CONTROL, RPM_MAX_FOR_BOOST_CONTROL),
+			RPM_MIN_FOR_BOOST_CONTROL, RPM_MAX_FOR_BOOST_CONTROL, 0, 255);
 #ifdef V2DEVDEBUG
 	}
 #endif
