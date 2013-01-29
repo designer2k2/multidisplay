@@ -199,13 +199,21 @@ void  MultidisplayController::myconstructor() {
 	Serial2.begin(115200);
 //	Serial2.begin(9600);
 
+	//Oled
+#ifdef OLED
+	//we have to start with 9600 baud
+	Serial3.begin(9600);
+	ProxySerial myPort(&Serial3);
+	oled = OledController(myPort);
+#endif
+
 	wire.begin();                  //Start the Wire Libary for the PCF8574
 
 	expanderWrite2(IOport2); //Switch off all Devices
 
 	//Print the Info:
 #ifdef MULTIDISPLAY_V2
-	Serial.println("MultiDisplay 2.0 pre!");
+	Serial.println("MultiDisplay 2.0!");
 #else
 	Serial.println("MultiDisplay 1.1!");
 #endif

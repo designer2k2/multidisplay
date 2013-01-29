@@ -27,6 +27,7 @@
 #include <avr/pgmspace.h>
 #include"SensorData.h"
 #include "LCD/LCDController.h"
+#include "OledController.h"
 
 
 
@@ -237,6 +238,11 @@ public:
 #ifdef V2DEVDEBUG
 	uint8_t v2devdebugflag;
 #endif
+
+#ifdef OLED
+	OledController oled;
+#endif
+
 
 };
 

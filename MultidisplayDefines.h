@@ -224,15 +224,7 @@ typedef unsigned char byte;
 #define SERIALFREQ 100
 //#define SERIALFREQ 800
 
-
-#define SCREENA 1
-#define SCREENB 2
-
-#define SCOPE_BOOST 1
-#define SCOPE_LMM 2
-#define SCOPE_RPM 3
-#define SCOPE_THROTTLE 4
-#define SCOPE_LAMBDA 5
+#define OLED
 
 #define LCD
 #define LCD_DRAW_TIME 300
@@ -244,6 +236,16 @@ typedef unsigned char byte;
 #define LCD_HEIGHT 4
 #define LCD_BIGFONT_2 2
 #define LCD_BIGFONT_4 4
+
+#define SCREENA 1
+#define SCREENB 2
+
+#define SCOPE_BOOST 1
+#define SCOPE_LMM 2
+#define SCOPE_RPM 3
+#define SCOPE_THROTTLE 4
+#define SCOPE_LAMBDA 5
+
 
 #define BAR2PSI 14.50377
 
