@@ -11,14 +11,20 @@
 #include <libs/Serial_LCD/Serial_LCD.h>
 #include <libs/Serial_LCD/proxySerial.h>
 
+#include <libs/Goldelox_Serial_4DLib.h>
+
 class OledController {
 public:
 	OledController();
-	OledController( ProxySerial ps );
 	virtual ~OledController();
+	void myconstructor();
+	void reset();
+
+	static void callback(int ErrCode, unsigned char ErrByte);
 
 	void init ();
 	void draw ();
+	void sendDebugData();
 
 	void toggleScreen ();
 	void setActiveScreen (uint8_t as);
@@ -26,7 +32,11 @@ public:
 	uint8_t activeScreen;
 	uint8_t brightness;
 
-	Serial_LCD display;
+	ProxySerial *ps;
+	Serial_LCD *display;
+//	Goldelox_Serial_4DLib display;
 };
+
+extern Goldelox_Serial_4DLib display;
 
 #endif /* OLEDCONTROLLER_H_ */

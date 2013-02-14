@@ -135,6 +135,7 @@ void  MultidisplayController::myconstructor() {
 
 	DoCheck = 1;
 	SerOut = SERIALOUT_BINARY;
+//	SerOut = SERIALOUT_DISABLED;
 
 	buttonTime = 0;
 
@@ -201,11 +202,25 @@ void  MultidisplayController::myconstructor() {
 
 	//Oled
 #ifdef OLED
-	//we have to start with 9600 baud
-	Serial3.begin(9600);
-	ProxySerial myPort(&Serial3);
-	oled = OledController(myPort);
+	oled = OledController();
+	oled.myconstructor();
+//	oled_flags = 0;
+//	oled.reset();
 #endif
+/* ************** TES T***************** */
+//	// Serial port choice
+//	#define mySerial Serial3
+//	ProxySerial myPort(&mySerial);
+//	Serial_LCD myLCD( &myPort);
+//
+//	// Serial port initialisation
+//	mySerial.begin(9600);
+//	myLCD.begin();
+//
+//	// Serial port speed up
+//	myLCD.setSpeed(38400);
+//	mySerial.begin(38400);
+	/* ************** TES T***************** */
 
 	wire.begin();                  //Start the Wire Libary for the PCF8574
 
@@ -305,7 +320,7 @@ int MultidisplayController::read_adc_fast_mega (uint8_t channel){
 
 	//read bits from adc
 	for (int i=11 ; i>=0 ; i--){
-		adcvalue+=digitalReadFast(DATAIN)<<i;
+		adcvalue += digitalReadFast(DATAIN) << i;
 		//cycle clock
 		//SPICLOCK
 		asm("sbi %0,4" : : "I" (_SFR_IO_ADDR(PORTA)) );
@@ -851,6 +866,15 @@ void MultidisplayController::serialReceive() {
 								break;
 						}
 						break;
+#ifdef OLED
+					case 5: //OLED debug
+						switch ( srData.asBytes[1] ) {
+						case 0: oled.sendDebugData();
+								break;
+
+						}
+						break;
+#endif
 					}
 				}
 				break;
@@ -1703,6 +1727,13 @@ void MultidisplayController::mainLoop() {
 		lcdController.draw();
 		drawTime = millis() + LCD_DRAW_TIME;
 	}
+#endif
+
+#ifdef OLED
+//	if ( oled_flags == 0 && millis() > 3000 ) {
+//		oled.myconstructor();
+//		oled_flags = 1;
+//	}
 #endif
 
 #ifdef MULTIDISPLAY_V1

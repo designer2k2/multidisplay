@@ -133,7 +133,7 @@
  * K11 2xanalog (arduino pin A1 und A2)
  * 2xdigital: 15,16
  * nordschleifen switch (switch must be connected to ground!) (left)
- * free (lambda relais) (right)
+ * oled reset (right)
  */
 #ifdef MULTIDISPLAY_V1
 #define NORDSCHLEIFENPIN 15
@@ -224,7 +224,8 @@ typedef unsigned char byte;
 #define SERIALFREQ 100
 //#define SERIALFREQ 800
 
-#define OLED
+//#define OLED
+#define OLED_RESET_PIN 53
 
 #define LCD
 #define LCD_DRAW_TIME 300

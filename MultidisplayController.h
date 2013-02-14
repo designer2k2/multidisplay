@@ -241,6 +241,7 @@ public:
 
 #ifdef OLED
 	OledController oled;
+	uint8_t oled_flags;
 #endif
 
 
