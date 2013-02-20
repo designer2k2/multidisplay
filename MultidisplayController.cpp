@@ -266,7 +266,39 @@ void  MultidisplayController::myconstructor() {
 //	lcd.begin(20,4, LCD_5x10DOTS);
 //	lcd.clear();
 
+#ifdef BW_EFR_SPEEDSENSOR
+	pinMode (BW_EFR_SPEEDSENSOR_PIN, INPUT);
+	//normal Port Mode. OC4A, OC4B, OC4C disconnected
+	TCCR4A = 0;
+	//set prescalter to 8
+	//1 timer tick earch 0.5usecs
+	TCCR4B = 1;
+	//enable input capture 4
+	// 1 = trigger on rising edge!
+	TCCR4B |= _BV (ICES4);
+	//enable input capture IRQ
+	bitSet (TIMSK4,ICIE4);
+#endif
+
 }
+
+#ifdef BW_EFR_SPEEDSENSOR
+ISR(TIMER4_CAPT_vect) {
+	//reset
+	TCNT4 = 0;
+	if ( bitRead(TIMSK4,ICIE4) == 0 ) {
+		//falling edge
+		data.efr_speed_reading = ICR4;
+	}
+	//toggle capture
+	TCCR4B ^= _BV(ICES4);
+}
+ISR(TIMER4_OVF_vect) {
+	//we have a timer overflow
+	//set reading to max
+	data.efr_speed_reading = 0xFFFF;
+}
+#endif
 
 /*
  * only for V2 pcb!
@@ -662,6 +694,10 @@ Zeitronix: (v*2)+9.6
 		data.saveMax(MAXVAL_SPEED);
 	}
 
+#ifdef BW_EFR_SPEEDSENSOR
+	//we measure the time from rising to falling edge
+	data.efr_speed = BW_EFR_TIME_2_RPM / data.efr_speed_reading;
+#endif
 
 
 	//Battery Voltage: (Directly from the Arduino!, so only 1024, not 4096.)

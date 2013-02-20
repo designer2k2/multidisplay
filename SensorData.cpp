@@ -100,6 +100,10 @@ void SensorData::myconstructor () {
 		speedReadings[i] = 0;                      // initialize all the readings to 0
 	}
 
+	efr_speed_reading = 0;
+	efr_speed = 0;
+//	efr_speed_idx = 0;
+
 #endif
 }
 

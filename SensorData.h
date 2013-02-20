@@ -97,6 +97,10 @@ public:
 	int speedTotal;                            // the running total
 	int speedAverage;
 
+	volatile unsigned int efr_speed_reading;
+	float efr_speed;
+//	volatile uint8_t efr_speed_idx;
+
 	/*
 	 * Digifant
 	 * 4 x knock cyl 1-4 retard
