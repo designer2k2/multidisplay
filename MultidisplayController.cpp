@@ -273,11 +273,16 @@ void  MultidisplayController::myconstructor() {
 	//set prescalter to 8
 	//1 timer tick earch 0.5usecs
 	TCCR4B = 1;
+	//enable noise canceller
+	TCCR4B |= ICNC4;
 	//enable input capture 4
 	// 1 = trigger on rising edge!
 	TCCR4B |= _BV (ICES4);
 	//enable input capture IRQ
 	bitSet (TIMSK4,ICIE4);
+	// Enable overflow interrupt
+	bitSet (TIMSK4,TOIE4);
+	sei();
 #endif
 
 }
@@ -696,7 +701,12 @@ Zeitronix: (v*2)+9.6
 
 #ifdef BW_EFR_SPEEDSENSOR
 	//we measure the time from rising to falling edge
-	data.efr_speed = BW_EFR_TIME_2_RPM / data.efr_speed_reading;
+	if ( data.efr_speed_reading == 0xFFFF )
+		data.efr_speed = 0;
+	else
+		data.efr_speed = BW_EFR_TIME_2_RPM / data.efr_speed_reading;
+	if ( data.efr_speed >= data.maxValues[MAXVAL_EFR_SPEED].efr_speed )
+			data.saveMax(MAXVAL_EFR_SPEED);
 #endif
 
 
@@ -1224,6 +1234,7 @@ void MultidisplayController::serialSend() {
 //		Serial.write ( (uint8_t*) &(data.calEgt[1]), sizeof(int) );
 	case SERIALOUT_TUNERPRO_ADX:
 		int outbuf;
+		uint32_t outbuf32;
 		float f;
 
 		//1. Lambda Raw
@@ -1365,6 +1376,10 @@ void MultidisplayController::serialSend() {
 			outbuf |= 2;
 #endif
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
+//		outbuf32 = float2fixedint32b100(data.efr_speed);
+		outbuf = data.efr_speed_reading;
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint16_t) );
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint16_t) );
 
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
 		// 32 bytes

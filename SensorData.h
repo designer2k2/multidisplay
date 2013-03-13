@@ -24,7 +24,7 @@
 #include <stdint.h>
 #include "MultidisplayDefines.h"
 
-#define MAXVALUES 8
+#define MAXVALUES 9
 #define MAXVAL_BOOST 0
 #define MAXVAL_LMM 1
 #define MAXVAL_LAMBDA 2
@@ -33,10 +33,11 @@
 #define MAXVAL_OILPRES 5
 #define MAXVAL_GASPRES 6
 #define MAXVAL_EGT 7
+#define MAXVAL_EFR_SPEED 8
 
 class MaxDataSet {
 public:
-	MaxDataSet () : boost(0), lmm(0), lambda(0), rpm(0), speed(0), oilpres(0), gaspres(0), gear(0) {};
+	MaxDataSet () : boost(0), lmm(0), lambda(0), rpm(0), speed(0), oilpres(0), gaspres(0), gear(0), efr_speed(0) {};
 	float boost;
 	float lmm;
 	float lambda;
@@ -45,6 +46,7 @@ public:
 	float oilpres;
 	float gaspres;
 	uint8_t gear;
+	float efr_speed;
 	uint16_t egt[NUMBER_OF_ATTACHED_TYPK];
 };
 

@@ -89,6 +89,9 @@ uint16_t EEPROMReaduint16(int p_address) {
 uint16_t float2fixedintb100 (float in) {
 	return (uint16_t) (in * 100.0);
 }
+uint32_t float2fixedint32b100 (float in) {
+	return (uint32_t) (in * 100.0);
+}
 float fixedintb1002float (int in) {
 	return (float) (in / 100.0);
 }

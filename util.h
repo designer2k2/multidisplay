@@ -33,6 +33,7 @@ void EEPROMWriteuint16(int p_address, uint16_t p_value);
 uint16_t EEPROMReaduint16(int p_address);
 
 uint16_t float2fixedintb100 (float in);
+uint32_t float2fixedint32b100 (float in);
 float fixedintb1002float (int in);
 float fixedintb1002float (uint16_t in);
 

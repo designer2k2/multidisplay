@@ -180,6 +180,9 @@ public:
 	void screen4_draw();
 	void screen5_init();
 	void screen5_draw();
+	//debug
+//	void screen6_init();
+//	void screen6_draw();
 
 private:
 	char *cbuf;

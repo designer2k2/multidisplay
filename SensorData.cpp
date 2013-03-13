@@ -100,7 +100,7 @@ void SensorData::myconstructor () {
 		speedReadings[i] = 0;                      // initialize all the readings to 0
 	}
 
-	efr_speed_reading = 0;
+	efr_speed_reading = 1;
 	efr_speed = 0;
 //	efr_speed_idx = 0;
 
@@ -146,6 +146,7 @@ void SensorData::saveMax(uint8_t maxEv) {
 	maxValues[maxEv].oilpres = VDOPres1;
 	maxValues[maxEv].gaspres = VDOPres2;
 	maxValues[maxEv].gear = gear;
+	maxValues[maxEv].efr_speed = efr_speed;
 	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++ )
 		maxValues[maxEv].egt[i] = calEgt[i];
 }

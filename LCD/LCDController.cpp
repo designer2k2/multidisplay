@@ -938,4 +938,11 @@ void LCDController::screen5_draw() {
 	lcdController.drawBar(10,boostMapped);
 }
 
+//void LCDController::screen6_init() {
+//	lcd.lcdCommandWriteAndPrintIn_P (0x80, PSTR("DEBUG"));
+//}
+//void LCDController::screen6_draw() {
+//	printInt (ystart[0]+6, data.efr_speed_reading);
+//	printFloat(ystart[1], data.efr_speed, 1);
+//}
 #endif /* LCD */

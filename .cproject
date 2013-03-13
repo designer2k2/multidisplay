@@ -554,7 +554,7 @@
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.other.364364712" name="Other Optimization Flags" superClass="de.innot.avreclipse.cppcompiler.option.optimize.other" value="--combine  -fno-inline-small-functions -fno-split-wide-types -fno-tree-scev-cprop" valueType="string"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.packstruct.2033218762" name="Pack structs (-fpack-struct)" superClass="de.innot.avreclipse.cppcompiler.option.optimize.packstruct" value="true" valueType="boolean"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.shortenums.476285472" name="Short enums (-fshort-enums)" superClass="de.innot.avreclipse.cppcompiler.option.optimize.shortenums" value="true" valueType="boolean"/>
-								<option id="de.innot.avreclipse.cppcompiler.option.def.747362706" superClass="de.innot.avreclipse.cppcompiler.option.def" valueType="definedSymbols">
+								<option id="de.innot.avreclipse.cppcompiler.option.def.747362706" name="Define Syms (-D)" superClass="de.innot.avreclipse.cppcompiler.option.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="ARDUINO=100"/>
 								</option>
 								<inputType id="de.innot.avreclipse.cppcompiler.input.1034405056" superClass="de.innot.avreclipse.cppcompiler.input"/>
