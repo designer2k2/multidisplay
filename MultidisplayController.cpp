@@ -268,6 +268,8 @@ void  MultidisplayController::myconstructor() {
 
 #ifdef BW_EFR_SPEEDSENSOR
 	pinMode (BW_EFR_SPEEDSENSOR_PIN, INPUT);
+	//enable pull-up
+//	digitalWrite (BW_EFR_SPEEDSENSOR_PIN, HIGH);
 	//normal Port Mode. OC4A, OC4B, OC4C disconnected
 	TCCR4A = 0;
 	//set prescalter to 8
@@ -289,11 +291,11 @@ void  MultidisplayController::myconstructor() {
 
 #ifdef BW_EFR_SPEEDSENSOR
 ISR(TIMER4_CAPT_vect) {
-	//reset
-	TCNT4 = 0;
-	if ( bitRead(TIMSK4,ICIE4) == 0 ) {
+	if ( bitRead(TCCR4B,ICES4) == 0 ) {
 		//falling edge
 		data.efr_speed_reading = ICR4;
+		//reset
+		TCNT4 = 0;
 	}
 	//toggle capture
 	TCCR4B ^= _BV(ICES4);
