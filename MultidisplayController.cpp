@@ -276,7 +276,7 @@ void  MultidisplayController::myconstructor() {
 	//1 timer tick earch 0.5usecs
 	TCCR4B = 1;
 	//enable noise canceller
-	TCCR4B |= ICNC4;
+	TCCR4B |= _BV (ICNC4);
 	//enable input capture 4
 	// 1 = trigger on rising edge!
 	TCCR4B |= _BV (ICES4);
@@ -295,6 +295,9 @@ ISR(TIMER4_CAPT_vect) {
 		//falling edge
 		data.efr_speed_reading = ICR4;
 		//reset
+		TCNT4 = 0;
+	} else {
+		//rising edgke
 		TCNT4 = 0;
 	}
 	//toggle capture
