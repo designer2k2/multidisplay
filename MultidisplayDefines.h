@@ -66,9 +66,9 @@
 #define BW_EFR_SPEEDSENSOR_PIN 49
 #define BW_EFR_SMOOTH 5
 //for 12 wheel blades (67mm)
-#define BW_EFR_TIME_2_RPM 20000000
+#define BW_EFR_TIME_2_RPM 40000000
 //14 wheel blades
-//#define BW_EFR_TIME_2_RPM 17142856
+//#define BW_EFR_TIME_2_RPM 34285712
 
 //----------------------------------------------------------------------------------------------------
 //Max Values:
@@ -231,6 +231,7 @@ typedef unsigned char byte;
 
 //send and receive each SERIALFREQ millisecs!
 #define SERIALFREQ 100
+//#define SERIALFREQ 50
 //#define SERIALFREQ 800
 
 //#define OLED

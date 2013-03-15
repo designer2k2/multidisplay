@@ -273,8 +273,8 @@ void  MultidisplayController::myconstructor() {
 	//normal Port Mode. OC4A, OC4B, OC4C disconnected
 	TCCR4A = 0;
 	//set prescalter to 8
-	//1 timer tick earch 0.5usecs
-	TCCR4B = 1;
+	//1 timer tick earch 0.5usecs (prescaler 8)
+	TCCR4B = 2;
 	//enable noise canceller
 	TCCR4B |= _BV (ICNC4);
 	//enable input capture 4
@@ -709,7 +709,7 @@ Zeitronix: (v*2)+9.6
 	if ( data.efr_speed_reading == 0xFFFF )
 		data.efr_speed = 0;
 	else
-		data.efr_speed = BW_EFR_TIME_2_RPM / data.efr_speed_reading;
+		data.efr_speed = (uint32_t) BW_EFR_TIME_2_RPM / data.efr_speed_reading;
 	if ( data.efr_speed >= data.maxValues[MAXVAL_EFR_SPEED].efr_speed )
 			data.saveMax(MAXVAL_EFR_SPEED);
 #endif

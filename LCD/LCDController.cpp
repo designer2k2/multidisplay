@@ -765,6 +765,19 @@ void LCDController::printInt (uint8_t pos, int value, uint8_t length) {
 }
 
 /**
+ * prints a long value to postion pos
+ * blanks the resulting places if length is > 0 and strlen(value) < length
+ */
+void LCDController::printLong (uint8_t pos, long value, uint8_t length) {
+	ltoa (value, cbuf, 10);
+	uint8_t b = length - strlen ( cbuf );
+	printString (pos, cbuf);
+	if ( b > 0 && length > 0 )
+		blanks(b);
+}
+
+
+/**
  * prints a integer value to postion pos
  */
 //void LCDController::printt (uint8_t pos, int value) {
@@ -785,6 +798,7 @@ void LCDController::screen1_init() {
     lcd.lcdCommandWriteAndPrintIn_P (0x80+9, PSTR("AGT:"));
     lcd.lcdCommandWriteAndPrintIn_P (0xC0, PSTR("BST:"));
     lcd.lcdCommandWriteAndPrintIn_P (0xC0+9, PSTR("P1 :"));
+    lcd.lcdCommandWriteAndPrintIn_P (ystart[2], PSTR("EFR SPEED:"));
 }
 
 
@@ -794,6 +808,7 @@ void LCDController::screen1_draw() {
 
     printFloat2DP(ystart[1] + 4, data.calBoost);
     printInt(ystart[1] + 13, data.VDOPres1, 4);
+    printLong (ystart[2] + 11, data.efr_speed, 6);
 }
 
 void LCDController::screen2_init() {

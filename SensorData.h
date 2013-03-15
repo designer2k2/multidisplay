@@ -46,7 +46,7 @@ public:
 	float oilpres;
 	float gaspres;
 	uint8_t gear;
-	float efr_speed;
+	long efr_speed;
 	uint16_t egt[NUMBER_OF_ATTACHED_TYPK];
 };
 
@@ -100,7 +100,7 @@ public:
 	int speedAverage;
 
 	volatile unsigned int efr_speed_reading;
-	float efr_speed;
+	long efr_speed;
 //	volatile uint8_t efr_speed_idx;
 
 	/*

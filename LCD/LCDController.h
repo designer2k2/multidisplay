@@ -92,6 +92,7 @@ public:
 	void cgramBigFont4();
 
 	void printInt (uint8_t pos, int value, uint8_t length=0);
+	void printLong (uint8_t pos, long value, uint8_t length=0);
 //	void printInt (uint8_t pos, int value);
 	void printString (uint8_t pos, char* str);
 
