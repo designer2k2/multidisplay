@@ -152,7 +152,7 @@
 
 #define LAMBDA_WIDEBAND
 #define LAMBDA_PLX_SMAFR
-#define LAMBDA_PLX_INNOVATE_LC1
+//#define LAMBDA_PLX_INNOVATE_LC1
 //#define LAMBDASTANDALONE A2
 
 //left of lcd pins
@@ -202,7 +202,7 @@
 #define SPEEDPIN 4 //analog 4
 
 #define TEMPTYPKREADINGS 28         //how many entrys are in the Lookup Table
-#define NUMBER_OF_ATTACHED_TYPK 1                   //how many TypK`s are attached
+#define NUMBER_OF_ATTACHED_TYPK 4                   //how many TypK`s are attached
 #define MAX_ATTACHED_TYPK 8			//max typk which can be attached
 #define MAXTYPK 1170                //over that will be seen as Open.
 
@@ -221,8 +221,8 @@ typedef unsigned char byte;
 #define SERIALOUT_ENABLED 2
 #define SERIALOUT_TUNERPRO_ADX 3
 
-//84 bytes
 #define SERIALOUT_BINARY_TAG 92
+//#define SERIALOUT_BINARY_TAG 88
 #define SERIALOUT_BINARY_TAG_N75_DUTY_MAP 22
 #define SERIALOUT_BINARY_TAG_N75_SETPOINT_MAP 38
 #define SERIALOUT_BINARY_TAG_ACK 4
