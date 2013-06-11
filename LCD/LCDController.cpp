@@ -410,11 +410,11 @@ void LCDController::lcdShowIntro(int delayValue) {
 
 	//Flash the Shiftlight:
 
-	analogWrite(RPMSHIFTLIGHTPIN,RPM_HIGH_BRIGHT);
+	analogWrite(V1_RPMSHIFTLIGHTPIN,V1_RPM_HIGH_BRIGHT);
 	delay(50);
-	analogWrite(RPMSHIFTLIGHTPIN,RPM_LOW_BRIGHT);
+	analogWrite(V1_RPMSHIFTLIGHTPIN,V1_RPM_LOW_BRIGHT);
 	delay(50);
-	analogWrite(RPMSHIFTLIGHTPIN,RPM_NO_BRIGHT);
+	analogWrite(V1_RPMSHIFTLIGHTPIN,V1_RPM_NO_BRIGHT);
 
 
 	delay(delayValue);                      //Short delay, for the Intro screen :)

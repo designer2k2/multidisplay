@@ -145,7 +145,7 @@ public:
 	void expanderWrite2(byte _data);
 	byte expanderRead2();
 	void AnaConversion();
-	void Shiftlight();
+	void V1_Shiftlight();
 
 	void serialSend();
 	void serialSendAck (uint8_t serial);

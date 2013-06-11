@@ -90,14 +90,20 @@
 #define INITTIME 2000          //How long the Init screen will be shown
 //--------------------------------------
 
-// Shiftlight Config:
+// V1 Shiftlight Config:
+//#define V1_RPM_SHIFT_LIGHT
+#define V1_RPM_SHIFT_LOW 6000             //Shiftlight half brightness
+#define V1_RPM_LOW_BRIGHT 40
+#define V1_RPM_SHIFT_HIGH 6500            //Shiftlight full brightness
+#define V1_RPM_HIGH_BRIGHT 255
+#define V1_RPM_NO_BRIGHT 0                //Shiftlight normal brightness
 
-#define RPM_SHIFT_LIGHT
-#define RPM_SHIFT_LOW 6000             //Shiftlight half brightness
-#define RPM_LOW_BRIGHT 40
-#define RPM_SHIFT_HIGH 6500            //Shiftlight full brightness
-#define RPM_HIGH_BRIGHT 255
-#define RPM_NO_BRIGHT 0                //Shiftlight normal brightness
+//--------------------------------------
+// V2 RGB LED on Shiftlight 1-3
+#define V2_RGB_WARNLED_ON_SHIFTLED123
+//#define V2_SHIFTLED1
+//#define V2_SHIFTLED2
+//#define V2_SHIFTLED3
 
 //--------------------------------------
 
@@ -132,7 +138,7 @@
 
 #define BATTERYPIN 0           //The Signal from the voltage divider (Analog Pin on the Arduino!)
 #define LCDBRIGHTPIN 5		     //The Pin for the Brightness of the LCD, it will be PWM.
-#define RPMSHIFTLIGHTPIN 3           //where is the Shiftlight connected
+#define V1_RPMSHIFTLIGHTPIN 3           //where is the Shiftlight connected
 
 /*
  * K10 2xPWM (arduino pin 10 und 11):

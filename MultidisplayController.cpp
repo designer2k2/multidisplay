@@ -751,15 +751,15 @@ Zeitronix: (v*2)+9.6
 }
 
 
-void MultidisplayController::Shiftlight()
+void MultidisplayController::V1_Shiftlight()
 {
 	//This sets the brightness according to the RPM
-	if(data.calRPM >= RPM_SHIFT_LOW && data.calRPM <= RPM_SHIFT_HIGH) 	{
-		analogWrite(RPMSHIFTLIGHTPIN,RPM_LOW_BRIGHT);
-	} else if(data.calRPM>= RPM_SHIFT_HIGH) 	{
-		analogWrite(RPMSHIFTLIGHTPIN,RPM_HIGH_BRIGHT);
-	} else if(data.calRPM< RPM_SHIFT_LOW) {
-		analogWrite(RPMSHIFTLIGHTPIN,RPM_NO_BRIGHT);
+	if(data.calRPM >= V1_RPM_SHIFT_LOW && data.calRPM <= V1_RPM_SHIFT_HIGH) 	{
+		analogWrite(V1_RPMSHIFTLIGHTPIN,V1_RPM_LOW_BRIGHT);
+	} else if(data.calRPM>= V1_RPM_SHIFT_HIGH) 	{
+		analogWrite(V1_RPMSHIFTLIGHTPIN,V1_RPM_HIGH_BRIGHT);
+	} else if(data.calRPM< V1_RPM_SHIFT_LOW) {
+		analogWrite(V1_RPMSHIFTLIGHTPIN,V1_RPM_NO_BRIGHT);
 	}
 }
 
@@ -1765,9 +1765,9 @@ void MultidisplayController::mainLoop() {
 
 
 
-#ifdef RPM_SHIFT_LIGHT
-	Shiftlight();
-#endif //RPM_SHIFT_LIGHT
+#ifdef V1_RPM_SHIFT_LIGHT
+	V1_Shiftlight();
+#endif
 
 
 
