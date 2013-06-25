@@ -555,7 +555,7 @@ void MultidisplayController::AnaConversion() {
 	//see http://plxdevices.com/images/SM-VacBoostVolts.jpg
 	// voltage = boost(psi)/9 + 1,66
 	// boost (psi) = voltage * 9 - 15
-	data.calAbsoluteBoost = 5.0* ( (float) data.anaIn[BOOSTPIN])/4096.0;
+	data.calAbsoluteBoost = 5.0* ( (float) data.anaIn[BOOSTPIN])/4095.0;
 	data.calAbsoluteBoost = data.calAbsoluteBoost * 9.0 - 15; //psi
 	data.calAbsoluteBoost = data.calAbsoluteBoost / BAR2PSI; //bar
 	data.calBoost = data.calAbsoluteBoost; //formula above gets relative boost
@@ -563,18 +563,18 @@ void MultidisplayController::AnaConversion() {
 #endif
 #ifdef BOOST_MOTOROLA_MPX4250
 	//or Motorola MPX 4250 datasheet
-	data.calAbsoluteBoost = ( ((5.0 * (data.anaIn[BOOSTPIN]/4096.0)) + 0.2) / 0.02 ) / 100; //Bar
+	data.calAbsoluteBoost = ( ((5.0 * (data.anaIn[BOOSTPIN]/4095.0)) + 0.2) / 0.02 ) / 100; //Bar
 	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
 #endif
 #ifdef BOOST_FREESCALE_MPXA6400A
-	data.calAbsoluteBoost = 5.0* ((float) data.anaIn[BOOSTPIN])/4096.0;             //only gets 0-5V
+	data.calAbsoluteBoost = 5.0* ((float) data.anaIn[BOOSTPIN])/4095.0;             //only gets 0-5V
 	// Freescale MPXA6400A
 	// transfer function P = Vout/0.012105 + 3.477902
 	data.calAbsoluteBoost = (data.calAbsoluteBoost/0.012105 + 3.477902) / 100;     	//makes 0-400kPa out of it
 	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;			//apply the offset (ambient pressure)
 #endif
 #ifdef BOOST_BOSCH_200KPA
-	data.calAbsoluteBoost = 5.0* ((float) data.anaIn[BOOST2PIN])/4096.0;             //only gets 0-5V
+	data.calAbsoluteBoost = 5.0* ((float) data.anaIn[BOOST2PIN])/4095.0;             //only gets 0-5V
 	data.calAbsoluteBoost = (data.calAbsoluteBoost + 0.25)/0.0252778;     	//makes 0-200kPa out of it
 	data.calAbsoluteBoost = data.calAbsoluteBoost / 100.0; //bar
 //	data.calBoostPSI = data.calBoostBar * BAR2PSI;
@@ -609,12 +609,12 @@ Zeitronix: (v*2)+9.6
 #ifdef LAMBDA_PLX_SMAFR
 	//http://www.plxdevices.com/InstallationInstructions/SM-AFRUsersGuide.pdf
 	// air fuel ratio = 2*Voltage + 10
-	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /4096)) * 2 + 10 ) / 14.7;
+	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /4095)) * 2 + 10 ) / 14.7;
 #endif
 #ifdef LAMBDA_INNOVATE_LC1
-	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /4096)) * 3 + 7.35 ) / 14.7;
+	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /4095)) * 3 + 7.35 ) / 14.7;
 #endif
-	data.calLambda = map(data.anaIn[LAMBDAPIN], 0, 4096, 0, 200);
+	data.calLambda = map(data.anaIn[LAMBDAPIN], 0, 4095, 0, 200);
 #else
 	data.calLambda = map(data.anaIn[LAMBDAPIN], LAMBDAMIN, LAMBDAMAX, 0, 200);    //gets about the 0-1V into 0-200 values
 	data.calLambdaF = (float) data.calLambda;
@@ -622,13 +622,13 @@ Zeitronix: (v*2)+9.6
 	data.calLambda = constrain(data.calLambda, 0, 200);
 
 #ifdef LAMBDASTANDALONE
-	//Lambda Standalone Patch -> hängt am Arduino direkt!	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /4096)) * 2 + 10 ) / 14.7;
+	//Lambda Standalone Patch -> hängt am Arduino direkt!	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /4095)) * 2 + 10 ) / 14.7;
 	//nur 10Bit ADC!
-	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /1024)) * 2 + 10 ) / 14.7;
+	data.calLambdaF = ( (5.0*( ((float) data.anaIn[LAMBDAPIN]) /1023)) * 2 + 10 ) / 14.7;
 #endif
 
 	//CaseTemp: (damped)
-	data.calCaseTemp = data.calCaseTemp*0.9 + (500.0*data.anaIn[CASETEMPPIN]/4096.0)*0.1;  //thats how to get Â°C out from a LM35 with 12Bit ADW
+	data.calCaseTemp = data.calCaseTemp*0.9 + (500.0*data.anaIn[CASETEMPPIN]/4095.0)*0.1;  //thats how to get Â°C out from a LM35 with 12Bit ADW
 
 #ifdef VR6_MOTRONIC
 	//Throttle:
@@ -653,7 +653,7 @@ Zeitronix: (v*2)+9.6
 
 #ifdef VR6_MOTRONIC
 	//LMM
-	data.calLMM = 5.0*data.anaIn[LMMPIN]/4096.0;		   //makes 0.0 to 5.0 Volt out of it, with VagCom this could be maped to gr Air i think
+	data.calLMM = 5.0*data.anaIn[LMMPIN]/4095.0;		   //makes 0.0 to 5.0 Volt out of it, with VagCom this could be maped to gr Air i think
 #endif
 
 #ifdef V2DEVDEBUG
@@ -715,7 +715,7 @@ Zeitronix: (v*2)+9.6
 #endif
 
 
-	//Battery Voltage: (Directly from the Arduino!, so only 1024, not 4096.)
+	//Battery Voltage: (Directly from the Arduino!, so only 1023, not 4095.)
 	//measured Voltage * 4,09 + 0,7V should give the supply voltage
 	data.batVolt = ((5.0*analogRead(BATTERYPIN)/1023.0)*4.09)+0.7;
 
@@ -1249,7 +1249,7 @@ void MultidisplayController::serialSend() {
 		outbuf = 0;
 #endif
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(int) );
-		f = ( (5.0*( ((float) outbuf) /1024)) * 2 + 10 ) / 14.7;
+		f = ( (5.0*( ((float) outbuf) /1023)) * 2 + 10 ) / 14.7;
 		outbuf = float2fixedintb100(f);
 		//2. Lambda float
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
@@ -1464,7 +1464,7 @@ void MultidisplayController::calibrateLD()
 {
 	data.boostAmbientPressureBar = data.calAbsoluteBoost;
 	// changed from global val3 to caluclation of mapped boost
-	data.ldCalPoint = map(data.anaIn[BOOSTPIN], 0, 4096, 0, 200) / 10;
+	data.ldCalPoint = map(data.anaIn[BOOSTPIN], 0, 4095, 0, 200) / 10;
 	//and saved:
 	EEPROM.write(EEPROM_LDCALPOINT,data.ldCalPoint);
 	EEPROMWriteLong(EEPROM_AMBIENTPRESSURE,data.boostAmbientPressureBar*1000);    //writes the float as long, will do it.
@@ -1581,7 +1581,7 @@ void MultidisplayController::FetchTypK()  {
 		delay(20);   //Due to the 0.1 ÂµF cap this is needed. The Cap should be there to get a stable reading! (from open to RT it takes 15ms, plus 5ms safety)
 		//then read in the value from the ADW
 
-		Temp = ((5.0*read_adc(AGTPIN))/4096.0)*10000;   //gets the Volts and makes ï¿œV out of it (100 is already added from the Amp)
+		Temp = ((5.0*read_adc(AGTPIN))/4095.0)*10000;   //gets the Volts and makes ï¿œV out of it (100 is already added from the Amp)
 		Temp = GetTypKTemp(Temp);                       //Converts the ï¿œV into Â°C
 
 		//Check if it is open:
@@ -1653,7 +1653,7 @@ void MultidisplayController::selectTypKchannelForReading (uint8_t channel) {
 
 void MultidisplayController::readTypK ( uint8_t channel ) {
 	unsigned int Temp = 0;
-	Temp = ((5.0*read_adc(AGTPIN))/4096.0)*10000;   //gets the Volts and makes ï¿œV out of it (100 is already added from the Amp)
+	Temp = ((5.0*read_adc(AGTPIN))/4095.0)*10000;   //gets the Volts and makes ï¿œV out of it (100 is already added from the Amp)
 	Temp = GetTypKTemp(Temp);                       //Converts the ï¿œV into Â°C
 
 	//Check if it is open:
