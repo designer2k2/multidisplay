@@ -1384,8 +1384,11 @@ void MultidisplayController::serialSend() {
 //		outbuf32 = float2fixedint32b100(data.efr_speed);
 		outbuf = data.efr_speed_reading;
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint16_t) );
-		outbuf = 0;
+		//Knock
+		outbuf = data.knock;
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint16_t) );
 		//reserved 2 bytes
+		outbuf = 0;
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint16_t) );
 
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)

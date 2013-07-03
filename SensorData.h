@@ -101,6 +101,8 @@ public:
 
 	volatile unsigned int efr_speed_reading;
 	long efr_speed;
+	//reserved for connection of an phormula knock tool
+	uint16_t knock;
 //	volatile uint8_t efr_speed_idx;
 
 	/*

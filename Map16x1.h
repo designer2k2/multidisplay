@@ -48,6 +48,17 @@ public:
 	static const uint16_t PROGMEM lookupVDOPressure5Bar[];
 };
 
+class MapVdo10Bar {
+public:
+	MapVdo10Bar();
+
+	uint16_t map16 (uint8_t);
+	uint16_t map32 (uint8_t);
+
+	static const uint16_t PROGMEM lookupVDOPressure10Bar[];
+};
+
 extern MapVdo5Bar mapVdo5Bar;
+extern MapVdo10Bar mapVdo10Bar;
 
 #endif /* MAP16X1_H_ */

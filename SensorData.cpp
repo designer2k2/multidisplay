@@ -103,7 +103,7 @@ void SensorData::myconstructor () {
 	efr_speed_reading = 1;
 	efr_speed = 0;
 //	efr_speed_idx = 0;
-
+	knock = 0;
 #endif
 }
 
