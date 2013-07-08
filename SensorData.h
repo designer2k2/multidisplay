@@ -37,7 +37,9 @@
 
 class MaxDataSet {
 public:
-	MaxDataSet () : boost(0), lmm(0), lambda(0), rpm(0), speed(0), oilpres(0), gaspres(0), gear(0), efr_speed(0) {};
+	MaxDataSet () : boost(0), lmm(0), lambda(0), rpm(0), speed(0),
+					oilpres(0), gaspres(0), gear(0), efr_speed(0),
+					hottestTypKIndex(0) {};
 	float boost;
 	float lmm;
 	float lambda;
@@ -47,7 +49,10 @@ public:
 	float gaspres;
 	uint8_t gear;
 	long efr_speed;
+	uint8_t hottestTypKIndex;
 	uint16_t egt[NUMBER_OF_ATTACHED_TYPK];
+
+	uint16_t getMaxEgt() { return egt[hottestTypKIndex]; };
 };
 
 class SensorData {
@@ -60,6 +65,7 @@ public:
 
 
 	uint16_t calEgt[NUMBER_OF_ATTACHED_TYPK];  //All Typ K Values will be stored inside this array
+	uint8_t hottestTypKIndex;
 
 	//RPM Smoothing:
 	int rpmReadings[RPMSMOOTH];                // the readings from the analog input
@@ -133,7 +139,9 @@ public:
 	void generate_debugData();
 
 	void saveMax(uint8_t maxEv);
+	void computeHighestEgtTypK ();
 	void checkAndSaveMaxEgt ();
+	uint16_t getMaxEgt() { return calEgt[hottestTypKIndex]; };
 
 };
 

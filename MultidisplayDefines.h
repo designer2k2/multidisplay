@@ -101,9 +101,9 @@
 //--------------------------------------
 // V2 RGB LED on Shiftlight 1-3
 #define V2_RGB_WARNLED_ON_SHIFTLED123
-//#define V2_SHIFTLED1
-//#define V2_SHIFTLED2
-//#define V2_SHIFTLED3
+#define V2_SHIFTLED1PIN 3
+#define V2_SHIFTLED2PIN 38
+#define V2_SHIFTLED3PIN 39
 
 //--------------------------------------
 

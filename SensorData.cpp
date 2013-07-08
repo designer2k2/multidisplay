@@ -75,6 +75,7 @@ void SensorData::myconstructor () {
 	for (uint8_t i = 0; i < NUMBER_OF_ATTACHED_TYPK ; i++) 	{
 		calEgt[i] = 0;
 	}
+	hottestTypKIndex = 0;
 
 #ifdef MULTIDISPLAY_V2
 	speed = 0;
@@ -149,18 +150,24 @@ void SensorData::saveMax(uint8_t maxEv) {
 	maxValues[maxEv].efr_speed = efr_speed;
 	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++ )
 		maxValues[maxEv].egt[i] = calEgt[i];
+	maxValues[maxEv].hottestTypKIndex = hottestTypKIndex;
+}
+
+void SensorData::computeHighestEgtTypK () {
+	uint16_t maxCur = 0;
+	uint8_t typKNum = 0;
+	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++ ) {
+		if ( calEgt[i] > maxCur ) {
+			maxCur = calEgt[i];
+			typKNum = i;
+		}
+	}
+	hottestTypKIndex = typKNum;
 }
 
 void SensorData::checkAndSaveMaxEgt () {
-	//we're saving if me have a new max value over all channels!
-	uint16_t maxCur = 0;
-	uint16_t maxSaved = 0;
-	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++ ) {
-		if ( calEgt[i] > maxCur )
-			maxCur = calEgt[i];
-		if ( maxValues[MAXVAL_EGT].egt[i] > maxSaved )
-			maxSaved = maxValues[MAXVAL_EGT].egt[i];
-	}
-	if ( maxCur >= maxSaved )
+	computeHighestEgtTypK ();
+
+	if ( calEgt[hottestTypKIndex] > maxValues[MAXVAL_EGT].getMaxEgt() )
 		saveMax (MAXVAL_EGT);
 }

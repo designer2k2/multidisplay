@@ -750,6 +750,21 @@ Zeitronix: (v*2)+9.6
 
 }
 
+void MultidisplayController::V2_EgtWarnlight() {
+	//TODO finish me!
+	if ( data.getMaxEgt() < 900 ) {
+		//green
+		;
+	} else {
+		if ( data.getMaxEgt() > 900 && data.getMaxEgt() < 950 ) {
+			//yellow
+			;
+		} else if ( data.getMaxEgt() > 950 ) {
+			//red
+			;
+		}
+	}
+}
 
 void MultidisplayController::V1_Shiftlight()
 {

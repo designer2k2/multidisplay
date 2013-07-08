@@ -147,6 +147,8 @@ public:
 	void AnaConversion();
 	void V1_Shiftlight();
 
+	void V2_EgtWarnlight();
+
 	void serialSend();
 	void serialSendAck (uint8_t serial);
 #ifdef GEAR_RECOGNITION
