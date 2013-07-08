@@ -1387,9 +1387,7 @@ void MultidisplayController::serialSend() {
 		//Knock
 		outbuf = data.knock;
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint16_t) );
-		//reserved 2 bytes
-		outbuf = 0;
-		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint16_t) );
+
 
 #if defined(MULTIDISPLAY_V2) && defined(DIGIFANT_KLINE)
 		// 32 bytes
