@@ -147,7 +147,7 @@ public:
 	void AnaConversion();
 	void V1_Shiftlight();
 
-	void V2_EgtWarnlight();
+	void V2_WarnLED();
 
 	void serialSend();
 	void serialSendAck (uint8_t serial);

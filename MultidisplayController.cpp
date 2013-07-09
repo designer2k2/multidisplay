@@ -287,6 +287,9 @@ void  MultidisplayController::myconstructor() {
 	sei();
 #endif
 
+	pinMode (V2_SHIFTLED1PIN, OUTPUT);
+	pinMode (V2_SHIFTLED2PIN, OUTPUT);
+	pinMode (V2_SHIFTLED3PIN, OUTPUT);
 }
 
 #ifdef BW_EFR_SPEEDSENSOR
@@ -750,18 +753,43 @@ Zeitronix: (v*2)+9.6
 
 }
 
-void MultidisplayController::V2_EgtWarnlight() {
-	//TODO finish me!
-	if ( data.getMaxEgt() < 900 ) {
-		//green
-		;
+void MultidisplayController::V2_WarnLED() {
+	#define BlueGreen 450      // Temperature (°C) when the Led changes from Blue to Green
+	#define GreenYellow 900    // Temperature (°C) when the Led changes from Green to Yellow
+	#define YellowRed 945      // Temperature (°C) when the Led changes from Yellow to Red
+
+	if ( data.efr_speed > V2_RGB_WARNLED_EFR_SPEED_REDLINE ) {
+		//red
+		analogWrite (V2_SHIFTLED1PIN, 255);
+		analogWrite (V2_SHIFTLED2PIN, 0);
+		analogWrite (V2_SHIFTLED3PIN, 0);
+		return; //dont matter what egt says -> we're over the redline and want red light!
+	}
+
+	if ( data.getMaxEgt() < BlueGreen ) {
+		//blue
+		analogWrite (V2_SHIFTLED1PIN, 0);
+		analogWrite (V2_SHIFTLED2PIN, 0);
+		analogWrite (V2_SHIFTLED3PIN, 255);
 	} else {
-		if ( data.getMaxEgt() > 900 && data.getMaxEgt() < 950 ) {
-			//yellow
-			;
-		} else if ( data.getMaxEgt() > 950 ) {
-			//red
-			;
+		if ( data.getMaxEgt() < GreenYellow ) {
+			//green
+			analogWrite (V2_SHIFTLED1PIN, 0);
+			analogWrite (V2_SHIFTLED2PIN, 255);
+			analogWrite (V2_SHIFTLED3PIN, 0);
+		} else {
+			if ( data.getMaxEgt() < YellowRed ) {
+				//yellow
+				analogWrite (V2_SHIFTLED1PIN, 255);
+				analogWrite (V2_SHIFTLED2PIN, 100);
+				analogWrite (V2_SHIFTLED3PIN, 0);
+			} else {
+				//red
+				analogWrite (V2_SHIFTLED1PIN, 255);
+				analogWrite (V2_SHIFTLED2PIN, 0);
+				analogWrite (V2_SHIFTLED3PIN, 0);
+			}
+
 		}
 	}
 }
@@ -1785,15 +1813,10 @@ void MultidisplayController::mainLoop() {
 	V1_Shiftlight();
 #endif
 
-
-
+#ifdef V2_RGB_WARNLED_ON_SHIFTLED123
 	//Check for Limits:
-	//if(DoCheck == 1)
-	// {
-
-//	CheckLimits();
-
-	// }
+	V2_WarnLED();
+#endif
 
 	// ui knows what screen is active and draws it!
 #ifdef LCD
