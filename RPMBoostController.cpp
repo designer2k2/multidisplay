@@ -115,6 +115,15 @@ void RPMBoostController::compute () {
 		boostOutput = boostOutput * 0.75;
 		pidBoostOutput = boostOutput;
 	}
+#ifdef BOOST_EFR_SPEEDLIMIT_PROTECTION
+	//EFR overspeeding protection
+	if ( data.efr_speed > V2_RGB_WARNLED_EFR_SPEED_REDLINE ) {
+		//TODO log this event!
+		boostOutput = boostOutput * 0.75;
+		pidBoostOutput = boostOutput;
+	}
+#endif
+
 }
 
 void RPMBoostController::serialSendDutyMap ( uint8_t gear, uint8_t mode, uint8_t serial ) {

@@ -653,10 +653,21 @@ Zeitronix: (v*2)+9.6
                     data.calThrottle = 100;
     }
 #endif
+    if ( data.calThrottle >= 90 ) {
+    	//only on wot
+    	if ( data.calLambdaF <= data.maxValues[MAXVAL_LAMBDA].lambda ) {
+    		data.saveMax(MAXVAL_LAMBDA);
+    	}
+	}
+
+
 
 #ifdef VR6_MOTRONIC
 	//LMM
 	data.calLMM = 5.0*data.anaIn[LMMPIN]/4095.0;		   //makes 0.0 to 5.0 Volt out of it, with VagCom this could be maped to gr Air i think
+	if ( data.calLMM >= data.maxValues[MAXVAL_LMM].lmm ) {
+		data.saveMax(MAXVAL_LMM);
+	}
 #endif
 
 #ifdef V2DEVDEBUG
@@ -750,6 +761,8 @@ Zeitronix: (v*2)+9.6
 		data.VDOPres3 = mapVdo5Bar.map32 ( data.anaIn[VDOP3PIN] >> 4 );
 
 	//data.VDOPres3 = GetVDOPressure(data.anaIn[VDOP3PIN]);
+
+	//TODO max val for oil and gas pressure!
 
 }
 
