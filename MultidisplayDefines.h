@@ -71,11 +71,6 @@
 //14 wheel blades
 //#define BW_EFR_TIME_2_RPM 34285712
 
-//----------------------------------------------------------------------------------------------------
-//Max Values:
-#define MaxAGT 1200            //Maximum AGT
-#define MaxOP 8                //Maximum Oilpressure
-//----------------------------------------------------------------------------------------------------
 
 //Options:
 
@@ -210,9 +205,9 @@
 #define SPEEDPIN 4 //analog 4
 
 #define TEMPTYPKREADINGS 28         //how many entrys are in the Lookup Table
-#define NUMBER_OF_ATTACHED_TYPK 4                   //how many TypK`s are attached
+#define NUMBER_OF_ATTACHED_TYPK 5   //how many TypK`s are attached
 #define MAX_ATTACHED_TYPK 8			//max typk which can be attached
-#define MAXTYPK 1170                //over that will be seen as Open.
+#define MAXTYPK 1200                //over that will be seen as Open.
 
 
 #define EXPANDER B0100001       // Address with 2 address pins grounded. (from the PCF8574)

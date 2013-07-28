@@ -735,9 +735,7 @@ Zeitronix: (v*2)+9.6
 
 #ifdef TYPE_K
 	//Lets do the Typ K Conversion:
-	if(DoTypK==1) 	{
-		fetchTypK3_fast();
-	}
+	fetchTypK3_fast();
 #endif
 
 	//VDO Stuff:
@@ -748,17 +746,17 @@ Zeitronix: (v*2)+9.6
 	if ( data.anaIn[VDOP1PIN] > 4090 )
 		data.VDOPres1 = 0;
 	else
-		data.VDOPres1 = mapVdo5Bar.map32 ( data.anaIn[VDOP1PIN] >> 4 );
+		data.VDOPres1 = mapVdo10Bar.map32 ( data.anaIn[VDOP1PIN] >> 4 );
 
 	if ( data.anaIn[VDOP2PIN] > 4090 )
 		data.VDOPres2 = 0;
 	else
-		data.VDOPres2 = mapVdo5Bar.map32 ( data.anaIn[VDOP2PIN] >> 4 );
+		data.VDOPres2 = mapVdo10Bar.map32 ( data.anaIn[VDOP2PIN] >> 4 );
 
-	if ( data.anaIn[VDOP2PIN] > 4090 )
+	if ( data.anaIn[VDOP3PIN] > 4090 )
 		data.VDOPres3 = 0;
 	else
-		data.VDOPres3 = mapVdo5Bar.map32 ( data.anaIn[VDOP3PIN] >> 4 );
+		data.VDOPres3 = mapVdo10Bar.map32 ( data.anaIn[VDOP3PIN] >> 4 );
 
 	//data.VDOPres3 = GetVDOPressure(data.anaIn[VDOP3PIN]);
 
@@ -1748,15 +1746,6 @@ void MultidisplayController::CheckLimits()
 //		//TODO counter 1sec!
 //	}
 #endif
-
-	if(data.calEgt[0]>MaxAGT) {
-		FlashTrigger = 1;    //Enable the LCDFlash
-	}
-
-
-	if(data.calEgt[1]>MaxAGT) 	{
-		FlashTrigger = 1;    //Enable the LCDFlash
-	}
 
 
 	//Set The new Flash Timeout
