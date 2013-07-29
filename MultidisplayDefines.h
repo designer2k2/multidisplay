@@ -204,10 +204,10 @@
 #define SPEEDSMOOTH 5
 #define SPEEDPIN 4 //analog 4
 
-#define TEMPTYPKREADINGS 28         //how many entrys are in the Lookup Table
-#define NUMBER_OF_ATTACHED_TYPK 5   //how many TypK`s are attached
-#define MAX_ATTACHED_TYPK 8			//max typk which can be attached
-#define MAXTYPK 1200                //over that will be seen as Open.
+#define TEMPTYPEKREADINGS 28         //how many entrys are in the Lookup Table
+#define NUMBER_OF_ATTACHED_TYPE_K 5   //how many TypK`s are attached
+#define MAX_ATTACHED_TYPE_K 8			//max typk which can be attached
+#define MAX_TYPE_K 1200                //over that will be seen as Open.
 
 
 #define EXPANDER B0100001       // Address with 2 address pins grounded. (from the PCF8574)
@@ -224,7 +224,8 @@ typedef unsigned char byte;
 #define SERIALOUT_ENABLED 2
 #define SERIALOUT_TUNERPRO_ADX 3
 
-#define SERIALOUT_BINARY_TAG 92
+#define SERIALOUT_BINARY_TAG 95
+//#define SERIALOUT_BINARY_TAG 92
 //#define SERIALOUT_BINARY_TAG 88
 #define SERIALOUT_BINARY_TAG_N75_DUTY_MAP 22
 #define SERIALOUT_BINARY_TAG_N75_SETPOINT_MAP 38

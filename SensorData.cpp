@@ -72,7 +72,7 @@ void SensorData::myconstructor () {
 	}
 
 	//TypK Array init:
-	for (uint8_t i = 0; i < NUMBER_OF_ATTACHED_TYPK ; i++) 	{
+	for (uint8_t i = 0; i < MAX_ATTACHED_TYPE_K ; i++) 	{
 		calEgt[i] = 0;
 	}
 	hottestTypKIndex = 0;
@@ -117,7 +117,7 @@ void SensorData::generate_debugData () {
 	calCaseTemp=6;
 
 #ifdef TYPE_K
-	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++)
+	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPE_K ; i++)
 		calEgt[i] = 88;
 #endif
 
@@ -148,7 +148,7 @@ void SensorData::saveMax(uint8_t maxEv) {
 	maxValues[maxEv].gaspres = VDOPres2;
 	maxValues[maxEv].gear = gear;
 	maxValues[maxEv].efr_speed = efr_speed;
-	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++ )
+	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPE_K ; i++ )
 		maxValues[maxEv].egt[i] = calEgt[i];
 	maxValues[maxEv].hottestTypKIndex = hottestTypKIndex;
 }
@@ -156,7 +156,7 @@ void SensorData::saveMax(uint8_t maxEv) {
 void SensorData::computeHighestEgtTypK () {
 	uint16_t maxCur = 0;
 	uint8_t typKNum = 0;
-	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPK ; i++ ) {
+	for ( uint8_t i = 0 ; i < NUMBER_OF_ATTACHED_TYPE_K ; i++ ) {
 		if ( calEgt[i] > maxCur ) {
 			maxCur = calEgt[i];
 			typKNum = i;

@@ -174,7 +174,7 @@ public:
 	void readTypK ( uint8_t channel );
 	void incTypKChannel () {
 		typK_state_cur_channel++;
-		if ( typK_state_cur_channel == NUMBER_OF_ATTACHED_TYPK ) {
+		if ( typK_state_cur_channel == NUMBER_OF_ATTACHED_TYPE_K ) {
 			typK_state_cur_channel = 0;
 			data.checkAndSaveMaxEgt();
 		}

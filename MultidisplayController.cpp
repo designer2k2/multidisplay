@@ -1379,7 +1379,7 @@ void MultidisplayController::serialSend() {
 		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
 
 		//8 x 16 bit -> 16 bytes
-		for ( uint8_t i = 0 ; i < MAX_ATTACHED_TYPK ; i++) {
+		for ( uint8_t i = 0 ; i < MAX_ATTACHED_TYPE_K ; i++) {
 			Serial.write ( (uint8_t*) &(data.calEgt[i]), sizeof(int) );
 		}
 
@@ -1455,6 +1455,12 @@ void MultidisplayController::serialSend() {
 				Serial.write ( (uint8_t*) &(tmp), sizeof(uint8_t) );
 			}
 		}
+		// k-line debug
+		// frequency 2 bytes
+		outbuf = df_kline_freq_milliseconds;
+		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint16_t) );
+		// frame number 1 byte
+		Serial.write ( (uint8_t*) &(df_kline_last_frame_completely_received), sizeof(uint8_t) );
 #endif
 
 		break;
@@ -1542,7 +1548,7 @@ int MultidisplayController::GetTypKTemp(unsigned int microVolts)
 
 	int LookedupValue = 0;
 	//This searches the 2 surrounding values, and then linear interpolates between them.
-	for(int i = 0; i<TEMPTYPKREADINGS;i++) 	{
+	for(int i = 0; i<TEMPTYPEKREADINGS;i++) 	{
 		if(microVolts >= pgm_read_word(&tempTypK[i]) && microVolts <= pgm_read_word(&tempTypK[i+1]))
 		{
 			LookedupValue = ((i)*50) + ((50L *(microVolts - pgm_read_word(&tempTypK[i]))) / ((pgm_read_word(&tempTypK[i+1]) - pgm_read_word(&tempTypK[i]))));
@@ -1611,7 +1617,7 @@ void MultidisplayController::FetchTypK()  {
 	int row;     // storeing the bin code
 	int  bin [] = {000, 1, 10, 11, 100, 101, 110, 111};//bin = binary, some times it is so easy
 
-	for (int i=0; i < NUMBER_OF_ATTACHED_TYPK; i++) {
+	for (int i=0; i < NUMBER_OF_ATTACHED_TYPE_K; i++) {
 		//there are 8 connections, so i have to set the 3 pins according to all channels
 
 		//This needs to be modded to fit the new IO Handler
@@ -1641,7 +1647,7 @@ void MultidisplayController::FetchTypK()  {
 
 		//Check if it is open:
 
-		if(Temp>=MAXTYPK) {
+		if(Temp>=MAX_TYPE_K) {
 			Temp = 0;
 		} else {
 			Temp += int(data.calCaseTemp);                       //apply the Correction
@@ -1681,7 +1687,7 @@ void MultidisplayController::fetchTypK3_fast() {
  * TODO test me!
  */
 void MultidisplayController::fetchTypK2()  {
-	for (uint8_t i=0; i < NUMBER_OF_ATTACHED_TYPK; i++) {
+	for (uint8_t i=0; i < NUMBER_OF_ATTACHED_TYPE_K; i++) {
 		selectTypKchannelForReading (i);
 
 		delay(20);   //Due to the 0.1 ÂµF cap this is needed. The Cap should be there to get a stable reading! (from open to RT it takes 15ms, plus 5ms safety)
@@ -1713,7 +1719,7 @@ void MultidisplayController::readTypK ( uint8_t channel ) {
 
 	//Check if it is open:
 
-	if(Temp>=MAXTYPK) {
+	if(Temp>=MAX_TYPE_K) {
 		Temp = 0;
 	} else {
 		Temp += int(data.calCaseTemp);                       //apply the Correction

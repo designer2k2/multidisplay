@@ -50,7 +50,7 @@ public:
 	uint8_t gear;
 	long efr_speed;
 	uint8_t hottestTypKIndex;
-	uint16_t egt[NUMBER_OF_ATTACHED_TYPK];
+	uint16_t egt[NUMBER_OF_ATTACHED_TYPE_K];
 
 	uint16_t getMaxEgt() { return egt[hottestTypKIndex]; };
 };
@@ -64,7 +64,7 @@ public:
 	int ldCalPoint;             //where to draw the dot from the calibration
 
 
-	uint16_t calEgt[NUMBER_OF_ATTACHED_TYPK];  //All Typ K Values will be stored inside this array
+	uint16_t calEgt[MAX_ATTACHED_TYPE_K];  //All Typ K Values will be stored inside this array
 	uint8_t hottestTypKIndex;
 
 	//RPM Smoothing:
