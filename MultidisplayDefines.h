@@ -64,7 +64,7 @@
 
 #define BW_EFR_SPEEDSENSOR
 //Port PL0 / Timer 4
-#define BW_EFR_SPEEDSENSOR_PIN 1
+#define BW_EFR_SPEEDSENSOR_PIN 49
 #define BW_EFR_SMOOTH 5
 //for 12 wheel blades (67mm)
 #define BW_EFR_TIME_2_RPM 40000000
