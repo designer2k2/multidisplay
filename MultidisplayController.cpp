@@ -674,6 +674,7 @@ Zeitronix: (v*2)+9.6
 	if ( (v2devdebugflag & 1) == 0 ) {
 #endif
 	//RPM
+#ifdef RPM_ONBOARD
 	//(from the smoothing example)
 	//TODO more smoothing below 1000 rpm
 	data.rpmTotal -= data.rpmReadings[data.rpmIndex];               // subtract the last reading
@@ -694,9 +695,11 @@ Zeitronix: (v*2)+9.6
 	if ( data.calRPM >= data.maxValues[MAXVAL_RPM].rpm ) {
 		data.saveMax(MAXVAL_RPM);
 	}
+
 	data.rpm_map_idx = (uint8_t) map (
 			constrain (data.calRPM, RPM_MIN_FOR_BOOST_CONTROL, RPM_MAX_FOR_BOOST_CONTROL),
 			RPM_MIN_FOR_BOOST_CONTROL, RPM_MAX_FOR_BOOST_CONTROL, 0, 255);
+#endif
 #ifdef V2DEVDEBUG
 	}
 #endif
@@ -2221,6 +2224,21 @@ void MultidisplayController::DFConvertReceivedData() {
 //	data.calAbsoluteBoost =  (float) (((5.0 * ((df_klineData[df_kline_last_frame_completely_received].asBytes[1])/255.0)) + 0.1765) / 0.0159) / 100.0;
 //	data.calBoost = data.calAbsoluteBoost - data.boostAmbientPressureBar;
 	data.calBoost = data.calAbsoluteBoost - 1.0;
+#endif
+
+#ifdef USE_DIGIFANT_RPM
+	//anstatt 9 $4F und 18 $AD
+	data.calRPM = 15000000 /
+			(df_klineData[df_kline_last_frame_completely_received].asBytes[10]<<8 + df_klineData[df_kline_last_frame_completely_received].asBytes[19] );
+	//Check if the RPM is a new Max RPM Event
+	if ( data.calRPM >= data.maxValues[MAXVAL_RPM].rpm ) {
+		data.saveMax(MAXVAL_RPM);
+	}
+
+	data.rpm_map_idx = (uint8_t) map (
+			constrain (data.calRPM, RPM_MIN_FOR_BOOST_CONTROL, RPM_MAX_FOR_BOOST_CONTROL),
+			RPM_MIN_FOR_BOOST_CONTROL, RPM_MAX_FOR_BOOST_CONTROL, 0, 255);
+
 #endif
 }
 
