@@ -227,7 +227,7 @@ typedef unsigned char byte;
 #define SERIALOUT_ENABLED 2
 #define SERIALOUT_TUNERPRO_ADX 3
 
-#define SERIALOUT_BINARY_TAG 95
+#define SERIALOUT_BINARY_TAG 96
 //#define SERIALOUT_BINARY_TAG 92
 //#define SERIALOUT_BINARY_TAG 88
 #define SERIALOUT_BINARY_TAG_N75_DUTY_MAP 22
@@ -314,7 +314,7 @@ typedef unsigned char byte;
 #define EEPROM_N75_HIGH_DUTY_CYCLE_MAPS 3999
 
 #define DF_KLINESERIALFREQ 1
-#define DF_KLINEFRAMESIZE 34 //including stx / etx bytes
+#define DF_KLINEFRAMESIZE 35 //including stx / etx bytes
 #define DF_KLINE_STORE_FRAME_COUNT 2
 #define DF_KLINEBEGIN 2
 #define DF_KLINEEND 3

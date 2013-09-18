@@ -2228,8 +2228,8 @@ void MultidisplayController::DFConvertReceivedData() {
 
 #ifdef USE_DIGIFANT_RPM
 	//anstatt 9 $4F und 18 $AD
-	data.calRPM = 15000000 /
-			(df_klineData[df_kline_last_frame_completely_received].asBytes[10]<<8 + df_klineData[df_kline_last_frame_completely_received].asBytes[19] );
+	data.calRPM = (int) ( ((unsigned long) 15000000) /
+			( (unsigned long) (df_klineData[df_kline_last_frame_completely_received].asBytes[32]<<8 + df_klineData[df_kline_last_frame_completely_received].asBytes[33] ) ) );
 	//Check if the RPM is a new Max RPM Event
 	if ( data.calRPM >= data.maxValues[MAXVAL_RPM].rpm ) {
 		data.saveMax(MAXVAL_RPM);
