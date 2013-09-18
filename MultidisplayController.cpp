@@ -742,9 +742,12 @@ Zeitronix: (v*2)+9.6
 #endif
 
 	//VDO Stuff:
-	data.VDOTemp1 = GetVDOTemp(data.anaIn[VDOT1PIN]);
-	data.VDOTemp2 = GetVDOTemp(data.anaIn[VDOT2PIN]);
-	data.VDOTemp3 = GetVDOTemp(data.anaIn[VDOT3PIN]);
+	if ( data.anaIn[VDOT1PIN] > 0 )
+		data.VDOTemp1 = data.anaIn[VDOT1PIN];
+	if ( data.anaIn[VDOT2PIN] > 0 )
+		data.VDOTemp2 = GetVDOTemp(data.anaIn[VDOT2PIN]);
+	if ( data.anaIn[VDOT3PIN] > 0 )
+		data.VDOTemp3 = GetVDOTemp(data.anaIn[VDOT3PIN]);
 
 	if ( data.anaIn[VDOP1PIN] > 4090 )
 		data.VDOPres1 = 0;
