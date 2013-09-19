@@ -2231,7 +2231,7 @@ void MultidisplayController::DFConvertReceivedData() {
 
 #ifdef USE_DIGIFANT_RPM
 	//anstatt 9 $4F und 18 $AD
-	uint32_t df_delta_hall = (df_klineData[df_kline_last_frame_completely_received].asBytes[32]<<8) + df_klineData[df_kline_last_frame_completely_received].asBytes[33];
+	uint32_t df_delta_hall = (df_klineData[df_kline_last_frame_completely_received].asBytes[31]<<8) + df_klineData[df_kline_last_frame_completely_received].asBytes[32];
 	if ( df_delta_hall > 0 )
 		data.calRPM = (int) ( ((uint32_t) 30000000) / (uint32_t) df_delta_hall );
 	else
