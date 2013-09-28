@@ -97,7 +97,7 @@
 //--------------------------------------
 // V2 RGB LED on Shiftlight 1-3 RGB
 #define V2_RGB_WARNLED_ON_SHIFTLED123
-#define V2_RGB_WARNLED_EFR_SPEED_REDLINE 120000
+#define V2_RGB_WARNLED_EFR_SPEED_REDLINE 135000
 #define V2_SHIFTLED1PIN 3
 #define V2_SHIFTLED2PIN 38
 #define V2_SHIFTLED3PIN 39
