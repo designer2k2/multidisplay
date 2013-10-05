@@ -674,7 +674,7 @@ Zeitronix: (v*2)+9.6
 	if ( (v2devdebugflag & 1) == 0 ) {
 #endif
 	//RPM
-#ifdef RPM_ONBOARD
+#ifdef USE_RPM_ONBOARD
 	//(from the smoothing example)
 	//TODO more smoothing below 1000 rpm
 	data.rpmTotal -= data.rpmReadings[data.rpmIndex];               // subtract the last reading

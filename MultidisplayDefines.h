@@ -156,7 +156,7 @@
 
 #define LAMBDA_WIDEBAND
 #define LAMBDA_PLX_SMAFR
-//#define LAMBDA_PLX_INNOVATE_LC1
+//#define LAMBDA_INNOVATE_LC1
 //#define LAMBDASTANDALONE A2
 
 //left of lcd pins
