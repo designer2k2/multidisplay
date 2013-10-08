@@ -98,6 +98,7 @@ public:
 
 #ifdef MULTIDISPLAY_V2
 	uint16_t speed;
+	float speedF;
 	uint8_t gear;
 
 	int speedReadings[SPEEDSMOOTH];                // the readings from the analog input

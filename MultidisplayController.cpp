@@ -714,7 +714,8 @@ Zeitronix: (v*2)+9.6
 		data.speedIndex = 0;
 
 	data.speedAverage = data.speedTotal / SPEEDSMOOTH;               // calculate the average
-	data.speed = data.speedAverage * SPEEDFACTOR * SPEEDCORRECTIONFACTOR;                   // apply the factor for calibration
+	data.speedF = (float) data.speedAverage * SPEEDFACTOR * SPEEDCORRECTIONFACTOR;                   // apply the factor for calibration
+	data.speed = (uint16_t) data.speedF;
 
 	//Check if the speed is a new Max speed Event
 	if ( data.speed >= data.maxValues[MAXVAL_SPEED].speed ) {
@@ -1410,7 +1411,10 @@ void MultidisplayController::serialSend() {
 		Serial.write ( (uint8_t*) &(data.VDOTemp3), sizeof(int) );
 
 		// 2 bytes
-		Serial.write ( (uint8_t*) &(data.speed), sizeof(uint16_t) );
+		//Serial.write ( (uint8_t*) &(data.speed), sizeof(uint16_t) );
+		outbuf = float2fixedintb100(data.speedF);
+		Serial.write ( (uint8_t*) &outbuf, sizeof(int) );
+
 		// 1 byte
 		Serial.write ( (uint8_t*) &(data.gear), sizeof(uint8_t) );
 		// 1 byte N75 dutycycle

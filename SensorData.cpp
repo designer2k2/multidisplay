@@ -79,6 +79,7 @@ void SensorData::myconstructor () {
 
 #ifdef MULTIDISPLAY_V2
 	speed = 0;
+	speedF = 0;
 	gear = 5;
 
 	df_cyl1_retard = 0;
