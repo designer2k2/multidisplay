@@ -1,5 +1,5 @@
 /*
-    Copyright 2009-10 Stephan Martin, Dominik Gummel
+    Copyright 2009-13 Stephan Martin, Dominik Gummel
 
     This file is part of Multidisplay.
 
@@ -825,7 +825,7 @@ void LCDController::screen2_draw() {
 #ifdef DIGIFANT_KLINE
     printInt(ystart[2]+10, mController.df_kline_active_frame, 1);
     printInt(ystart[2]+15, mController.df_kline_freq_milliseconds, 2);
-    printInt(ystart[3]+10, mController.df_kline_freq_helper0, 2);
+    printInt(ystart[3]+10, mController.df_kline_millis_last_frame_received, 2);
     printInt(ystart[3]+17, mController.df_kline_discarded_frames, 2);
 #endif
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright 2009-10 Stephan Martin, Dominik Gummel
+    Copyright 2009-13 Stephan Martin, Dominik Gummel
 
     This file is part of Multidisplay.
 
@@ -193,7 +193,7 @@ void  MultidisplayController::myconstructor() {
 	df_kline_last_frame_completely_received = 255;
 
 	df_kline_freq_milliseconds = 0;
-	df_kline_freq_helper0 = millis();
+	df_kline_millis_last_frame_received = millis();
 #endif
 
 	//bluetooth module
@@ -1472,8 +1472,8 @@ void MultidisplayController::serialSend() {
 			}
 		}
 		// k-line debug
-		// frequency 2 bytes
-		outbuf = df_kline_freq_milliseconds;
+		// changed from frequency to timestamp of last received df frame
+		outbuf = df_kline_millis_last_frame_received;
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint16_t) );
 		// frame number 1 byte
 		Serial.write ( (uint8_t*) &(df_kline_last_frame_completely_received), sizeof(uint8_t) );
@@ -2192,8 +2192,8 @@ void MultidisplayController::DFKlineSerialReceive() {
 					df_kline_last_frame_completely_received = df_kline_active_frame;
 					DFConvertReceivedData();
 
-					df_kline_freq_milliseconds = (uint16_t) millis() - df_kline_freq_helper0;
-					df_kline_freq_helper0 = millis();
+					df_kline_freq_milliseconds = (uint16_t) millis() - df_kline_millis_last_frame_received;
+					df_kline_millis_last_frame_received = millis();
 
 					df_kline_active_frame++;
 					if ( df_kline_active_frame >= DF_KLINE_STORE_FRAME_COUNT )

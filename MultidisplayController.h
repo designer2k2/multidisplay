@@ -1,5 +1,5 @@
 /*
-    Copyright 2009-10 Stephan Martin, Dominik Gummel
+    Copyright 2009-13 Stephan Martin, Dominik Gummel
 
     This file is part of Multidisplay.
 
@@ -208,7 +208,7 @@ public:
 	//! holds the index of the last frame (255 if no frame was received)
 	uint8_t df_kline_last_frame_completely_received;
 	uint16_t df_kline_freq_milliseconds;
-	unsigned long df_kline_freq_helper0;
+	unsigned long df_kline_millis_last_frame_received;
 	uint8_t df_kline_active_frame;
 	uint8_t df_kline_index;
 	uint8_t df_kline_status;

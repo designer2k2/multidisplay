@@ -1,5 +1,5 @@
 /*
-    Copyright 2009-10 Stephan Martin, Dominik Gummel
+    Copyright 2009-13 Stephan Martin, Dominik Gummel
 
     This file is part of Multidisplay.
 
