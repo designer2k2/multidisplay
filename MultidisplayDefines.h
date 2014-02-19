@@ -30,6 +30,8 @@
 //choose your engines ecu
 //only one of them should be defined!
 //#define VR6_MOTRONIC
+//#define KWP1281_KLINE
+
 #define DIGIFANT
 #define DIGIFANT_KLINE
 
@@ -323,7 +325,8 @@ typedef unsigned char byte;
 #define DF_KLINE_STATUS_FRAME_COMPLETE 2
 #define DF_KLINE_STATUS_FRAMEERROR 3
 
-
+//PA7
+#define V2_LLINE 29
 
 
 #endif /* MULTIDISPLAY_DEFINES_H_ */

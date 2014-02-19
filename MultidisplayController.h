@@ -215,6 +215,14 @@ public:
 	uint16_t df_kline_discarded_frames;
 #endif
 
+#if defined(MULTIDISPLAY_V2) && defined(KWP1281_KLINE)
+	inline void setKLHigh () { PORTA |=  128; PORTD |= 8; };
+	inline void setKLLow () { PORTA &=  ~128; PORTD &= ~8; };
+	inline void sendFiveBaudBit (int bit);
+	void kwp1281SendControllerAddress(uint8_t address);
+	bool kwp1281Connect ();
+#endif
+
 #if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_SETUP_ON_SERIAL2)
 	unsigned long BTSerialTime;
 #endif

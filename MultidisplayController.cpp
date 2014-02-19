@@ -196,6 +196,16 @@ void  MultidisplayController::myconstructor() {
 	df_kline_millis_last_frame_received = millis();
 #endif
 
+#if defined(MULTIDISPLAY_V2) && defined(KWP1281_KLINE)
+	//arduino mega pinout diagram
+	//http://www.pighixxx.com/downloads/arduino-mega-v2/
+	//Serial1 TX: PD3
+	//L: PA7
+	//set L and K/TX to output
+	DDRD |= 8;
+	DDRA |= 128;
+#endif
+
 	//bluetooth module
 	Serial2.begin(115200);
 //	Serial2.begin(9600);
@@ -2259,6 +2269,145 @@ void MultidisplayController::DFConvertReceivedData() {
 #endif
 }
 
+#endif
+
+#if defined(MULTIDISPLAY_V2) && defined(KWP1281_KLINE)
+
+void MultidisplayController::sendFiveBaudBit (int bit) {
+	/* TX Port: USART must be disabled and port must be set as output
+	 * L must be configured as output
+	 *
+	 * 5 Baud -> 200msec period
+	 */
+	if (bit) {
+		setKLHigh();
+	} else {
+		setKLLow();
+	}
+	delay (200);
+	return;
+}
+
+void MultidisplayController::kwp1281SendControllerAddress(uint8_t address) {
+	//Start
+	sendFiveBaudBit(0);
+	//7 bits controller address; lsb first
+
+	//disabled because libm problems:
+	///opt/avr/lib/gcc/avr/4.3.4/../../../../avr/lib/avr51/libm.a(log.o):../../../../../source/avr-libc-1.6.8/libm/fplib/log.S:98: relocation truncated to fit: R_AVR_13_PCREL against symbol `__addsf3' defined in .text section in /opt/avr/lib/gcc/avr/4.3.4/avr51/libgcc.a(_addsub_sf.o)
+//	uint8_t bits = 0;
+//	for (uint8_t i = 0; i < 7 ; i++) {
+//		uint8_t bit = address & ( (int) pow (2,i) );
+//		sendFiveBaudBit( bit );
+//		bits += bit;
+//	}
+//	//parity -> number of 1s in the data byte has to be odd
+//	if ( bits % 2 )
+//		//odd
+//		sendFiveBaudBit( 0 );
+//	else
+//		sendFiveBaudBit( 1 );
+
+	//ECU address 1
+	sendFiveBaudBit( 1 );
+	sendFiveBaudBit( 0 );
+	sendFiveBaudBit( 0 );
+	sendFiveBaudBit( 0 );
+	sendFiveBaudBit( 0 );
+	sendFiveBaudBit( 0 );
+	sendFiveBaudBit( 0 );
+	//parity
+	sendFiveBaudBit( 0 );
+
+	//Stop
+	sendFiveBaudBit(1);
+}
+
+bool MultidisplayController::kwp1281Connect () {
+	setKLHigh();
+	delay(300);
+	//ecu
+	kwp1281SendControllerAddress (1);
+	//sync pattern from ecu
+	//80ms << t_r1 << 210 ms
+	delay (60);
+
+	/* synchonisation pattern: controller "tells" the baud rate -> measure the usecs of a bit -> baudrate
+	 * newer ecus use only 10400
+	 * older ones could use also 9600 or 1200
+	 */
+	uint16_t millis_stop = millis() + 1000;
+	uint16_t usecs = 0;
+	uint8_t state = 0;
+	uint8_t rx_last_read = 0;
+	uint8_t bits_seen=0;
+	while ( millis() < millis_stop ) {
+		if (state == 0) {
+			//wait for start bit (low)
+			if ( (PORTD & 4) == 0 ) {
+				state = 1;
+				rx_last_read = 1;
+			}
+		}
+		if (state == 1 ) {
+			//measure time
+			if ( rx_last_read == 0 &&  (PORTD & 4) == 1 ) {
+				usecs = micros();
+				rx_last_read = 1;
+				bits_seen++;
+			}
+			if ( rx_last_read == 1 &&  (PORTD & 4) == 0 ) {
+				usecs = micros() - usecs;
+				rx_last_read = 0;
+				bits_seen++;
+			}
+			if ( bits_seen == 8 )
+				state = 2;
+		}
+		if (state == 2) {
+			//wait for high -> stop bit
+			if ( rx_last_read == 0 &&  (PORTD & 4) == 1 ) {
+				//stop bit
+
+			}
+		}
+	}
+	if ( state < 2 )
+		return false;
+	if (usecs > 800)
+		Serial1.begin(1200);
+	else {
+		if (usecs > 100)
+			Serial1.begin(9600);
+		if (usecs < 100)
+			Serial1.begin(10400);
+	}
+
+	//low order key byte from ecu
+	//5ms << t_r2 << 20 ms
+	millis_stop = millis() + 40;
+	uint8_t kb1, kb2;
+	while ( millis() < millis_stop )
+		if ( Serial1.available() )
+			kb1 = Serial1.read();
+
+	//high order key byte from ecu
+	//1ms << t_r3 << 20 ms
+	millis_stop = millis() + 40;
+	while ( millis() < millis_stop )
+		if ( Serial1.available() )
+			kb2 = Serial1.read();
+	//ecu sends keywords 701, we receive 8N1
+	kb1 = kb1 & 0x7F;
+	uint8_t kb2_inv = 0xFF - kb2;
+	kb2 = kb2 & 0x7F;
+	uint16_t keyword = kb1 + kb2*128;
+
+	//send complement from kb2 back
+	delay(25);
+	Serial1.write (kb2_inv);
+	//now ecu sends vehicle data
+}
 #endif
 
 #if defined(MULTIDISPLAY_V2) && defined(GEAR_RECOGNITION)
