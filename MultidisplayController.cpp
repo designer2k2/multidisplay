@@ -204,6 +204,11 @@ void  MultidisplayController::myconstructor() {
 	//set L and K/TX to output
 	DDRD |= 8;
 	DDRA |= 128;
+	kwp1281_connect_failures=0;
+	kwp1281_block_counter=0;
+	kwp1281_state=KWP1281_STATE_NO_CONNECTION;
+	kwp1281_kline_active_frame = 0;
+	kwp1281_kline_index = 0;
 #endif
 
 	//bluetooth module
@@ -2324,6 +2329,7 @@ void MultidisplayController::kwp1281SendControllerAddress(uint8_t address) {
 }
 
 bool MultidisplayController::kwp1281Connect () {
+	kwp1281_state = KWP1281_STATE_HANDSHAKE;
 	setKLHigh();
 	delay(300);
 	//ecu
@@ -2372,8 +2378,11 @@ bool MultidisplayController::kwp1281Connect () {
 			}
 		}
 	}
-	if ( state < 2 )
+	if ( state < 2 ) {
+		kwp1281_state = KWP1281_STATE_NO_CONNECTION;
+		kwp1281_connect_failures++;
 		return false;
+	}
 	if (usecs > 800)
 		Serial1.begin(1200);
 	else {
@@ -2407,7 +2416,70 @@ bool MultidisplayController::kwp1281Connect () {
 	delay(25);
 	Serial1.write (kb2_inv);
 	//now ecu sends vehicle data
+	kwp1281_state = KWP1281_STATE_HANDSHAKE_RCV_CONTROLLER_DATA;
 }
+
+void MultidisplayController::kwp1281 () {
+	//send ?
+
+	switch (kwp1281_state) {
+	case KWP1281_STATE_NO_CONNECTION :
+		if ( kwp1281_connect_failures < KWP1281_MAX_CONNECTION_ATTEMPTS )
+			if ( kwp1281Connect() )
+				kwp1281_state = KWP1281_STATE_HANDSHAKE_RCV_CONTROLLER_DATA;
+		break;
+	case KWP1281_STATE_HANDSHAKE:
+		break;
+	case KWP1281_STATE_HANDSHAKE_RCV_CONTROLLER_DATA:
+		break;
+	case KWP1281_STATE_ESTABLISHED_MASTER:
+		break;
+	case KWP1281_STATE_ESTABLISHED_SLAVE:
+		break;
+	case KWP1281_STATE_ESTABLISHED_SLAVE_RECEIVING_BLOCK:
+		break;
+	}
+}
+
+void MultidisplayController::kwp1281ReceiveBlock( bool init ) {
+	if ( init ) {
+		kwp1281_block_state = KWP1281_BLOCKREAD_STATE_WAIT_LENGTH;
+		kwp1281IncActiveFrame ();
+		kwp1281_kline_index = 0;
+	}
+
+	switch ( kwp1281_block_state ) {
+		case KWP1281_BLOCKREAD_STATE_WAIT_LENGTH:
+			if ( kwp1281Read () ) {
+				//we got data
+				kwp1281_block_length = kwp1281_klineData[kwp1281_kline_active_frame].asBytes[kwp1281_kline_index];
+				kwp1281Write( KWP1281_COMP(kwp1281_block_length) );
+				kwp1281_block_state = KWP1281_BLOCKREAD_STATE_WAIT_COUNTER;
+			}
+			break;
+		case KWP1281_BLOCKREAD_STATE_WAIT_COUNTER:
+			break;
+		case KWP1281_BLOCKREAD_STATE_WAIT_TITLE:
+			break;
+		case KWP1281_BLOCKREAD_STATE_WAIT_DATA:
+			break;
+		case KWP1281_BLOCKREAD_STATE_WAIT_BLOCKEND:
+			break;
+	}
+}
+
+bool MultidisplayController::kwp1281Read () {
+	if ( Serial1.available() ) {
+		kwp1281_kline_index++;
+		kwp1281_klineData[kwp1281_kline_active_frame].asBytes[kwp1281_kline_index] = Serial1.read();
+		return true;
+	}
+	return false;
+}
+void MultidisplayController::kwp1281Write (uint8_t d) {
+	Serial1.write(d);
+}
+
 #endif
 
 #if defined(MULTIDISPLAY_V2) && defined(GEAR_RECOGNITION)

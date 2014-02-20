@@ -216,11 +216,33 @@ public:
 #endif
 
 #if defined(MULTIDISPLAY_V2) && defined(KWP1281_KLINE)
+	union {
+	    	byte asBytes[KWP1281_KLINEFRAMESIZE];
+	    } kwp1281_klineData[KWP1281_KLINE_STORE_FRAME_COUNT];
+	uint8_t kwp1281_kline_active_frame;
+	uint8_t kwp1281_kline_index;
+	inline void kwp1281IncActiveFrame () { kwp1281_kline_active_frame++; if ( kwp1281_kline_active_frame == KWP1281_KLINE_STORE_FRAME_COUNT ) kwp1281_kline_active_frame=0; };
+	inline void kwp1281IncIndex () { kwp1281_kline_index++; if ( kwp1281_kline_index == KWP1281_KLINEFRAMESIZE ) kwp1281_kline_index=0; };
+
+	uint8_t kwp1281_block_counter;
+	uint8_t kwp1281_state;
+	uint8_t kwp1281_connect_failures;
+
+	uint8_t kwp1281_block_state;
+	uint8_t kwp1281_block_length;
+	uint8_t kwp1281_block_title;
+
 	inline void setKLHigh () { PORTA |=  128; PORTD |= 8; };
 	inline void setKLLow () { PORTA &=  ~128; PORTD &= ~8; };
 	inline void sendFiveBaudBit (int bit);
 	void kwp1281SendControllerAddress(uint8_t address);
 	bool kwp1281Connect ();
+	void kwp1281();
+	void kwp1281ReceiveBlock( bool init = false);
+
+	inline bool kwp1281Read ();
+	inline void kwp1281Write (uint8_t d);
+
 #endif
 
 #if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_SETUP_ON_SERIAL2)
