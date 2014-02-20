@@ -30,7 +30,7 @@
 //choose your engines ecu
 //only one of them should be defined!
 //#define VR6_MOTRONIC
-#define KWP1281_KLINE
+//#define KWP1281_KLINE
 
 #define DIGIFANT
 #define DIGIFANT_KLINE

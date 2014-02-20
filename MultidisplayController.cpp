@@ -2422,6 +2422,8 @@ bool MultidisplayController::kwp1281Connect () {
 void MultidisplayController::kwp1281 () {
 	//send ?
 
+	//TODO check last received data to detect connection timeouts
+
 	switch (kwp1281_state) {
 	case KWP1281_STATE_NO_CONNECTION :
 		if ( kwp1281_connect_failures < KWP1281_MAX_CONNECTION_ATTEMPTS )
