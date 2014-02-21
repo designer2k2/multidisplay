@@ -108,8 +108,12 @@ void RPMBoostController::compute () {
 			pidBoostOutput = req_Boost_PWM;
 			//set the map pwm as output pwm
 			//we want a silent N75 on idle
+#ifdef DIGIFANT_KLINE
 			if ( data.calRPM > 1200 && ( data.calThrottle > 50 ||
 					( mController.df_klineData[mController.df_kline_last_frame_completely_received].asBytes[7] & 8) ) )
+#else
+			if ( data.calRPM > 1200 && ( data.calThrottle > 50 ) )
+#endif
 				boostOutput = req_Boost_PWM;
 			else boostOutput = 0;
 //			boostOutput = req_Boost_PWM;
@@ -117,8 +121,12 @@ void RPMBoostController::compute () {
 	} else {
 		//no PID
 		//we want a silent N75 on idle
+#ifdef DIGIFANT_KLINE
 		if ( data.calRPM > 1200 && ( data.calThrottle > 50 ||
 				( mController.df_klineData[mController.df_kline_last_frame_completely_received].asBytes[7] & 8) ) )
+#else
+		if ( data.calRPM > 1200 && ( data.calThrottle > 50 ) )
+#endif
 			boostOutput = req_Boost_PWM;
 		else
 			boostOutput = 0;

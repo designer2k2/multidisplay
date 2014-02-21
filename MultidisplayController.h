@@ -220,7 +220,7 @@ public:
 	    	byte asBytes[KWP1281_KLINEFRAMESIZE];
 	    } kwp1281_klineData[KWP1281_KLINE_STORE_FRAME_COUNT];
 	uint8_t kwp1281_kline_active_frame;
-	uint8_t kwp1281_kline_index;
+	int kwp1281_kline_index;
 	inline void kwp1281IncActiveFrame () { kwp1281_kline_active_frame++; if ( kwp1281_kline_active_frame == KWP1281_KLINE_STORE_FRAME_COUNT ) kwp1281_kline_active_frame=0; };
 	inline void kwp1281IncIndex () { kwp1281_kline_index++; if ( kwp1281_kline_index == KWP1281_KLINEFRAMESIZE ) kwp1281_kline_index=0; };
 
@@ -232,16 +232,28 @@ public:
 	uint8_t kwp1281_block_length;
 	uint8_t kwp1281_block_title;
 
+	uint8_t kwp1281_controller_data_block_counter;
+	bool kwp1281_controller_data_more_than_four_blocks;
+
+	//! set t0 0 on start; even = send , odd = receive answer
+	uint8_t kwp1281_send_block_state;
+
+	unsigned long kwp1281_kline_millis_last_frame_received;
+	unsigned long kwp1281_kline_millis_last_byte_send;
+
 	inline void setKLHigh () { PORTA |=  128; PORTD |= 8; };
 	inline void setKLLow () { PORTA &=  ~128; PORTD &= ~8; };
 	inline void sendFiveBaudBit (int bit);
 	void kwp1281SendControllerAddress(uint8_t address);
 	bool kwp1281Connect ();
 	void kwp1281();
-	void kwp1281ReceiveBlock( bool init = false);
+	//! returns true if block is completely received
+	bool kwp1281ReceiveBlock( bool init = false);
 
 	inline bool kwp1281Read ();
 	inline void kwp1281Write (uint8_t d);
+
+
 
 #endif
 

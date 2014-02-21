@@ -135,7 +135,9 @@ void  MultidisplayController::myconstructor() {
 
 	DoCheck = 1;
 	SerOut = SERIALOUT_BINARY;
-//	SerOut = SERIALOUT_DISABLED;
+#ifdef KWP1281_KLINE_DEBUG
+	SerOut = SERIALOUT_DISABLED;
+#endif
 
 	buttonTime = 0;
 
@@ -1937,6 +1939,9 @@ void MultidisplayController::mainLoop() {
 		DFKlineSerialReceive();
 	}
 #endif
+#if defined(MULTIDISPLAY_V2) && defined(KWP1281_KLINE)
+	kwp1281 ();
+#endif
 
 #if defined(MULTIDISPLAY_V2) && defined(BLUETOOTH_SETUP_ON_SERIAL2)
 	//to setup the bluetooth module
@@ -2332,6 +2337,9 @@ bool MultidisplayController::kwp1281Connect () {
 	kwp1281_state = KWP1281_STATE_HANDSHAKE;
 	setKLHigh();
 	delay(300);
+#ifdef KWP1281_KLINE_DEBUG
+	Serial.write (PSTR("send ecu address"));
+#endif
 	//ecu
 	kwp1281SendControllerAddress (1);
 	//sync pattern from ecu
@@ -2381,6 +2389,9 @@ bool MultidisplayController::kwp1281Connect () {
 	if ( state < 2 ) {
 		kwp1281_state = KWP1281_STATE_NO_CONNECTION;
 		kwp1281_connect_failures++;
+#ifdef KWP1281_KLINE_DEBUG
+	Serial.write (PSTR("EE sync pattern"));
+#endif
 		return false;
 	}
 	if (usecs > 800)
@@ -2391,6 +2402,10 @@ bool MultidisplayController::kwp1281Connect () {
 		if (usecs < 100)
 			Serial1.begin(10400);
 	}
+
+#ifdef KWP1281_KLINE_DEBUG
+	Serial.write (PSTR("awaiting key bytes"));
+#endif
 
 	//low order key byte from ecu
 	//5ms << t_r2 << 20 ms
@@ -2415,40 +2430,157 @@ bool MultidisplayController::kwp1281Connect () {
 	//send complement from kb2 back
 	delay(25);
 	Serial1.write (kb2_inv);
+
+#ifdef KWP1281_KLINE_DEBUG
+	Serial.write (PSTR("keyword"));
+	Serial.write (keyword);
+#endif
+
+	//controller changes to 8N1 too
 	//now ecu sends vehicle data
-	kwp1281_state = KWP1281_STATE_HANDSHAKE_RCV_CONTROLLER_DATA;
+	kwp1281_state = KWP1281_STATE_SLAVE_RCV_CONTROLLER_DATA;
+	kwp1281_controller_data_block_counter = 0;
 }
 
 void MultidisplayController::kwp1281 () {
-	//send ?
-
-	//TODO check last received data to detect connection timeouts
 
 	switch (kwp1281_state) {
+
+#ifdef KWP1281_KLINE_DEBUG
+	Serial.write(kwp1281_state);
+#endif
+
 	case KWP1281_STATE_NO_CONNECTION :
 		if ( kwp1281_connect_failures < KWP1281_MAX_CONNECTION_ATTEMPTS )
-			if ( kwp1281Connect() )
-				kwp1281_state = KWP1281_STATE_HANDSHAKE_RCV_CONTROLLER_DATA;
+			if ( kwp1281Connect() ) {
+				kwp1281_state = KWP1281_STATE_SLAVE_RCV_CONTROLLER_DATA;
+				kwp1281ReceiveBlock (true);
+			}
 		break;
 	case KWP1281_STATE_HANDSHAKE:
 		break;
-	case KWP1281_STATE_HANDSHAKE_RCV_CONTROLLER_DATA:
+	case KWP1281_STATE_SLAVE_RCV_CONTROLLER_DATA:
+		if ( kwp1281ReceiveBlock (false) ) {
+			//block completely received!
+			if ( kwp1281_controller_data_block_counter == 0 ) {
+				if ( (kwp1281_klineData[kwp1281_kline_active_frame].asBytes[3]) & 0x80 ) {
+					kwp1281_controller_data_more_than_four_blocks = true;
+					bitClear ( (kwp1281_klineData[kwp1281_kline_active_frame].asBytes[3]), 8);
+				} else
+					kwp1281_controller_data_more_than_four_blocks = false;
+				kwp1281_state = KWP1281_STATE_ESTABLISHED_MASTER_SEND_ACK;
+				kwp1281_send_block_state = 0;
+				//TODO do something with the received string
+#ifdef KWP1281_KLINE_DEBUG
+				Serial.write (PSTR("controller data"));
+				for (uint8_t i = 3 ; i < kwp1281_kline_index ; i++)
+					Serial.write (kwp1281_klineData[kwp1281_kline_active_frame].asBytes[i]);
+				Serial.print("\n");
+#endif
+
+			}
+			kwp1281_controller_data_block_counter++;
+		}
+
 		break;
 	case KWP1281_STATE_ESTABLISHED_MASTER:
+		//we are master
+		//either request a function or hold the connection alive with ACK (each 1000ms)
+
+		if ( kwp1281_kline_millis_last_frame_received + KWP1281_KEEPALIVE_MSECS > millis() ) {
+			kwp1281_state = KWP1281_STATE_ESTABLISHED_MASTER_SEND_ACK;
+#ifdef KWP1281_KLINE_DEBUG
+	Serial.write (PSTR("keepalive ACK"));
+#endif
+		}
+
+		break;
+	case KWP1281_STATE_ESTABLISHED_MASTER_SEND_ACK:
+		kwp1281_send_block_state = 0;
+	case KWP1281_STATE_ESTABLISHED_MASTER_SENDING_ACK:
+		//we are master but ecu expects an ACK
+		//3 block length, block counter, ack cmd 9, block end 3 (no response)
+		if ( kwp1281_send_block_state % 2 ) {
+			//odd -> receiv
+			 if ( Serial1.available() ) {
+					Serial1.read();
+					kwp1281_send_block_state++;
+			 } else {
+				 if ( kwp1281_kline_millis_last_byte_send + KWP1281_INTERBLOCK_TIMEOUT > millis() )
+					 kwp1281_state = KWP1281_STATE_NO_CONNECTION;
+			 }
+		} else {
+			//even ->  send
+			switch ( kwp1281_send_block_state ) {
+			case 0:
+				kwp1281Write ( 3 );
+				kwp1281_send_block_state++;
+				break;
+			case 2:
+				kwp1281_block_counter++;
+				kwp1281Write ( kwp1281_block_counter );
+				kwp1281_send_block_state++;
+				break;
+			case 4:
+				//special case if ecu wants to send more than 4 blocks
+				if ( kwp1281_controller_data_block_counter == 4 && kwp1281_controller_data_more_than_four_blocks )
+					kwp1281Write ( KWP1281_COMMAND_GET_CONTROLLER_DATA );
+				else
+					kwp1281Write ( KWP1281_COMMAND_ACK );
+				kwp1281_send_block_state++;
+				break;
+			case 6:
+				//block end; no response; ecu gets master
+				kwp1281Write ( 3 );
+				kwp1281_send_block_state = 0;
+				kwp1281_state = KWP1281_STATE_ESTABLISHED_SLAVE;
+			}
+		}
 		break;
 	case KWP1281_STATE_ESTABLISHED_SLAVE:
+		kwp1281ReceiveBlock (true);
+		kwp1281_state = KWP1281_STATE_ESTABLISHED_SLAVE_RECEIVING_BLOCK;
 		break;
 	case KWP1281_STATE_ESTABLISHED_SLAVE_RECEIVING_BLOCK:
+		if ( kwp1281_kline_millis_last_frame_received + KWP1281_INTERBLOCK_TIMEOUT > millis() ) {
+			kwp1281_state = KWP1281_STATE_NO_CONNECTION;
+		}
+		if ( kwp1281ReceiveBlock (false) ) {
+			kwp1281_kline_millis_last_frame_received = millis();
+			//block completely received!
+			switch ( kwp1281_block_title ) {
+			case KWP1281_COMMAND_ASCII_DATA:
+				//TODO do somethin with
+				kwp1281_state = KWP1281_STATE_ESTABLISHED_MASTER_SEND_ACK;
+				break;
+			case KWP1281_COMMAND_ACK:
+				kwp1281_state = KWP1281_STATE_ESTABLISHED_MASTER;
+				break;
+			case KWP1281_COMMAND_GROUP_READING_RESPONSE:
+				//TODO do something with the data
+				//ACK or next function
+				kwp1281_state = KWP1281_STATE_ESTABLISHED_MASTER;
+				break;
+			}
+		}
 		break;
 	}
 }
 
-void MultidisplayController::kwp1281ReceiveBlock( bool init ) {
+bool MultidisplayController::kwp1281ReceiveBlock( bool init ) {
 	if ( init ) {
 		kwp1281_block_state = KWP1281_BLOCKREAD_STATE_WAIT_LENGTH;
 		kwp1281IncActiveFrame ();
-		kwp1281_kline_index = 0;
+		kwp1281_kline_index = -1;
 	}
+
+	if ( ( kwp1281_kline_millis_last_byte_send + KWP1281_INTERBLOCK_TIMEOUT > millis() )
+	|| ( kwp1281_kline_millis_last_frame_received + KWP1281_INTERBLOCK_TIMEOUT > millis() ) ) {
+		kwp1281_state = KWP1281_STATE_NO_CONNECTION;
+		return false;
+	}
+	if ( kwp1281_kline_millis_last_byte_send + KWP1281_INTERBLOCK_TIMEOUT > millis() )
+			kwp1281_state = KWP1281_STATE_NO_CONNECTION;
 
 	switch ( kwp1281_block_state ) {
 		case KWP1281_BLOCKREAD_STATE_WAIT_LENGTH:
@@ -2460,14 +2592,38 @@ void MultidisplayController::kwp1281ReceiveBlock( bool init ) {
 			}
 			break;
 		case KWP1281_BLOCKREAD_STATE_WAIT_COUNTER:
+			if ( kwp1281Read () ) {
+				//we got data
+				kwp1281_block_counter = kwp1281_klineData[kwp1281_kline_active_frame].asBytes[kwp1281_kline_index];
+				kwp1281Write( KWP1281_COMP(kwp1281_block_counter) );
+				kwp1281_block_state = KWP1281_BLOCKREAD_STATE_WAIT_TITLE;
+			}
 			break;
 		case KWP1281_BLOCKREAD_STATE_WAIT_TITLE:
+			if ( kwp1281Read () ) {
+				//we got data
+				kwp1281_block_title = kwp1281_klineData[kwp1281_kline_active_frame].asBytes[kwp1281_kline_index];
+				kwp1281Write( KWP1281_COMP(kwp1281_block_title) );
+				kwp1281_block_state = KWP1281_BLOCKREAD_STATE_WAIT_DATA;
+			}
 			break;
 		case KWP1281_BLOCKREAD_STATE_WAIT_DATA:
+			if ( kwp1281Read () ) {
+				//we got data
+				kwp1281Write( KWP1281_COMP( kwp1281_klineData[kwp1281_kline_active_frame].asBytes[kwp1281_kline_index] ) );
+				if ( kwp1281_kline_index == kwp1281_block_length - 1 )
+					//last data byte -> next will be block end
+					kwp1281_block_state = KWP1281_BLOCKREAD_STATE_WAIT_BLOCKEND;
+			}
 			break;
 		case KWP1281_BLOCKREAD_STATE_WAIT_BLOCKEND:
+			if ( kwp1281Read () ) {
+				//read should be 3
+				return true;
+			}
 			break;
 	}
+	return false;
 }
 
 bool MultidisplayController::kwp1281Read () {
@@ -2480,6 +2636,7 @@ bool MultidisplayController::kwp1281Read () {
 }
 void MultidisplayController::kwp1281Write (uint8_t d) {
 	Serial1.write(d);
+	kwp1281_kline_millis_last_byte_send = millis();
 }
 
 #endif
