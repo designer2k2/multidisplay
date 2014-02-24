@@ -238,14 +238,22 @@ public:
 	//! set t0 0 on start; even = send , odd = receive answer
 	uint8_t kwp1281_send_block_state;
 
-	unsigned long kwp1281_kline_millis_last_frame_received;
+#ifdef KWP1281_KLINE_DEBUG
+	unsigned long kwp1281_debug_printtime;
+#endif
+
+	unsigned long kwp1281_kline_millis_last_byte_received;
 	unsigned long kwp1281_kline_millis_last_byte_send;
 
-	inline void setKLHigh () { PORTA |=  128; PORTD |= 8; };
-	inline void setKLLow () { PORTA &=  ~128; PORTD &= ~8; };
+//	inline void setKLHigh () { PORTA |=  128; PORTD |= 8;  digitalWrite (16,HIGH);  digitalWrite (2,HIGH); PORTE |= 16; digitalWrite(3,HIGH); };
+//	inline void setKLLow () { PORTA &=  ~128; PORTD &= ~8;  digitalWrite (16,LOW); digitalWrite (2,LOW); PORTE &= ~16; digitalWrite(3,LOW);};
+	inline void setKLHigh () { PORTA |=  128; PORTD |= 8; PORTH |= 2; PORTJ |= 2;};
+	inline void setKLLow () { PORTA &=  ~128; PORTD &= ~8; PORTH &= ~2; PORTJ &= ~2;};
+	inline void setKLow () { PORTD &= ~8; PORTH &= ~2; PORTJ &= ~2;};
 	inline void sendFiveBaudBit (int bit);
 	void kwp1281SendControllerAddress(uint8_t address);
 	bool kwp1281Connect ();
+	bool kwp1281Connect2 ();
 	void kwp1281();
 	//! returns true if block is completely received
 	bool kwp1281ReceiveBlock( bool init = false);
