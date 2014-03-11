@@ -811,12 +811,13 @@ Zeitronix: (v*2)+9.6
 	if ( data.anaIn[VDOP1PIN] > 4090 )
 		data.VDOPres1 = 0;
 	else
-		data.VDOPres1 = mapVdo10Bar.map32 ( data.anaIn[VDOP1PIN] >> 4 );
+		data.VDOPres1 = mapVdo5Bar.map32 ( data.anaIn[VDOP1PIN] >> 4 );
 
 	if ( data.anaIn[VDOP2PIN] > 4090 )
 		data.VDOPres2 = 0;
 	else
 		data.VDOPres2 = mapVdo10Bar.map32 ( data.anaIn[VDOP2PIN] >> 4 );
+//		data.VDOPres2 = data.anaIn[VDOP2PIN] >> 4;
 
 	if ( data.anaIn[VDOP3PIN] > 4090 )
 		data.VDOPres3 = 0;

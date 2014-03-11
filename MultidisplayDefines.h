@@ -64,7 +64,6 @@
 #define READFROMEEPROM
 
 #define TYPE_K
-
 #define BW_EFR_SPEEDSENSOR
 //Port PL0 / Timer 4
 #define BW_EFR_SPEEDSENSOR_PIN 49
@@ -208,6 +207,7 @@
 //#define SPEEDFACTOR 0.390625
 #define SPEEDFACTOR 0.38
 #define SPEEDCORRECTIONFACTOR 0.9
+//#define SPEEDCORRECTIONFACTOR 1
 #define SPEEDSMOOTH 5
 #define SPEEDPIN 4 //analog 4
 
