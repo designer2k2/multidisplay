@@ -687,12 +687,18 @@ Zeitronix: (v*2)+9.6
 
 #ifdef VR6_MOTRONIC
 	//Throttle:
-	data.calThrottle = map(data.anaIn[THROTTLEPIN], THROTTLEMIN, THROTTLEMAX, 0, 100);
+	data.calThrottle = map(data.anaIn[THROTTLEPIN], THROTTLE_VR6_MIN, THROTTLE_VR6_MAX, 0, 100);
 	data.calThrottle = constrain(data.calThrottle, 0, 100);
 	data.calThrottle = 100 - data.calThrottle;                 //VR6 has 5V for closed and 0V for open throttle...
 #endif
 
-#ifdef DIGIFANT
+#if defined(DIGIFANT) && defined(DIGIFANT_DK_POTI)
+//	data.calThrottle = data.anaIn[LMMPIN] ;
+	data.calThrottle = map(data.anaIn[LMMPIN], THROTTLE_S2_MIN, THROTTLE_S2_MAX, 0, 100);
+	data.calThrottle = constrain(data.calThrottle, 0, 100);
+#endif
+
+#if defined(DIGIFANT) && not defined(DIGIFANT_DK_POTI)
     //digifant idle switch (LL-Schalter) gets 0V for closed throttle valve; ~5V if open
     // assumption: if > 3 V: open
     if ( data.anaIn[LMMPIN] < 2457 )

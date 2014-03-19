@@ -35,6 +35,7 @@
 
 #define DIGIFANT
 #define DIGIFANT_KLINE
+#define DIGIFANT_DK_POTI
 
 #define USE_DIGIFANT_MAPSENSOR
 //#define BOOST_PLX_SMVACBOOST
@@ -194,8 +195,12 @@
 #define LAMBDALOWERLIMIT 3
 #define LAMBDAUPPERLIMIT 15
 
-#define THROTTLEMIN 620            //Calibration for Throttle
-#define THROTTLEMAX 3530
+#define THROTTLE_VR6_MIN 620            //Calibration for Throttle
+#define THROTTLE_VR6_MAX 3530
+
+#define THROTTLE_S2_MIN 622            //Calibration for Throttle
+#define THROTTLE_S2_MAX 3997
+
 
 //choose only 1 of them
 //#define USE_RPM_ONBOARD
