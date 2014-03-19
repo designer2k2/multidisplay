@@ -54,8 +54,9 @@ class MapVdo5Bar {
 public:
 	MapVdo5Bar();
 
-	uint16_t map16 (uint8_t);
-	uint16_t map32 (uint8_t);
+//	uint16_t map16 (uint8_t);
+//	uint16_t map32 (uint8_t);
+	uint16_t map32 (uint16_t);
 
 	static const uint16_t PROGMEM lookupVDOPressure5Bar[];
 };
@@ -64,8 +65,9 @@ class MapVdo10Bar {
 public:
 	MapVdo10Bar();
 
-	uint16_t map16 (uint8_t);
-	uint16_t map32 (uint8_t);
+//	uint16_t map16 (uint8_t);
+//	uint16_t map32 (uint8_t);
+	uint16_t map32 (uint16_t);
 
 	static const uint16_t PROGMEM lookupVDOPressure10Bar[];
 };

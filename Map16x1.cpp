@@ -91,18 +91,23 @@ void Map16x1Double::writeToEeprom (int address) {
 MapVdo5Bar::MapVdo5Bar () {
 }
 
-uint16_t MapVdo5Bar::map16(uint8_t idx) {
-    uint8_t l = idx & 0xF;
-    idx = idx >> 4;
-    return idx < 0xF ? (( ( l * pgm_read_word(&lookupVDOPressure5Bar[idx+1]) ) + ( -1 * (l-16) * pgm_read_word(&lookupVDOPressure5Bar[idx])) ) / 16) : pgm_read_word(&lookupVDOPressure5Bar[idx]);
-}
+//uint16_t MapVdo5Bar::map16(uint8_t idx) {
+//    uint8_t l = idx & 0xF;
+//    idx = idx >> 4;
+//    return idx < 0xF ? (( ( l * pgm_read_word(&lookupVDOPressure5Bar[idx+1]) ) + ( -1 * (l-16) * pgm_read_word(&lookupVDOPressure5Bar[idx])) ) / 16) : pgm_read_word(&lookupVDOPressure5Bar[idx]);
+//}
 
-uint16_t MapVdo5Bar::map32(uint8_t idx) {
-    uint8_t l = idx & 0x7;
-    idx = idx >> 3;
-    return idx < 0x1F ? (( ( l * pgm_read_word(&lookupVDOPressure5Bar[idx+1]) ) + ( -1 * (l-8) * pgm_read_word(&lookupVDOPressure5Bar[idx])) ) / 8) : pgm_read_word(&lookupVDOPressure5Bar[idx]);
+//uint16_t MapVdo5Bar::map32(uint8_t idx) {
+//    uint8_t l = idx & 0x7;
+//    idx = idx >> 3;
+//    return idx < 0x1F ? (( ( l * pgm_read_word(&lookupVDOPressure5Bar[idx+1]) ) + ( -1 * (l-8) * pgm_read_word(&lookupVDOPressure5Bar[idx])) ) / 8) : pgm_read_word(&lookupVDOPressure5Bar[idx]);
+//}
+uint16_t MapVdo5Bar::map32(uint16_t idx) {
+	float r = (idx & 0x1F) / 31 ;
+	//map 0-4095 to 0-31
+	idx = idx >> 7;
+	return idx < 0x1F ? (pgm_read_word(&lookupVDOPressure5Bar[idx]) + ( (uint16_t) (r*(pgm_read_word(&lookupVDOPressure5Bar[idx+1])-pgm_read_word(&lookupVDOPressure5Bar[idx])))) ) : pgm_read_word(&lookupVDOPressure5Bar[idx]);
 }
-
 /*
  *
  * when supplied with 5V and a 220Ohm Resistor in series (measuring the Voltage on the Sensor)
@@ -117,35 +122,41 @@ uint16_t MapVdo5Bar::map32(uint8_t idx) {
  *         U2 = U * R2/(R1+R2)
  *
  *
- * 12 bit AD -> max 4096 >> 4 max 255
+ * 12 bit AD -> max 4095 >> 4 max 255
  * -> map to 32x1 map
- * max is 5Bar = 1866 => we store only the lower 16 values!
+ * max is 5Bar = 1866
  *
  * stores the pressure in mBar for 16 steps of ad readings
  * [0, 128, 256, 384, 512, 640, 768, 896, 1024, 1152, 1280, 1408, 1536, 1664, 1792, 1920]
  */
 const uint16_t PROGMEM MapVdo5Bar::lookupVDOPressure5Bar[] =
-	{ 0, 0, 107, 333, 571, 834, 1110, 1410, 1752, 2119, 2541, 2950, 3445, 3987, 4622, 5321, 10000 };
+	{ 0, 0, 107, 333, 571, 834, 1110, 1410, 1752, 2119, 2541, 2950, 3445, 3987, 4622, 5321, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 
 MapVdo10Bar::MapVdo10Bar () {
 }
 
-uint16_t MapVdo10Bar::map16(uint8_t idx) {
-    uint8_t l = idx & 0xF;
-    idx = idx >> 4;
-    return idx < 0xF ? (( ( l * pgm_read_word(&lookupVDOPressure10Bar[idx+1]) ) + ( -1 * (l-16) * pgm_read_word(&lookupVDOPressure10Bar[idx])) ) / 16) : pgm_read_word(&lookupVDOPressure10Bar[idx]);
-}
+//uint16_t MapVdo10Bar::map16(uint8_t idx) {
+//    uint8_t l = idx & 0xF;
+//    idx = idx >> 4;
+//    return idx < 0xF ? (( ( l * pgm_read_word(&lookupVDOPressure10Bar[idx+1]) ) + ( -1 * (l-16) * pgm_read_word(&lookupVDOPressure10Bar[idx])) ) / 16) : pgm_read_word(&lookupVDOPressure10Bar[idx]);
+//}
 
-uint16_t MapVdo10Bar::map32(uint8_t idx) {
-	if ( idx == 255 )
-		return 0;
-    uint8_t l = idx & 0x7;
-    idx = idx >> 3;
-    return idx < 0x1F ? (( ( l * pgm_read_word(&lookupVDOPressure10Bar[idx+1]) ) + ( -1 * (l-8) * pgm_read_word(&lookupVDOPressure10Bar[idx])) ) / 8) : pgm_read_word(&lookupVDOPressure10Bar[idx]);
+//uint16_t MapVdo10Bar::map32(uint8_t idx) {
+//	if ( idx == 255 )
+//		return 0;
+//    uint8_t l = idx & 0x7;
+//    idx = idx >> 3;
+//    return idx < 0x1F ? (( ( l * pgm_read_word(&lookupVDOPressure10Bar[idx+1]) ) + ( -1 * (l-8) * pgm_read_word(&lookupVDOPressure10Bar[idx])) ) / 8) : pgm_read_word(&lookupVDOPressure10Bar[idx]);
+//}
+uint16_t MapVdo10Bar::map32(uint16_t idx) {
+	float r = (idx & 0x1F) / 31 ;
+	//map 0-4095 to 0-31
+	idx = idx >> 7;
+	return idx < 0x1F ? (pgm_read_word(&lookupVDOPressure10Bar[idx]) + ( (uint16_t) (r*(pgm_read_word(&lookupVDOPressure10Bar[idx+1])-pgm_read_word(&lookupVDOPressure10Bar[idx])))) ) : pgm_read_word(&lookupVDOPressure10Bar[idx]);
 }
 const uint16_t PROGMEM MapVdo10Bar::lookupVDOPressure10Bar[] =
-	{ 0, 0, 214, 666, 1142, 1668, 2220, 2820, 3504, 4238, 5082, 5900, 6890, 7974, 9244, 10642, 20000 };
+	{ 0, 0, 214, 666, 1142, 1668, 2220, 2820, 3504, 4238, 5082, 5900, 6890, 7974, 9244, 10642, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 
 MapVdo5Bar mapVdo5Bar;
