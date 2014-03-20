@@ -1534,7 +1534,8 @@ void MultidisplayController::serialSend() {
 		}
 		// k-line debug
 		// changed from frequency to timestamp of last received df frame
-		outbuf = df_kline_millis_last_frame_received;
+//		outbuf = df_kline_millis_last_frame_received;
+		outbuf = df_kline_discarded_frames;
 		Serial.write ( (uint8_t*) &(outbuf), sizeof(uint16_t) );
 		// frame number 1 byte
 		Serial.write ( (uint8_t*) &(df_kline_last_frame_completely_received), sizeof(uint8_t) );
@@ -2306,10 +2307,12 @@ void MultidisplayController::DFConvertReceivedData() {
 #ifdef USE_DIGIFANT_RPM
 	//anstatt 9 $4F und 18 $AD
 	uint32_t df_delta_hall = (df_klineData[df_kline_last_frame_completely_received].asBytes[31]<<8) + df_klineData[df_kline_last_frame_completely_received].asBytes[32];
-	if ( df_delta_hall > 0 )
-		data.calRPM = (int) ( ((uint32_t) 30000000) / (uint32_t) df_delta_hall );
-	else
+	if ( df_delta_hall > 0 ) {
+		uint32_t tmp = (uint32_t) ( ((uint32_t) 30000000) / (uint32_t) df_delta_hall );
+		data.calRPM = (int) tmp;
+	} else {
 		data.calRPM = 0;
+	}
 
 	//Check if the RPM is a new Max RPM Event
 	if ( data.calRPM >= data.maxValues[MAXVAL_RPM].rpm ) {
