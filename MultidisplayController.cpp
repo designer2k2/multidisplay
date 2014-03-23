@@ -135,7 +135,7 @@ void  MultidisplayController::myconstructor() {
 
 	DoCheck = 1;
 	SerOut = SERIALOUT_BINARY;
-#ifdef KWP1281_KLINE_DEBUG
+#if defined  (KWP1281_KLINE_DEBUG) || defined (KWP1281_KLINE_MIRROR_TO_SERIAL)
 	SerOut = SERIALOUT_DISABLED;
 #endif
 
@@ -199,48 +199,7 @@ void  MultidisplayController::myconstructor() {
 #endif
 
 #if defined(MULTIDISPLAY_V2) && defined(KWP1281_KLINE)
-	//arduino mega pinout diagram
-	//http://www.pighixxx.com/downloads/arduino-mega-v2/
-	//Serial1 RX: PD2
-	//Serial1 TX: PD3
-	//L: PA7
-	//set L and K/TX to output
-//	Serial1.end();
-	UCSR1B = bitClear(UCSR1B, 4);
-	UCSR1B = bitClear(UCSR1B, 3);
-	DDRD |= 8;
-	DDRD &= ~4;
-
-	UCSR2B = bitClear(UCSR2B, 4);
-	UCSR2B = bitClear(UCSR2B, 3);
-	DDRH |= 2;
-	DDRH &= ~1;
-
-	UCSR3B = bitClear(UCSR3B, 4);
-	UCSR3B = bitClear(UCSR3B, 3);
-	DDRJ |= 2;
-	DDRJ &= ~1;
-//
-//	//Test 2=PE4 3=PE5
-//	//DDRE &= ~8;
-//	DDRE |= 16;
-//	pinMode (3,OUTPUT);
-
-//	DDRD = bitSet(DDRD, 3);
-//	pinMode (18, OUTPUT);
-//	pinMode (19, INPUT);
-//	digitalWrite (18,LOW);
-//	pinMode (16, OUTPUT);
-//	digitalWrite (16,LOW);
-//	pinMode (2, OUTPUT);
-//	DDRA |= 128;
-//	DDRA = bitSet (DDRA,7);
-	kwp1281_connect_failures=0;
-	kwp1281_block_counter=0;
-	kwp1281_state=KWP1281_STATE_NO_CONNECTION;
-	kwp1281_kline_active_frame = 0;
-	kwp1281_kline_index = 0;
-
+	kwp1281Init();
 #ifdef KWP1281_KLINE_DEBUG
 	kwp1281_debug_printtime=0;
 #endif
@@ -814,18 +773,18 @@ Zeitronix: (v*2)+9.6
 	if (data.VDOTemp3 == 65506)
 			data.VDOTemp3 = 0;
 
-	if ( data.anaIn[VDOP1PIN] > 4090 )
+	if ( data.anaIn[VDOP1PIN] > 4070 )
 		data.VDOPres1 = 0;
 	else
 		data.VDOPres1 = mapVdo5Bar.map32 ( data.anaIn[VDOP1PIN] );
 
-	if ( data.anaIn[VDOP2PIN] > 4090 )
+	if ( data.anaIn[VDOP2PIN] > 4070 )
 		data.VDOPres2 = 0;
 	else
 		data.VDOPres2 = mapVdo10Bar.map32 ( data.anaIn[VDOP2PIN] );
 //		data.VDOPres2 = data.anaIn[VDOP2PIN] >> 4;
 
-	if ( data.anaIn[VDOP3PIN] > 4090 )
+	if ( data.anaIn[VDOP3PIN] > 4070 )
 		data.VDOPres3 = 0;
 	else
 		data.VDOPres3 = mapVdo10Bar.map32 ( data.anaIn[VDOP3PIN] );
@@ -2381,20 +2340,15 @@ void MultidisplayController::kwp1281SendControllerAddress(uint8_t address) {
 //	setKLow();
 }
 
-/*
- * hack: temp using Serial2 / Port PH0 / PH1
- *
- * PINH & 1
- * PINH & 1
- */
+
 bool MultidisplayController::kwp1281Connect2 () {
 	kwp1281_state = KWP1281_STATE_HANDSHAKE;
 
-	Serial2.end();
-	UCSR2B = bitClear(UCSR2B, 4);
-	UCSR2B = bitClear(UCSR2B, 3);
-	DDRH |= 2;
-	DDRH &= ~1;
+	Serial1.end();
+	bitClear(UCSR1B, 4);
+	bitClear(UCSR1B, 3);
+	DDRD |= 8;
+	DDRD &= ~4;
 
 	setKLHigh();
 	delay(300);
@@ -2406,22 +2360,20 @@ bool MultidisplayController::kwp1281Connect2 () {
 	//sync pattern from ecu
 	//80ms << t_r1 << 210 ms
 
-	Serial2.begin(10400);
-	UCSR2C |=  48; // odd parity
-	bitClear (UCSR2C,1); //7Bit
+	Serial1.begin(10400);
+//	Serial1.begin(9600);
+	UCSR1C |=  48; // odd parity
+	bitClear (UCSR1C,1); //7Bit
 
-	delay(60);
+	delay(100);
 
 	uint16_t millis_stop = millis() + 250;
 
 	while ( millis() < millis_stop ) {
 		//wait for sync byte 55h
-		if ( Serial2.available() ) {
-			if ( (Serial2.read() & 0x7F) == 0x55 ) {
+		if ( Serial1.available() ) {
+			if ( (Serial1.read() & 0x7F) == 0x55 ) {
 				//got sync byte
-#ifdef KWP1281_KLINE_DEBUG
-				Serial.println ("kwp1281Connect awaiting key bytes");
-#endif
 				break;
 			} else {
 #ifdef KWP1281_KLINE_DEBUG
@@ -2437,10 +2389,13 @@ bool MultidisplayController::kwp1281Connect2 () {
 	//low order key byte from ecu
 	//5ms << t_r2 << 20 ms
 	millis_stop = millis() + 40;
-	uint8_t kb1, kb2;
+	uint8_t kb1 = 0, kb2 = 0;
 	while ( millis() < millis_stop ) {
-		if ( Serial2.available() ) {
-			kb1 = Serial2.read();
+		if ( Serial1.available() ) {
+			kb1 = Serial1.read();
+#ifdef KWP1281_KLINE_MIRROR_TO_SERIAL
+			Serial.write(kb1);
+#endif
 			break;
 		}
 	}
@@ -2449,8 +2404,11 @@ bool MultidisplayController::kwp1281Connect2 () {
 	//1ms << t_r3 << 20 ms
 	millis_stop = millis() + 40;
 	while ( millis() < millis_stop ) {
-		if ( Serial2.available() ) {
-			kb2 = Serial2.read();
+		if ( Serial1.available() ) {
+			kb2 = Serial1.read();
+#ifdef KWP1281_KLINE_MIRROR_TO_SERIAL
+			Serial.write(kb2);
+#endif
 			break;
 		}
 	}
@@ -2471,16 +2429,18 @@ bool MultidisplayController::kwp1281Connect2 () {
 //	Serial2.write (kb2_inv);
 	kwp1281Write (kb2_inv);
 
-#ifdef KWP1281_KLINE_DEBUG
+	//controller changes to 8N1 too
+	//no parity
+	UCSR1C &=  ~48;
+	UCSR1C |= 6; //8Bit
+
+	//|| defined (KWP1281_KLINE_MIRROR_TO_SERIAL)
+#if defined (KWP1281_KLINE_DEBUG)
 	Serial.print ("connect kw ");
 	Serial.print (keyword, 10);
 	Serial.print ("\n");
 #endif
 
-	//controller changes to 8N1 too
-	//no parity
-	UCSR2C &=  ~48;
-	UCSR2C |= 6; //8Bit
 
 	kwp1281_kline_millis_last_byte_received = millis();
 
@@ -2488,141 +2448,189 @@ bool MultidisplayController::kwp1281Connect2 () {
 	kwp1281_state = KWP1281_STATE_SLAVE_RCV_CONTROLLER_DATA;
 	kwp1281_controller_data_block_counter = 0;
 
+
 	return true;
 }
 
-bool MultidisplayController::kwp1281Connect () {
-	kwp1281_state = KWP1281_STATE_HANDSHAKE;
-
-	setKLHigh();
-	delay(300);
-#ifdef KWP1281_KLINE_DEBUG
-	Serial.println ("kwp1281Connect: send ecu address");
-#endif
-	//ecu
-	kwp1281SendControllerAddress (1);
-	//sync pattern from ecu
-	//80ms << t_r1 << 210 ms
-	delay (60);
-
-	/* synchonisation pattern: controller "tells" the baud rate -> measure the usecs of a bit -> baudrate
-	 * newer ecus use only 10400
-	 * older ones could use also 9600 or 1200
-	 */
-	uint16_t millis_stop = millis() + 1000;
-	uint16_t usecs = 0;
-	uint8_t state = 0;
-	uint8_t rx_last_read = 0;
-	uint8_t bits_seen=0;
-	while ( millis() < millis_stop ) {
-		if (state == 0) {
-			//wait for start bit (low)
-			if ( (PINH & 1) == 0 ) {
-				state = 1;
-				rx_last_read = 0;
-#ifdef KWP1281_KLINE_DEBUG
-				Serial.println ("kwp1281Connect: state 0->1");
-#endif
-			}
-		}
-		if (state == 1 ) {
+//bool MultidisplayController::kwp1281Connect () {
+//	kwp1281_state = KWP1281_STATE_HANDSHAKE;
+//
+//	setKLHigh();
+//	delay(300);
 //#ifdef KWP1281_KLINE_DEBUG
-//				Serial.print ("kwp1281Connect: state 1 " );
-//				Serial.print (bits_seen);
-//				Serial.print (" rx=");
-//				if ( (PINH & 1) )
-//					Serial.print ("1");
-//				else
-//					Serial.print ("0");
-//				Serial.print ("\n");
+//	Serial.println ("kwp1281Connect: send ecu address");
 //#endif
-			//measure time
-			if ( rx_last_read == 0 &&  (PINH & 1) == 1 ) {
-				//rising
-				usecs = micros();
-				rx_last_read = 1;
-				bits_seen++;
-			}
-			if ( rx_last_read == 1 &&  (PINH & 1) == 0 ) {
-				//falling
-				usecs = micros() - usecs;
-				rx_last_read = 0;
-				bits_seen++;
-			}
-			if ( bits_seen == 8 )
-				state = 2;
-		}
-		if (state == 2) {
-			//wait for high -> stop bit
-			if ( rx_last_read == 0 &&  (PINH & 1) == 1 ) {
-				//stop bit
+//	//ecu
+//	kwp1281SendControllerAddress (1);
+//	//sync pattern from ecu
+//	//80ms << t_r1 << 210 ms
+//	delay (60);
+//
+//	/* synchonisation pattern: controller "tells" the baud rate -> measure the usecs of a bit -> baudrate
+//	 * newer ecus use only 10400
+//	 * older ones could use also 9600 or 1200
+//	 */
+//	uint16_t millis_stop = millis() + 1000;
+//	uint16_t usecs = 0;
+//	uint8_t state = 0;
+//	uint8_t rx_last_read = 0;
+//	uint8_t bits_seen=0;
+//	while ( millis() < millis_stop ) {
+//		if (state == 0) {
+//			//wait for start bit (low)
+//			if ( (PINH & 1) == 0 ) {
+//				state = 1;
+//				rx_last_read = 0;
+//#ifdef KWP1281_KLINE_DEBUG
+//				Serial.println ("kwp1281Connect: state 0->1");
+//#endif
+//			}
+//		}
+//		if (state == 1 ) {
+////#ifdef KWP1281_KLINE_DEBUG
+////				Serial.print ("kwp1281Connect: state 1 " );
+////				Serial.print (bits_seen);
+////				Serial.print (" rx=");
+////				if ( (PINH & 1) )
+////					Serial.print ("1");
+////				else
+////					Serial.print ("0");
+////				Serial.print ("\n");
+////#endif
+//			//measure time
+//			if ( rx_last_read == 0 &&  (PINH & 1) == 1 ) {
+//				//rising
+//				usecs = micros();
+//				rx_last_read = 1;
+//				bits_seen++;
+//			}
+//			if ( rx_last_read == 1 &&  (PINH & 1) == 0 ) {
+//				//falling
+//				usecs = micros() - usecs;
+//				rx_last_read = 0;
+//				bits_seen++;
+//			}
+//			if ( bits_seen == 8 )
+//				state = 2;
+//		}
+//		if (state == 2) {
+//			//wait for high -> stop bit
+//			if ( rx_last_read == 0 &&  (PINH & 1) == 1 ) {
+//				//stop bit
+//
+//			}
+//		}
+//	}
+//	if ( state < 2 ) {
+//		kwp1281_state = KWP1281_STATE_NO_CONNECTION;
+//		kwp1281_connect_failures++;
+//#ifdef KWP1281_KLINE_DEBUG
+//	Serial.print ("kwp1281Connect EE sync pattern state=");
+//	Serial.print (state, 10);
+//	Serial.print ("\n");
+//#endif
+//		return false;
+//	}
+//#ifdef KWP1281_KLINE_DEBUG
+//	Serial.print ("kwp1281Connect sync pattern received ");
+//	Serial.print (usecs, 10);
+//	Serial.print ("\n");
+//#endif
+//
+//	if (usecs > 800)
+//		Serial2.begin(1200);
+//	else {
+//		if (usecs > 100)
+//			Serial2.begin(9600);
+//		if (usecs < 100)
+//			Serial2.begin(10400);
+//	}
+//
+//#ifdef KWP1281_KLINE_DEBUG
+//	Serial.println ("kwp1281Connect awaiting key bytes");
+//#endif
+//
+//	//low order key byte from ecu
+//	//5ms << t_r2 << 20 ms
+//	millis_stop = millis() + 40;
+//	uint8_t kb1, kb2;
+//	while ( millis() < millis_stop )
+//		if ( Serial2.available() )
+//			kb1 = Serial2.read();
+//
+//	//high order key byte from ecu
+//	//1ms << t_r3 << 20 ms
+//	millis_stop = millis() + 40;
+//	while ( millis() < millis_stop )
+//		if ( Serial2.available() )
+//			kb2 = Serial2.read();
+//	//ecu sends keywords 701, we receive 8N1
+//	kb1 = kb1 & 0x7F;
+//	uint8_t kb2_inv = 0xFF - kb2;
+//	kb2 = kb2 & 0x7F;
+//	uint16_t keyword = kb1 + kb2*128;
+//
+//	//send complement from kb2 back
+//	delay(25);
+//	Serial2.write (kb2_inv);
+//
+//#ifdef KWP1281_KLINE_DEBUG
+//	Serial.print ("kwp1281Connect keyword=");
+//	Serial.print (keyword, 10);
+//	Serial.print ("\n");
+//#endif
+//
+//	//controller changes to 8N1 too
+//	//now ecu sends vehicle data
+//	kwp1281_state = KWP1281_STATE_SLAVE_RCV_CONTROLLER_DATA;
+//	kwp1281_controller_data_block_counter = 0;
+//}
 
-			}
-		}
-	}
-	if ( state < 2 ) {
-		kwp1281_state = KWP1281_STATE_NO_CONNECTION;
-		kwp1281_connect_failures++;
-#ifdef KWP1281_KLINE_DEBUG
-	Serial.print ("kwp1281Connect EE sync pattern state=");
-	Serial.print (state, 10);
-	Serial.print ("\n");
-#endif
-		return false;
-	}
-#ifdef KWP1281_KLINE_DEBUG
-	Serial.print ("kwp1281Connect sync pattern received ");
-	Serial.print (usecs, 10);
-	Serial.print ("\n");
-#endif
 
-	if (usecs > 800)
-		Serial2.begin(1200);
-	else {
-		if (usecs > 100)
-			Serial2.begin(9600);
-		if (usecs < 100)
-			Serial2.begin(10400);
-	}
+void MultidisplayController::kwp1281Init(bool resetConnectionFailures) {
+	//arduino mega pinout diagram
+	//http://www.pighixxx.com/downloads/arduino-mega-v2/
+	//Serial1 RX: PD2
+	//Serial1 TX: PD3
+	//L: PA7
+	//set L and K/TX to output
+	Serial1.end();
+	bitClear(UCSR1B, 4);
+	bitClear(UCSR1B, 3);
+	DDRD |= 8;
+	DDRD &= ~4;
 
-#ifdef KWP1281_KLINE_DEBUG
-	Serial.println ("kwp1281Connect awaiting key bytes");
-#endif
+//	UCSR2B = bitClear(UCSR2B, 4);
+//	UCSR2B = bitClear(UCSR2B, 3);
+//	DDRH |= 2;
+//	DDRH &= ~1;
+//
+//	UCSR3B = bitClear(UCSR3B, 4);
+//	UCSR3B = bitClear(UCSR3B, 3);
+//	DDRJ |= 2;
+//	DDRJ &= ~1;
 
-	//low order key byte from ecu
-	//5ms << t_r2 << 20 ms
-	millis_stop = millis() + 40;
-	uint8_t kb1, kb2;
-	while ( millis() < millis_stop )
-		if ( Serial2.available() )
-			kb1 = Serial2.read();
+	//
+//	//Test 2=PE4 3=PE5
+//	//DDRE &= ~8;
+//	DDRE |= 16;
+//	pinMode (3,OUTPUT);
 
-	//high order key byte from ecu
-	//1ms << t_r3 << 20 ms
-	millis_stop = millis() + 40;
-	while ( millis() < millis_stop )
-		if ( Serial2.available() )
-			kb2 = Serial2.read();
-	//ecu sends keywords 701, we receive 8N1
-	kb1 = kb1 & 0x7F;
-	uint8_t kb2_inv = 0xFF - kb2;
-	kb2 = kb2 & 0x7F;
-	uint16_t keyword = kb1 + kb2*128;
-
-	//send complement from kb2 back
-	delay(25);
-	Serial2.write (kb2_inv);
-
-#ifdef KWP1281_KLINE_DEBUG
-	Serial.print ("kwp1281Connect keyword=");
-	Serial.print (keyword, 10);
-	Serial.print ("\n");
-#endif
-
-	//controller changes to 8N1 too
-	//now ecu sends vehicle data
-	kwp1281_state = KWP1281_STATE_SLAVE_RCV_CONTROLLER_DATA;
-	kwp1281_controller_data_block_counter = 0;
+//	DDRD = bitSet(DDRD, 3);
+//	pinMode (18, OUTPUT);
+//	pinMode (19, INPUT);
+//	digitalWrite (18,LOW);
+//	pinMode (16, OUTPUT);
+//	digitalWrite (16,LOW);
+//	pinMode (2, OUTPUT);
+//	DDRA |= 128;
+//	DDRA = bitSet (DDRA,7);
+	if ( resetConnectionFailures )
+		kwp1281_connect_failures=0;
+	kwp1281_block_counter=0;
+	kwp1281_state=KWP1281_STATE_NO_CONNECTION;
+	kwp1281_kline_active_frame = 0;
+	kwp1281_kline_index = 0;
 }
 
 void MultidisplayController::kwp1281 () {
@@ -2639,11 +2647,13 @@ void MultidisplayController::kwp1281 () {
 	switch (kwp1281_state) {
 
 	case KWP1281_STATE_NO_CONNECTION :
-		if ( kwp1281_connect_failures < KWP1281_MAX_CONNECTION_ATTEMPTS )
+		if ( kwp1281_connect_failures < KWP1281_MAX_CONNECTION_ATTEMPTS ) {
+			kwp1281Init(false);
 			if ( kwp1281Connect2() ) {
 				kwp1281_state = KWP1281_STATE_SLAVE_RCV_CONTROLLER_DATA;
 				kwp1281ReceiveBlock (true);
 			}
+		}
 		break;
 	case KWP1281_STATE_HANDSHAKE:
 		break;
@@ -2658,15 +2668,22 @@ void MultidisplayController::kwp1281 () {
 					kwp1281_controller_data_more_than_four_blocks = false;
 				kwp1281_state = KWP1281_STATE_ESTABLISHED_MASTER_SEND_ACK;
 				kwp1281_send_block_state = 0;
-				//TODO do something with the received string
+			}
+			//TODO do something with the received string
 #ifdef KWP1281_KLINE_DEBUG
-				Serial.println ("controller data");
-				for (uint8_t i = 3 ; i < kwp1281_kline_index ; i++)
-					Serial.write (kwp1281_klineData[kwp1281_kline_active_frame].asBytes[i]);
-				Serial.print("\n");
+			Serial.println ("controller data 2");
+			Serial.print ("idx=");
+			Serial.print ( kwp1281_kline_index);
+			Serial.print (" block length=");
+			Serial.print(kwp1281_block_length);
+
+			for (uint8_t i = 3 ; i < kwp1281_kline_index ; i++) {
+				Serial.write (kwp1281_klineData[kwp1281_kline_active_frame].asBytes[i]);
+				Serial.print (" ");
+			}
+			Serial.print("\n");
 #endif
 
-			}
 			kwp1281_controller_data_block_counter++;
 		}
 
@@ -2690,8 +2707,8 @@ void MultidisplayController::kwp1281 () {
 		//3 block length, block counter, ack cmd 9, block end 3 (no response)
 		if ( kwp1281_send_block_state % 2 ) {
 			//odd -> receiv
-			 if ( Serial2.available() ) {
-					Serial2.read();
+			 if ( Serial1.available() ) {
+					Serial1.read();
 					kwp1281_send_block_state++;
 			 } else {
 				 if ( kwp1281_kline_millis_last_byte_send + KWP1281_INTERBLOCK_TIMEOUT > millis() )
@@ -2739,6 +2756,12 @@ void MultidisplayController::kwp1281 () {
 			switch ( kwp1281_block_title ) {
 			case KWP1281_COMMAND_ASCII_DATA:
 				//TODO do somethin with
+#ifdef KWP1281_KLINE_DEBUG
+				Serial.println ("controller data 5");
+				for (uint8_t i = 3 ; i < kwp1281_kline_index ; i++)
+					Serial.print (kwp1281_klineData[kwp1281_kline_active_frame].asBytes[i]);
+				Serial.print("\n");
+#endif
 				kwp1281_state = KWP1281_STATE_ESTABLISHED_MASTER_SEND_ACK;
 				break;
 			case KWP1281_COMMAND_ACK:
@@ -2816,22 +2839,41 @@ bool MultidisplayController::kwp1281ReceiveBlock( bool init ) {
 }
 
 bool MultidisplayController::kwp1281Read () {
-	if ( Serial2.available() ) {
+	if ( Serial1.available() ) {
 		kwp1281_kline_index++;
-		kwp1281_klineData[kwp1281_kline_active_frame].asBytes[kwp1281_kline_index] = Serial2.read();
+		if ( kwp1281_kline_index >= KWP1281_KLINEFRAMESIZE ) {
+			//this shouldnt happen!
+			kwp1281_kline_index = KWP1281_KLINEFRAMESIZE - 1;
+			kwp1281_state = KWP1281_STATE_NO_CONNECTION;
+#ifdef KWP1281_KLINE_DEBUG
+			Serial.println ("EE read too many bytes!!!");
+#endif
+		}
+		kwp1281_klineData[kwp1281_kline_active_frame].asBytes[kwp1281_kline_index] = Serial1.read();
 		kwp1281_kline_millis_last_byte_received = millis();
 #ifdef KWP1281_KLINE_DEBUG
-		Serial.print ("data ");
-		Serial.print (kwp1281_klineData[kwp1281_kline_active_frame].asBytes[kwp1281_kline_index]);
+		Serial.print ("rx ");
+		Serial.println (kwp1281_klineData[kwp1281_kline_active_frame].asBytes[kwp1281_kline_index]);
 		Serial.write ("\n");
+#endif
+#ifdef KWP1281_KLINE_MIRROR_TO_SERIAL
+		Serial.write (kwp1281_klineData[kwp1281_kline_active_frame].asBytes[kwp1281_kline_index]);
 #endif
 		return true;
 	}
 	return false;
 }
 void MultidisplayController::kwp1281Write (uint8_t d) {
-	Serial2.write(d);
+	Serial1.write(d);
 	kwp1281_kline_millis_last_byte_send = millis();
+#ifdef KWP1281_KLINE_DEBUG
+	Serial.print ("tx ");
+	Serial.println (d);
+	Serial.write ("\n");
+#endif
+#ifdef KWP1281_KLINE_MIRROR_TO_SERIAL
+	Serial.write (d);
+#endif
 }
 
 #endif

@@ -103,7 +103,7 @@ MapVdo5Bar::MapVdo5Bar () {
 //    return idx < 0x1F ? (( ( l * pgm_read_word(&lookupVDOPressure5Bar[idx+1]) ) + ( -1 * (l-8) * pgm_read_word(&lookupVDOPressure5Bar[idx])) ) / 8) : pgm_read_word(&lookupVDOPressure5Bar[idx]);
 //}
 uint16_t MapVdo5Bar::map32(uint16_t idx) {
-	float r = (idx & 0x1F) / 31 ;
+	float r = (idx & 0x7F) / 127.0 ;
 	//map 0-4095 to 0-31
 	idx = idx >> 7;
 	return idx < 0x1F ? (pgm_read_word(&lookupVDOPressure5Bar[idx]) + ( (uint16_t) (r*(pgm_read_word(&lookupVDOPressure5Bar[idx+1])-pgm_read_word(&lookupVDOPressure5Bar[idx])))) ) : pgm_read_word(&lookupVDOPressure5Bar[idx]);
@@ -150,7 +150,7 @@ MapVdo10Bar::MapVdo10Bar () {
 //    return idx < 0x1F ? (( ( l * pgm_read_word(&lookupVDOPressure10Bar[idx+1]) ) + ( -1 * (l-8) * pgm_read_word(&lookupVDOPressure10Bar[idx])) ) / 8) : pgm_read_word(&lookupVDOPressure10Bar[idx]);
 //}
 uint16_t MapVdo10Bar::map32(uint16_t idx) {
-	float r = (idx & 0x1F) / 31 ;
+	float r = (idx & 0x7F) / 127.0 ;
 	//map 0-4095 to 0-31
 	idx = idx >> 7;
 	return idx < 0x1F ? (pgm_read_word(&lookupVDOPressure10Bar[idx]) + ( (uint16_t) (r*(pgm_read_word(&lookupVDOPressure10Bar[idx+1])-pgm_read_word(&lookupVDOPressure10Bar[idx])))) ) : pgm_read_word(&lookupVDOPressure10Bar[idx]);

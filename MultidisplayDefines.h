@@ -29,12 +29,13 @@
 
 //choose your engines ecu
 //only one of them should be defined!
-//#define VR6_MOTRONIC
-//#define KWP1281_KLINE
-//#define KWP1281_KLINE_DEBUG 1
+#define VR6_MOTRONIC
+#define KWP1281_KLINE
+#define KWP1281_KLINE_DEBUG 1
+//#define KWP1281_KLINE_MIRROR_TO_SERIAL 1
 
-#define DIGIFANT
-#define DIGIFANT_KLINE
+//#define DIGIFANT
+//#define DIGIFANT_KLINE
 #define DIGIFANT_DK_POTI
 
 #define USE_DIGIFANT_MAPSENSOR
@@ -333,7 +334,7 @@ typedef unsigned char byte;
 
 //PA7
 #define V2_LLINE 29
-#define KWP1281_KLINEFRAMESIZE 34
+#define KWP1281_KLINEFRAMESIZE 40
 #define KWP1281_KLINE_STORE_FRAME_COUNT 2
 
 #define KWP1281_STATE_NO_CONNECTION 0
