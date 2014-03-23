@@ -2003,7 +2003,69 @@ void MultidisplayController::mainLoop() {
 
 
 void MultidisplayController::buttonCheck_V2()  {
-	//TODO implement me!
+
+    int ButtonState = 3;
+    int reading = 0;
+
+    /*
+    3 = open
+    1 = s1
+    2 = s2
+    */
+
+    //V2, the Buttons are direct connected to IO´s!
+    reading = digitalRead(V2_BUTTON1);
+    if(reading == 1)
+    {
+      ButtonState = ButtonState - 2;
+      reading = 0;
+    }
+
+    reading = digitalRead(V2_BUTTON2);
+    if(reading == 1)
+    {
+      ButtonState = ButtonState - 1;
+    }
+
+    //now a little inteligent stuff:
+
+    switch(ButtonState) {
+      case 1:
+       if(buttonTime == 0)
+       {
+             buttonAPressed();
+             buttonTime = millis();
+       }
+       else
+       {
+             if(millis()>=buttonTime+BUTTONHOLD)
+             {
+               buttonAHold();
+               buttonTime = millis();
+             }
+       }
+       break;
+
+      case 2:
+       if(buttonTime == 0)
+       {
+             buttonBPressed();
+             buttonTime = millis();
+       }
+       else
+       {
+             if(millis()>=buttonTime+BUTTONHOLD)
+             {
+               buttonBHold();
+               buttonTime = millis();
+             }
+       }
+       break;
+
+      case 3:
+       buttonTime = 0;
+       break;
+      }
 }
 
 
