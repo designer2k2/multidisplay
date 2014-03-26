@@ -21,6 +21,7 @@
 #include "LCDController.h"
 #include "RPMBoostController.h"
 #include "Map16x1.h"
+#include "Map32x1.h"
 
 #include <stdlib.h>
 #include <inttypes.h>
@@ -652,6 +653,7 @@ Zeitronix: (v*2)+9.6
 #endif
 
 #if defined(DIGIFANT) && defined(DIGIFANT_DK_POTI)
+	//TODO move wiring to throttle pin!
 //	data.calThrottle = data.anaIn[LMMPIN] ;
 	data.calThrottle = map(data.anaIn[LMMPIN], THROTTLE_S2_MIN, THROTTLE_S2_MAX, 0, 100);
 	data.calThrottle = constrain(data.calThrottle, 0, 100);
@@ -2013,7 +2015,7 @@ void MultidisplayController::buttonCheck_V2()  {
     2 = s2
     */
 
-    //V2, the Buttons are direct connected to IO´s!
+    //V2, the Buttons are direct connected to IOï¿½s!
     reading = digitalRead(V2_BUTTON1);
     if(reading == 1)
     {

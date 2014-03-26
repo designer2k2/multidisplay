@@ -77,6 +77,12 @@ void RPMBoostController::compute () {
 		req_Boost_PWM = lowboost_duty_cycle[gear_index]->map(data.rpm_map_idx);
 		req_Boost = lowboost_pid_boost[gear_index]->map(data.rpm_map_idx);
 	}
+#if ( ( defined(DIGIFANT) && defined(DIGIFANT_DK_POTI) ) || ( defined (VR6_MOTRONIC) ) )
+	// throttle poti -> throttle plate open 0..100 %
+	// adjust requested boost
+	req_Boost_PWM = req_Boost_PWM * mapThrottleBoostReduction.map ( data.calThrottle );
+	req_Boost = req_Boost * mapThrottleBoostReduction.map ( data.calThrottle );
+#endif
 
 	if ( usePID ) {
 		//give the PID the requested boost level
@@ -108,28 +114,34 @@ void RPMBoostController::compute () {
 			pidBoostOutput = req_Boost_PWM;
 			//set the map pwm as output pwm
 			//we want a silent N75 on idle
-#ifdef DIGIFANT_KLINE
+#if defined (DIGIFANT_KLINE) && not defined(DIGIFANT_DK_POTI)
+			//only wot and idle switch
 			if ( data.calRPM > 1200 && ( data.calThrottle > 50 ||
 					( mController.df_klineData[mController.df_kline_last_frame_completely_received].asBytes[7] & 8) ) )
-#else
-			if ( data.calRPM > 1200 && ( data.calThrottle > 50 ) )
-#endif
 				boostOutput = req_Boost_PWM;
-			else boostOutput = 0;
+			else
+				boostOutput = 0;
+#else
+			// throttle poti -> output already adjusted!
+			boostOutput = req_Boost_PWM;
+#endif
+		//t
 //			boostOutput = req_Boost_PWM;
 		}
 	} else {
 		//no PID
 		//we want a silent N75 on idle
-#ifdef DIGIFANT_KLINE
+#if defined (DIGIFANT_KLINE) && not defined(DIGIFANT_DK_POTI)
+		//only wot and idle switch
 		if ( data.calRPM > 1200 && ( data.calThrottle > 50 ||
 				( mController.df_klineData[mController.df_kline_last_frame_completely_received].asBytes[7] & 8) ) )
-#else
-		if ( data.calRPM > 1200 && ( data.calThrottle > 50 ) )
-#endif
 			boostOutput = req_Boost_PWM;
 		else
 			boostOutput = 0;
+#else
+		// throttle poti -> throttle plate open 0..100 %  -> output already adjusted!
+		boostOutput = req_Boost_PWM;
+#endif
 		//test
 //		boostOutput = req_Boost_PWM;
 	}

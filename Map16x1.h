@@ -49,30 +49,15 @@ public:
 	double *data;
 };
 
-
-class MapVdo5Bar {
+class MapThrottleBoostReduction {
 public:
-	MapVdo5Bar();
+	MapThrottleBoostReduction();
 
-//	uint16_t map16 (uint8_t);
-//	uint16_t map32 (uint8_t);
-	uint16_t map32 (uint16_t);
+	double map (uint8_t);
 
-	static const uint16_t PROGMEM lookupVDOPressure5Bar[];
+	static const float PROGMEM lookupThrottleBoostReduction[];
 };
 
-class MapVdo10Bar {
-public:
-	MapVdo10Bar();
-
-//	uint16_t map16 (uint8_t);
-//	uint16_t map32 (uint8_t);
-	uint16_t map32 (uint16_t);
-
-	static const uint16_t PROGMEM lookupVDOPressure10Bar[];
-};
-
-extern MapVdo5Bar mapVdo5Bar;
-extern MapVdo10Bar mapVdo10Bar;
+extern MapThrottleBoostReduction mapThrottleBoostReduction;
 
 #endif /* MAP16X1_H_ */
