@@ -196,7 +196,7 @@
 #define THROTTLE_VR6_MAX 3530
 
 #define THROTTLE_S2_MIN 622            //Calibration for Throttle
-#define THROTTLE_S2_MAX 3997
+#define THROTTLE_S2_MAX 3597
 
 
 //choose only 1 of them
