@@ -247,7 +247,7 @@ void  MultidisplayController::myconstructor() {
 
 #ifdef LCD
 	lcdController.myconstructor();
-//	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
+	lcdController.lcdShowIntro(INITTIME);                      //Shows the Into
 	lcdController.init();
 #endif
 
