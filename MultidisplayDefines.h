@@ -26,6 +26,7 @@
 #define MULTIDISPLAY_V1
 #endif
 
+#define WATCHDOG
 
 //choose your engines ecu
 //only one of them should be defined!
@@ -192,10 +193,12 @@
 #define LAMBDALOWERLIMIT 3
 #define LAMBDAUPPERLIMIT 15
 
-#define THROTTLE_VR6_MIN 620            //Calibration for Throttle
+//Calibration for Throttle
+#define THROTTLE_VR6_MIN 620
 #define THROTTLE_VR6_MAX 3530
 
-#define THROTTLE_S2_MIN 622            //Calibration for Throttle
+//#define THROTTLE_S2_MIN 622
+#define THROTTLE_S2_MIN 560
 #define THROTTLE_S2_MAX 3597
 
 
@@ -361,5 +364,9 @@ typedef unsigned char byte;
 #define KWP1281_DEBUG_TIME 1000
 
 #define KWP1281_COMP(a) (0xFF - a)
+
+
+//internal test mode used to verify the code -> dont use in production!
+//#define DEV_INTERNAL_TEST_MODE
 
 #endif /* MULTIDISPLAY_DEFINES_H_ */

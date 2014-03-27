@@ -106,3 +106,29 @@ float fixedintb10002float (uint16_t in) {
 	return (float) (in / 1000.0);
 }
 
+void watchdogOn() {
+	//http://forum.arduino.cc/index.php?topic=176329.0
+
+	// Clear the reset flag, the WDRF bit (bit 3) of MCUSR.
+	MCUSR = MCUSR & 0b11110111;
+
+	// Set the WDCE bit (bit 4) and the WDE bit (bit 3)
+	// of WDTCSR. The WDCE bit must be set in order to
+	// change WDE or the watchdog prescalers. Setting the
+	// WDCE bit will allow updtaes to the prescalers and
+	// WDE for 4 clock cycles then it will be reset by
+	// hardware.
+	WDTCSR = WDTCSR | 0b00011000;
+
+	// Set the watchdog timeout prescaler value to 256 K
+	// which will yeild a time-out interval of about 2.0 s.
+	//WDTCSR = 0b00000111;
+	//4secs
+	WDTCSR = 0b00100000;
+	//8secs
+	//WDTCSR = 0b00100001;
+
+	// Enable the watchdog timer interupt.
+	WDTCSR = WDTCSR | 0b01000000;
+	MCUSR = MCUSR & 0b11110111;
+}

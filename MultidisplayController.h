@@ -298,6 +298,10 @@ public:
 	uint8_t oled_flags;
 #endif
 
+#ifdef TEST_MODE
+	uint8_t testC;
+	void testMode();
+#endif
 
 };
 

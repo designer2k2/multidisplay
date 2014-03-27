@@ -40,4 +40,6 @@ float fixedintb1002float (uint16_t in);
 uint16_t float2fixedintb1000 (float in);
 float fixedintb10002float (uint16_t in);
 
+void watchdogOn();
+
 #endif /* UTIL_H_ */

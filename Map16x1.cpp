@@ -92,10 +92,15 @@ MapThrottleBoostReduction::MapThrottleBoostReduction() {
 }
 
 double MapThrottleBoostReduction::map (uint8_t idx) {
-    uint8_t l = idx & 0xF;
+//    uint8_t l = idx & 0xF;
+//    idx = idx >> 4;
+//    return idx < 0xF ? (( ( l * pgm_read_word(&lookupThrottleBoostReduction[idx+1]) ) + ( -1 * (l-16) * pgm_read_word(&lookupThrottleBoostReduction[idx])) ) / 16) : pgm_read_word(&lookupThrottleBoostReduction[idx]);
+    float r = (idx & 0xF) / 15.0 ;
+    //map 0-255 to 0-15
     idx = idx >> 4;
-    return idx < 0xF ? (( ( l * pgm_read_word(&lookupThrottleBoostReduction[idx+1]) ) + ( -1 * (l-16) * pgm_read_word(&lookupThrottleBoostReduction[idx])) ) / 16) : pgm_read_word(&lookupThrottleBoostReduction[idx]);
+    return idx < 0xF ? (pgm_read_float(&lookupThrottleBoostReduction[idx]) + (r*(pgm_read_float(&lookupThrottleBoostReduction[idx+1])-pgm_read_float(&lookupThrottleBoostReduction[idx]))) ) : pgm_read_float(&lookupThrottleBoostReduction[idx]);
 }
+
 
 const float PROGMEM MapThrottleBoostReduction::lookupThrottleBoostReduction[] =
 	{ 0.0, 0.0, 0.0, 0.0, 0.3, 0.8, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };

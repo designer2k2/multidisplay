@@ -17,6 +17,7 @@
     along with Multidisplay.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <avr/wdt.h>
 
 #include <Arduino.h>
 
@@ -51,6 +52,7 @@ RPMBoostController boostController;
 LCD4Bit lcd(4);
 
 int main(void) {
+
 	/* Must call init for arduino to work properly */
     init();
 

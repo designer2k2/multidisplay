@@ -27,6 +27,7 @@
 #include <inttypes.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
+#include <avr/wdt.h>
 #include <Arduino.h>
 #include <EEPROM.h>
 
@@ -302,6 +303,11 @@ void  MultidisplayController::myconstructor() {
 	pinMode (V2_SHIFTLED1PIN, OUTPUT);
 	pinMode (V2_SHIFTLED2PIN, OUTPUT);
 	pinMode (V2_SHIFTLED3PIN, OUTPUT);
+
+#ifdef WATCHDOG
+	watchdogOn();
+#endif
+
 }
 
 #ifdef BW_EFR_SPEEDSENSOR
@@ -1837,6 +1843,11 @@ void MultidisplayController::CheckLimits()
 
 
 void MultidisplayController::mainLoop() {
+
+#ifdef WATCHDOG
+	wdt_reset();
+#endif
+
 	//Current Time:
 	time = millis();
 
@@ -1854,7 +1865,9 @@ void MultidisplayController::mainLoop() {
 
 	AnaConversion();
 
-
+#ifdef TEST_MODE
+	testMode();
+#endif
 
 #ifdef V1_RPM_SHIFT_LIGHT
 	V1_Shiftlight();
@@ -3003,5 +3016,12 @@ void MultidisplayController::gear_computation () {
 		break;
 	}
 }
-
 #endif
+
+#ifdef TEST_MODE
+	void MultidisplayController::testMode() {
+		++testC;
+		data.calThrottle = testC;
+	}
+#endif /*TEST_MODE*/
+
