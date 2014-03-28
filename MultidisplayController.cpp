@@ -474,10 +474,7 @@ int MultidisplayController::read_adc_fast (uint8_t channel){
 }
 
 
-/**
- * reads the 12bit adc -> analog values between 0 and 2^12
- * \see http://www.arduino.cc/playground/Code/MCP3208
- */
+
 int MultidisplayController::read_adc(uint8_t channel){
 	//TODO replace digital write http://code.google.com/p/multidisplay/issues/detail?id=3
 
@@ -1625,10 +1622,7 @@ int MultidisplayController::GetVDOTemp(unsigned int ADWreading) {
 
 
 
-/*
- * Converts the ADW Reading into 0.1Bar (must be divided by 10 for Bar)
- * @deprecated too slow!
- */
+
 int MultidisplayController::GetVDOPressure(unsigned int ADWreading) {
 	int LookedupValue = 0;
 	//This searches the 2 surrounding values, and then linear interpolates between them.

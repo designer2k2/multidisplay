@@ -135,16 +135,39 @@ public:
       int32_t asFixedInt32[12];
     } srData;
 
+    /**
+     * software SPI
+     * reads the 12bit adc -> analog values between 0 and 2^12
+     * \see http://www.arduino.cc/playground/Code/MCP3208
+     */
 	int read_adc(uint8_t channel);
-
+    /**
+     * software SPI, faster implementation for ATMega328p
+     * reads the 12bit adc -> analog values between 0 and 2^12
+     * \see http://www.arduino.cc/playground/Code/MCP3208
+     */
 	int read_adc_fast(uint8_t channel);
+    /**
+     * software SPI, faster implementation for ATMega1280/2560
+     * reads the 12bit adc -> analog values between 0 and 2^12
+     * \see http://www.arduino.cc/playground/Code/MCP3208
+     */
 	int read_adc_fast_mega(uint8_t channel);
 
+	/** hardware I2C write the IO expander PCF8574P */
 	void expanderWrite(byte _data);
+	/** hardware I2C read the IO expander PCF8574P */
 	byte expanderRead();
+	/** hardware I2C write the IO expander PCF8574P */
 	void expanderWrite2(byte _data);
+	/** hardware I2C read the IO expander PCF8574P */
 	byte expanderRead2();
+
+	/**
+	 * converts the read digitized values to human readable units
+	 */
 	void AnaConversion();
+
 	void V1_Shiftlight();
 
 	void V2_WarnLED();
@@ -158,6 +181,10 @@ public:
 
 	int GetTypKTemp(unsigned int microVolts);
 	int GetVDOTemp(unsigned int ADWreading);
+	/**
+	 * Converts the ADW Reading into 0.1Bar (must be divided by 10 for Bar)
+	 * @deprecated too slow! -> use VDO Map lookup instead!
+	 */
 	int GetVDOPressure(unsigned int ADWreading);
 
 	//TypK state machine
