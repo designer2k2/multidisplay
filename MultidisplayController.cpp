@@ -1505,6 +1505,13 @@ void MultidisplayController::serialSend() {
 		Serial.write ( (uint8_t*) &(df_kline_last_frame_completely_received), sizeof(uint8_t) );
 #endif
 
+#if defined(MULTIDISPLAY_V2) && defined(VR6_MOTRONIC)
+		// 35 bytes
+		outbuf = 0;
+		for ( uint8_t i = 0; i < 35 ; i++ )
+			Serial.write ( (uint8_t*) &(outbuf), sizeof(uint8_t) );
+#endif
+
 		break;
 
 	default:

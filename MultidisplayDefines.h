@@ -205,6 +205,8 @@
 //choose only 1 of them
 //#define USE_RPM_ONBOARD
 #define USE_DIGIFANT_RPM
+//20K
+//#define RPMFACTOR 5.21
 #define RPMFACTOR 2.34              //Calibration for RPM (its 2.34!)
 #define RPMSMOOTH 5                 //how many readings will be taken for the smoothing (5 is quick and smooth, 10 would be supersmooth but its getting slow)
 #define RPMMAX 3400                 //its about 8k
