@@ -31,29 +31,24 @@
 //choose your engines ecu
 //only one of them should be defined!
 //#define VR6_MOTRONIC
-//#define KWP1281_KLINE
-//#define KWP1281_KLINE_DEBUG 1
-//#define KWP1281_KLINE_MIRROR_TO_SERIAL 1
-
 #define DIGIFANT
-#define DIGIFANT_KLINE
-#define DIGIFANT_DK_POTI
 
-#define USE_DIGIFANT_MAPSENSOR
-//#define BOOST_PLX_SMVACBOOST
-//#define BOOST_MOTOROLA_MPX4250
-//#define BOOST_FREESCALE_MPXA6400A
-//on boostpin2
-//#define BOOST_BOSCH_200KPA
+#if defined VR6_MOTRONIC
+#include "MultiDisplayDefinesVR6.h"
+#endif
+#if defined DIGIFANT
+#include "MultiDisplayDefinesDigifant.h"
+#endif
+
 
 #define GEARS 6
 #define GEAR_RECOGNITION
 //215 40 R16
-#define ABROLLUMFANG 1.764
+//#define ABROLLUMFANG 1.764
 //195 50 R15
 //#define ABROLLUMFANG 1.757
 //205 40 R17
-//#define ABROLLUMFANG 1.818
+#define ABROLLUMFANG 1.818
 
 #define BOOSTN75
 #define BOOST_MODE_NORMAL 1
@@ -64,7 +59,7 @@
 
 #define READFROMEEPROM
 
-#define TYPE_K
+//#define TYPE_K
 #define BW_EFR_SPEEDSENSOR
 //Port PL0 / Timer 4
 #define BW_EFR_SPEEDSENSOR_PIN 49
@@ -77,7 +72,7 @@
 
 //Options:
 
-#define V2DEVDEBUG 1
+//#define V2DEVDEBUG 1
 //#define BLUETOOTH_ON_SERIAL2 1
 //#define BLUETOOTH_SETUP_ON_SERIAL2
 
@@ -157,11 +152,6 @@
 #define NORDSCHLEIFENPIN A1
 #endif
 
-#define LAMBDA_WIDEBAND
-#define LAMBDA_PLX_SMAFR
-//#define LAMBDA_INNOVATE_LC1
-//#define LAMBDASTANDALONE A2
-
 //left of lcd pins
 #define FREEPWM2 10
 #define N75PIN 11
@@ -196,32 +186,44 @@
 #define LAMBDAUPPERLIMIT 15
 
 //Calibration for Throttle
-#define THROTTLE_VR6_MIN 620
-#define THROTTLE_VR6_MAX 3530
+#define THROTTLE_VR6_16BIT_MIN 620
+#define THROTTLE_VR6_16BIT_MAX 3530
+
+#define THROTTLE_VR6_8BIT_MIN 409
+#define THROTTLE_VR6_8BIT_MAX 3600
 
 //#define THROTTLE_S2_MIN 622
 #define THROTTLE_S2_MIN 560
 #define THROTTLE_S2_MAX 3597
 
 
+/* <moved to ecu specific define file> */
 //choose only 1 of them
 //#define USE_RPM_ONBOARD
-#define USE_DIGIFANT_RPM
+//#define USE_DIGIFANT_RPM
 //20K
 //#define RPMFACTOR 5.21
-#define RPMFACTOR 2.34              //Calibration for RPM (its 2.34!)
+//#define RPMFACTOR 2.34              //Calibration for RPM (its 2.34!)
+/* </moved to ecu specific define file> */
+
 #define RPMSMOOTH 5                 //how many readings will be taken for the smoothing (5 is quick and smooth, 10 would be supersmooth but its getting slow)
 #define RPMMAX 3400                 //its about 8k
 
+/* <moved to ecu specific define file> */
+
 //#define SPEEDFACTOR 0.390625
-#define SPEEDFACTOR 0.38
-#define SPEEDCORRECTIONFACTOR 0.9
+//#define SPEEDFACTOR 0.38
+//#define SPEEDCORRECTIONFACTOR 0.9
 //#define SPEEDCORRECTIONFACTOR 1
+/* </moved to ecu specific define file> */
+
 #define SPEEDSMOOTH 5
 #define SPEEDPIN 4 //analog 4
 
+/* <moved to ecu specific define file> */
+//#define NUMBER_OF_ATTACHED_TYPE_K 5   //how many TypK`s are attached
+/* </moved to ecu specific define file> */
 #define TEMPTYPEKREADINGS 28         //how many entrys are in the Lookup Table
-#define NUMBER_OF_ATTACHED_TYPE_K 5   //how many TypK`s are attached
 #define MAX_ATTACHED_TYPE_K 8			//max typk which can be attached
 #define MAX_TYPE_K 1200                //over that will be seen as Open.
 

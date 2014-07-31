@@ -650,9 +650,21 @@ Zeitronix: (v*2)+9.6
 
 #ifdef VR6_MOTRONIC
 	//Throttle:
+#ifdef VR6_MOTRONIC_M381
+	//VR6 16Bit has 5V for closed and 0V for open throttle...
 	data.calThrottle = map(data.anaIn[THROTTLEPIN], THROTTLE_VR6_MIN, THROTTLE_VR6_MAX, 0, 100);
 	data.calThrottle = constrain(data.calThrottle, 0, 100);
-	data.calThrottle = 100 - data.calThrottle;                 //VR6 has 5V for closed and 0V for open throttle...
+	data.calThrottle = 100 - data.calThrottle;
+#endif
+
+#ifdef VR6_MOTRONIC_M2X
+	//ABV Vetteiler 8Bit: 0,5 closed, 4,5 full open throttle
+//	data.calThrottle = 5.0*data.anaIn[THROTTLEPIN]/4095.0;		   //makes 0.0 to 5.0 Volt out of it, with VagCom this could be maped to gr Air i think
+//	data.calThrottle = data.anaIn[THROTTLEPIN];
+	data.calThrottle = map(data.anaIn[THROTTLEPIN], THROTTLE_VR6_8BIT_MIN, THROTTLE_VR6_8BIT_MAX, 0, 100);
+	data.calThrottle = constrain(data.calThrottle, 0, 100);
+#endif
+
 #endif
 
 #if defined(DIGIFANT) && defined(DIGIFANT_DK_POTI)
@@ -686,7 +698,11 @@ Zeitronix: (v*2)+9.6
 
 #ifdef VR6_MOTRONIC
 	//LMM
-	data.calLMM = 5.0*data.anaIn[LMMPIN]/4095.0;		   //makes 0.0 to 5.0 Volt out of it, with VagCom this could be maped to gr Air i think
+//	data.calLMM = map(data.anaIn[LMMPIN], THROTTLE_VR6_8BIT_MIN, THROTTLE_VR6_8BIT_MAX, 0, 100);
+//	data.calLMM = constrain(data.calLMM, 0, 100);
+//	data.calLMM = data.anaIn[LMMPIN];
+
+    data.calLMM = 5.0*data.anaIn[LMMPIN]/4095.0;		   //makes 0.0 to 5.0 Volt out of it, with VagCom this could be maped to gr Air i think
 	if ( data.calLMM >= data.maxValues[MAXVAL_LMM].lmm ) {
 		data.saveMax(MAXVAL_LMM);
 	}
@@ -701,6 +717,9 @@ Zeitronix: (v*2)+9.6
 	//TODO more smoothing below 1000 rpm
 	data.rpmTotal -= data.rpmReadings[data.rpmIndex];               // subtract the last reading
 	data.rpmReadings[data.rpmIndex] = data.anaIn[RPMPIN];           // read from the sensor
+	//debug TEST
+//	data.calThrottle = data.anaIn[RPMPIN];
+
 	data.rpmTotal += data.rpmReadings[data.rpmIndex];               // add the reading to the total
 	data.rpmIndex = (data.rpmIndex + 1);                       // advance to the next index
 
@@ -1942,6 +1961,12 @@ void MultidisplayController::mainLoop() {
 #ifdef V2DEVDEBUG
 	}
 #endif
+//	//N75 TEST
+//	if ( digitalRead(NORDSCHLEIFENPIN ) )
+//		boostController.boostOutput = 200;
+//	else
+//		boostController.boostOutput = 50;
+
 	analogWrite(N75PIN, (int) boostController.boostOutput);
 //	analogWrite(FREEPWM2, (int) boostController.boostOutput);
 #endif

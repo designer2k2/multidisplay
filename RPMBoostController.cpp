@@ -64,6 +64,12 @@ void RPMBoostController::toggleMode (uint8_t nmode) {
 	}
 }
 
+//void RPMBoostController::test (uint8_t nmode) {
+//	if ( nmode > 1 )
+//		boostOutput = 200;
+//	else
+//		boostOutput = 0;
+//}
 
 void RPMBoostController::compute () {
 	uint8_t gear_index = constrain (data.gear - 1, 0, GEARS-1);

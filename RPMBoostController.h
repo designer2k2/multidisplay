@@ -53,6 +53,8 @@ public:
 	void toggleMode (uint8_t nmode);
 	void compute ();
 
+//	void test (uint8_t nmode);
+
 	uint8_t mode;
 	Map16x1* highboost_duty_cycle[GEARS];
 	Map16x1Double* highboost_pid_boost[GEARS];
