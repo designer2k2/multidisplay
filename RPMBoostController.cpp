@@ -166,6 +166,19 @@ void RPMBoostController::compute () {
 	}
 #endif
 
+#ifdef BOOST_EGT_PROTECTION
+	//protection against too high egt
+	if ( data.getMaxEgt() > BOOST_MAX_EGT_CRITICAL ) {
+		//TODO log this event!
+		boostOutput = 0;
+		pidBoostOutput = boostOutput;
+	} else 	if ( data.getMaxEgt() > BOOST_MAX_EGT_YELLOW ) {
+		//TODO log this event!
+		boostOutput = boostOutput * 0.75;
+		pidBoostOutput = boostOutput;
+	}
+#endif
+
 }
 
 void RPMBoostController::serialSendDutyMap ( uint8_t gear, uint8_t mode, uint8_t serial ) {

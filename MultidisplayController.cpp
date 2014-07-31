@@ -1976,13 +1976,13 @@ void MultidisplayController::mainLoop() {
 		DF_KlineSerialTime += DF_KLINESERIALFREQ;
 		DFKlineSerialReceive();
 
-#if defined(DEV_INTERNAL_TEST_MODE)
-		if ( df_kline_last_frame_completely_received = 255 )
-			df_kline_last_frame_completely_received=0;
-		df_klineData[df_kline_last_frame_completely_received].asBytes[31] = 0xEA;
-		df_klineData[df_kline_last_frame_completely_received].asBytes[32] = 0x60;
-		DFConvertReceivedData();
-#endif
+//#if defined(DEV_INTERNAL_TEST_MODE)
+//		if ( df_kline_last_frame_completely_received = 255 )
+//			df_kline_last_frame_completely_received=0;
+//		df_klineData[df_kline_last_frame_completely_received].asBytes[31] = 0xEA;
+//		df_klineData[df_kline_last_frame_completely_received].asBytes[32] = 0x60;
+//		DFConvertReceivedData();
+//#endif
 
 	}
 #endif
@@ -2378,14 +2378,10 @@ void MultidisplayController::DFConvertReceivedData() {
 
 #ifdef USE_DIGIFANT_RPM
 	//anstatt 9 $4F und 18 $AD
-	uint32_t df_delta_hall = (df_klineData[df_kline_last_frame_completely_received].asBytes[31]<<8) + df_klineData[df_kline_last_frame_completely_received].asBytes[32];
-#if defined(DEV_INTERNAL_TEST_MODE)
-	data.speed = df_delta_hall;
-#endif
+	uint16_t df_delta_hall = (df_klineData[df_kline_last_frame_completely_received].asBytes[31]<<8) + df_klineData[df_kline_last_frame_completely_received].asBytes[32];
 
 	if ( df_delta_hall > 0 ) {
-		uint32_t tmp = (uint32_t) ( ((uint32_t) 30000000) / (uint32_t) df_delta_hall );
-		data.calRPM = (int) tmp;
+		data.calRPM = (int) ( 30000000  / df_delta_hall );
 	} else {
 		data.calRPM = 0;
 	}
