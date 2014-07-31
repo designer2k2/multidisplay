@@ -34,10 +34,10 @@
 #define DIGIFANT
 
 #if defined VR6_MOTRONIC
-#include "MultiDisplayDefinesVR6.h"
+#include "MultidisplayDefinesVR6.h"
 #endif
 #if defined DIGIFANT
-#include "MultiDisplayDefinesDigifant.h"
+#include "MultidisplayDefinesDigifant.h"
 #endif
 
 
