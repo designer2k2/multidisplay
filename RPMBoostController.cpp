@@ -170,7 +170,7 @@ void RPMBoostController::compute () {
 	//protection against too high egt
 	if ( data.getMaxEgt() > BOOST_MAX_EGT_CRITICAL ) {
 		//TODO log this event!
-		boostOutput = 0;
+		boostOutput = boostOutput * 0.5;
 		pidBoostOutput = boostOutput;
 	} else 	if ( data.getMaxEgt() > BOOST_MAX_EGT_YELLOW ) {
 		//TODO log this event!
