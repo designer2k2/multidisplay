@@ -232,8 +232,13 @@
 #define MAX_TYPE_K 1200                //over that will be seen as Open.
 
 
-#define EXPANDER B0100001       // Address with 2 address pins grounded. (from the PCF8574)
-#define EXPANDER2 B0100000      // Address with three address pins grounded. (from the PCF8574)
+// PCF8574 on old V1-md01 board. not used anymore on v2-md01
+#define EXPANDER B0100001       // Address with 2 address pins grounded.
+
+// PCF8574 on md02
+#define EXPANDER2 B0100000      // Address with three address pins grounded.
+// PCF8574A on md02
+//#define EXPANDER2 B0111000     // Address with three address pins grounded.
 
 #define DEBUGRPM 10
 

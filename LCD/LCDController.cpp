@@ -873,8 +873,8 @@ void LCDController::screen3_draw() {
 
 	//Get the Data:
 	int d = 0;
-	d = map(ScopeVal, scopeMin, scopeMax, 0, 33);
-	d = constrain(d, 0, 32);
+//	d = map(ScopeVal, scopeMin, scopeMax, 0, 33);
+//	d = constrain(d, 0, 32);
 
 	//Show only the rightmost bar: (live screen)
 	drawVertBar(d,19);
