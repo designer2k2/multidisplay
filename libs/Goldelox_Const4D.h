@@ -611,7 +611,7 @@
 #define PAPAYAWHIP              0xFF7A
 #define PEACHPUFF               0xFED7
 #define PERU                    0xCC27
-#define PINK4D                  0xFE19
+#define PINK2                   0xFE19
 #define PLUM                    0xDD1B
 #define POWDERBLUE              0xB71C
 #define PURPLE                  0x8010

@@ -20,8 +20,6 @@
 #ifndef OLEDCONTROLLER_H_
 #define OLEDCONTROLLER_H_
 
-#include <libs/Serial_LCD/Serial_LCD.h>
-#include <libs/Serial_LCD/proxySerial.h>
 
 #include <libs/Goldelox_Serial_4DLib.h>
 
@@ -36,7 +34,6 @@ public:
 
 	void init ();
 	void draw ();
-	void sendDebugData();
 
 	void toggleScreen ();
 	void setActiveScreen (uint8_t as);
@@ -44,9 +41,6 @@ public:
 	uint8_t activeScreen;
 	uint8_t brightness;
 
-	ProxySerial *ps;
-	Serial_LCD *display;
-//	Goldelox_Serial_4DLib display;
 };
 
 extern Goldelox_Serial_4DLib display;

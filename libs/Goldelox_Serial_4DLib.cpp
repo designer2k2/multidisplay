@@ -3,6 +3,7 @@
  */
 
 #include "Goldelox_Serial_4DLib.h"
+#include <stddef.h>
 
 #if (ARDUINO >= 100)
 	#include "Arduino.h" // for Arduino 1.0
@@ -230,7 +231,7 @@ void Goldelox_Serial_4DLib::SetThisBaudrate(int Newrate)
 //      break ;
     case BAUD_19200  : br = 19200 ;
       break ;
-    case BAUD_31250  : br = 31250 ;
+ /*   case BAUD_31250  : br = 31250 ;
       break ;
     case BAUD_38400  : br = 38400 ;
       break ;
@@ -251,7 +252,7 @@ void Goldelox_Serial_4DLib::SetThisBaudrate(int Newrate)
     case BAUD_500000 : br = 562500 ; // actual rate is not  500000 ;
       break ;
     case BAUD_600000 : br = 703125 ; // actual rate is not  600000 ;
-      break ;
+      break ;*/
   }
 //  _virtualPort->begin(br) ;
   delay(50) ; // Display sleeps for 100
@@ -901,14 +902,6 @@ void Goldelox_Serial_4DLib::blitComtoDisplay(word  X, word  Y, word  Width, word
   _virtualPort->print((char)(Height)) ;
   WriteBytes(Pixels, Width*Height*2) ;
   GetAck() ;
-}
-
-void Goldelox_Serial_4DLib::setDisplayBaud(word  Newrate)
-{
-  _virtualPort->print((char)(F_setbaudWait >> 8)) ;
-  _virtualPort->print((char)(F_setbaudWait)) ;
-  _virtualPort->print((char)(Newrate >> 8)) ;
-  _virtualPort->print((char)(Newrate)) ;
 }
 
 void Goldelox_Serial_4DLib::setbaudWait(word  Newrate)

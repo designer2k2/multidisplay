@@ -62,9 +62,7 @@ class Goldelox_Serial_4DLib
 		void pokeB(word  Address, word  ByteValue) ;
 		void pokeW(word  Address, word  wordValue) ;
 		void putCH(word  wordChar) ;
-		//! dont use it!
 		void setbaudWait(word  Newrate) ;
-		void setDisplayBaud(word  Newrate) ;
 		void SSMode(word  Parm) ;
 		void SSSpeed(word  Speed) ;
 		void SSTimeout(word  Seconds) ;

@@ -21,8 +21,6 @@
 #include "OledController.h"
 #include "MultidisplayDefines.h"
 
-#include <libs/Serial_LCD/proxySerial.h>
-#include <libs/Serial_LCD/Serial_LCD.h>
 #include <Arduino.h>
 
 Goldelox_Serial_4DLib display(&Serial3);
@@ -48,19 +46,7 @@ void OledController::reset () {
 }
 
 void OledController::myconstructor () {
-	ps = new ProxySerial(&Serial3);
-	display = new Serial_LCD(ps);
-	Serial3.begin(9600);
-	display->begin(OLED_RESET_PIN);
 
-	// Serial port speed up
-	display->setSpeed(115200);
-	Serial3.begin(115200);
-
-	display->clear();
-	display->tText(0,0,"Hello World");
-
-	sendDebugData();
 
 //	Serial3.print('U');    // connect
 //	while (Serial3.read()!=0x06)  {
@@ -135,10 +121,3 @@ void OledController::callback(int ErrCode, unsigned char ErrByte) {
 		Serial.println(F("")) ;
 }
 
-void OledController::sendDebugData() {
-	display->checkScreenType();
-	display->checkControllerType();
-	display->checkHardwareVersion();
-	display->checkSoftwareVersion();
-	Serial.print ( display->WhoAmI() );
-}
