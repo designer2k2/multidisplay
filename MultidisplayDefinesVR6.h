@@ -25,8 +25,8 @@
 #define MULTIDISPLAYDEFINESVR6_H_
 
 /* ECU config file for VR6 motronic */
-#define VR6_MOTRONIC_M2X
-//#define VR6_MOTRONIC_M381
+//#define VR6_MOTRONIC_M2X
+#define VR6_MOTRONIC_M381
 
 /* =============== KLINE (unstable, currently under development) ==================== */
 //#define KWP1281_KLINE
@@ -62,7 +62,7 @@
 //#define SPEEDCORRECTIONFACTOR 1
 
 /* ===============  Type K EGT ==================== */
-#define NUMBER_OF_ATTACHED_TYPE_K 5   //how many TypK`s are attached
+#define NUMBER_OF_ATTACHED_TYPE_K 7   //how many TypK`s are attached
 
 
 

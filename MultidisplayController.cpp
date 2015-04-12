@@ -652,7 +652,7 @@ Zeitronix: (v*2)+9.6
 	//Throttle:
 #ifdef VR6_MOTRONIC_M381
 	//VR6 16Bit has 5V for closed and 0V for open throttle...
-	data.calThrottle = map(data.anaIn[THROTTLEPIN], THROTTLE_VR6_MIN, THROTTLE_VR6_MAX, 0, 100);
+	data.calThrottle = map(data.anaIn[THROTTLEPIN], THROTTLE_VR6_16BIT_MIN, THROTTLE_VR6_16BIT_MAX, 0, 100);
 	data.calThrottle = constrain(data.calThrottle, 0, 100);
 	data.calThrottle = 100 - data.calThrottle;
 #endif
