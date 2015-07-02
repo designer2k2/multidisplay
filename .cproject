@@ -42,7 +42,7 @@
 								<option id="de.innot.avreclipse.cppcompiler.option.debug.level.392010736" name="Generate Debugging Info" superClass="de.innot.avreclipse.cppcompiler.option.debug.level" value="de.innot.avreclipse.cppcompiler.option.debug.level.g2" valueType="enumerated"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.2095707913" name="Optimization Level" superClass="de.innot.avreclipse.cppcompiler.option.optimize" value="de.innot.avreclipse.cppcompiler.optimize.none" valueType="enumerated"/>
 								<option id="de.innot.avreclipse.cppcompiler.option.incpath.642053631" name="Include Paths (-I)" superClass="de.innot.avreclipse.cppcompiler.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arduinoDuemilanoveCore}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multidisplay-lib}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/avr/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multidisplay}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multidisplay/LCD}&quot;"/>
@@ -55,7 +55,7 @@
 							<tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.2008525991" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug"/>
 							<tool command="avr-g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="de.innot.avreclipse.tool.cpplinker.app.debug.363101363" name="AVR C++ Linker" superClass="de.innot.avreclipse.tool.cpplinker.app.debug">
 								<option id="de.innot.avreclipse.cpplinker.option.libpath.638252020" name="Libraries Path (-L)" superClass="de.innot.avreclipse.cpplinker.option.libpath" valueType="stringList">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arduinoDuemilanoveCore/Release}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multidisplay-lib/Release}&quot;"/>
 								</option>
 								<option id="de.innot.avreclipse.cpplinker.option.libs.29111790" name="Libraries (-l)" superClass="de.innot.avreclipse.cpplinker.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="arduinocore"/>
